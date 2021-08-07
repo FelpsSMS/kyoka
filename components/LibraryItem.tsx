@@ -1,6 +1,16 @@
 import { motion } from "framer-motion";
+import { useRouter } from "next/router";
 
-export default function LibraryItem({ title, numberOfCards }) {
+export default function LibraryItem({ title, numberOfCards, id }) {
+  const router = useRouter();
+
+  function handleClick(id: string) {
+    router.push({
+      pathname: `decks/[deckId]`,
+      query: { deckId: id },
+    });
+  }
+
   return (
     <motion.div
       className="bg-white flex flex-col text-black shadow-lg w-4/5 rounded-lg 
@@ -9,6 +19,9 @@ export default function LibraryItem({ title, numberOfCards }) {
       initial={{ height: 0, opacity: 0 }}
       animate={{ height: "13rem", opacity: 1 }}
       transition={{ duration: 0.2 }}
+      onClick={() => {
+        handleClick(id);
+      }}
     >
       <div className="flex flex-col items-center">
         <p className="font-bold text-4xl">{title}</p>
