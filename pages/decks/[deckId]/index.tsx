@@ -1,6 +1,9 @@
 import { useRouter } from "next/router";
 import React from "react";
+import CardTable from "../../../components/CardTable";
 import Container from "../../../components/Container";
+import DeckNavbar from "../../../components/DeckNavbar";
+import Footer from "../../../components/Footer";
 import Navbar from "../../../components/Navbar";
 import { NewCardForm } from "../../../components/NewCardForm";
 
@@ -10,19 +13,14 @@ export default function index() {
 
   const { deckId } = router.query;
 
-  function handleClick(id: any) {
-    router.push({
-      pathname: `[deckId]/create_card`,
-      query: { deckId: id },
-    });
-  }
-
   return (
     <div className="">
       <Navbar />
+      <DeckNavbar deckId={deckId} />
       <Container>
-        <button onClick={() => handleClick(deckId)}>Create card page</button>
+        <CardTable />
       </Container>
+      <Footer />
     </div>
   );
 }

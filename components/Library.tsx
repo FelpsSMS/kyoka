@@ -28,8 +28,9 @@ export default function Library() {
 
   return (
     <div
-      className="grid grid-cols-1 gap-y-4 justify-items-center items-center grid-wrap h-full overflow-auto 
-    sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
+      className="grid grid-cols-1 grid-wrap
+    sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 
+    gap-8"
     >
       {library.map((item, i) => {
         return (

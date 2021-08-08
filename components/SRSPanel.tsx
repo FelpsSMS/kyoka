@@ -10,10 +10,10 @@ function SRSPanel() {
 
   return (
     <motion.div
-      className="bg-white flex justify-center items-center w-full h-full sm:shadow-lg sm:rounded-lg sm:w-4/5 sm:h-4/5"
+      className="bg-white flex h-screen w-screen items-center justify-center sm:rounded-lg sm:shadow-lg sm:my-8 sm:mx-8 md:my-8 md:mx-16 lg:my-16 lg:mx-32"
       initial={{ height: 0, opacity: 0 }}
       animate={{ height: animationHeight, opacity: 1 }}
-      transition={{ duration: 0.4 }}
+      transition={{ duration: 0.2 }}
     >
       <p className="text-2xl">SRS Panel</p>
     </motion.div>

@@ -9,7 +9,7 @@ export default function Home() {
   return (
     <div
       id="container"
-      className="flex flex-col h-screen w-screen justify-between"
+      // className="flex flex-col h-screen w-screen justify-between"
     >
       <Head>
         <title>Kyoka</title>
@@ -21,7 +21,7 @@ export default function Home() {
       <Navbar />
 
       {/* Container */}
-      <div className="flex flex-col justify-center items-center flex-grow">
+      <div className="flex justify-center items-center min-h-screen">
         {/* SRS Panel */}
         <SRSPanel />
       </div>

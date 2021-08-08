@@ -1,4 +1,5 @@
 import Container from "../../../components/Container";
+import Footer from "../../../components/Footer";
 import Navbar from "../../../components/Navbar";
 import { NewCardForm } from "../../../components/NewCardForm";
 
@@ -9,6 +10,7 @@ function create_card({ deckId }) {
       <Container>
         <NewCardForm deckId={deckId} />
       </Container>
+      <Footer />
     </div>
   );
 }

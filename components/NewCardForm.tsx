@@ -44,7 +44,7 @@ export const NewCardForm = ({ deckId }) => {
     >
       {(formik) => (
         <Form
-          className="bg-white flex flex-col justify-center items-center w-full space-y-8 
+          className="bg-white flex flex-col justify-center items-center sm:my-8 space-y-8 w-full
         sm:shadow-lg sm:rounded-lg sm:w-4/5 sm:items-start sm:justify-start p-4
         whitespace-nowrap"
         >
@@ -88,37 +88,42 @@ export const NewCardForm = ({ deckId }) => {
 
             <label className="font-normal text-xl">Imagens</label>
 
-            <div className="flex space-x-4">
-              <ImageDropzone
-                name="image1"
-                fileExchange={(image) => {
-                  formik.setFieldValue("image1Holder", image);
-                }}
-              />
+            <input type="file" name="image1Holder" hidden />
+            <input type="file" name="image2Holder" hidden />
+            <input type="file" name="image3Holder" hidden />
+            <input type="file" name="image4Holder" hidden />
 
-              <input type="file" name="image1Holder" hidden />
-              <input type="file" name="image2Holder" hidden />
-              <input type="file" name="image3Holder" hidden />
-              <input type="file" name="image4Holder" hidden />
+            <div className="flex flex-wrap flex-col space-y-4 xs:space-x-4 xs:space-y-0 xs:flex-row">
+              <div className="flex space-x-4 xs:space-x-4">
+                <ImageDropzone
+                  name="image1"
+                  fileExchange={(image) => {
+                    formik.setFieldValue("image1Holder", image);
+                  }}
+                />
 
-              <ImageDropzone
-                name="image2"
-                fileExchange={(image) => {
-                  formik.setFieldValue("image2Holder", image);
-                }}
-              />
-              <ImageDropzone
-                name="image3"
-                fileExchange={(image) => {
-                  formik.setFieldValue("image3Holder", image);
-                }}
-              />
-              <ImageDropzone
-                name="image4"
-                fileExchange={(image) => {
-                  formik.setFieldValue("image4Holder", image);
-                }}
-              />
+                <ImageDropzone
+                  name="image2"
+                  fileExchange={(image) => {
+                    formik.setFieldValue("image2Holder", image);
+                  }}
+                />
+              </div>
+
+              <div className="flex space-x-4 xs:space-x-4">
+                <ImageDropzone
+                  name="image3"
+                  fileExchange={(image) => {
+                    formik.setFieldValue("image3Holder", image);
+                  }}
+                />
+                <ImageDropzone
+                  name="image4"
+                  fileExchange={(image) => {
+                    formik.setFieldValue("image4Holder", image);
+                  }}
+                />
+              </div>
             </div>
 
             <TextField
@@ -130,11 +135,7 @@ export const NewCardForm = ({ deckId }) => {
             <TextArea label="Observações" name="notes" type="text" />
           </div>
 
-          <button
-            className="bg-gray-900 text-white p-2 px-16 rounded-sm text-xl font-bold focus:text-gray-200 
-            focus:bg-black hover:text-gray-200 hover:bg-black outline-none"
-            type="submit"
-          >
+          <button className="confirmation-button" type="submit">
             Criar
           </button>
         </Form>

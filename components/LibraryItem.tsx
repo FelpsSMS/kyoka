@@ -13,18 +13,20 @@ export default function LibraryItem({ title, numberOfCards, id }) {
 
   return (
     <motion.div
-      className="bg-white flex flex-col text-black shadow-lg w-4/5 rounded-lg 
-        justify-center items-center max-w-xs hover:cursor-pointer"
+      className="bg-white flex flex-col text-black shadow-lg rounded-lg 
+        justify-center items-center hover:cursor-pointer py-16 "
       whileHover={{ scale: 1.1 }}
       initial={{ height: 0, opacity: 0 }}
-      animate={{ height: "13rem", opacity: 1 }}
+      animate={{ height: "100%", opacity: 1 }}
       transition={{ duration: 0.2 }}
       onClick={() => {
         handleClick(id);
       }}
     >
       <div className="flex flex-col items-center">
-        <p className="font-bold text-4xl">{title}</p>
+        <p className="font-bold text-4xl break-all whitespace-normal">
+          {title}
+        </p>
         <p className="text-2xl font-thin">{numberOfCards} cartas</p>
       </div>
       {/*       <motion.button
