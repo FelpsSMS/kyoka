@@ -1,9 +1,28 @@
+import { useState } from "react";
+
 function CardTable() {
-  function populateTable() {}
+  const [cardId, setCardId] = useState("");
+  const [showCard, setShowCard] = useState(false);
+
+  function getCard(id) {
+    setCardId(id);
+
+    setShowCard(!showCard);
+  }
+
+  function populateTable() {
+    //To do here
+    //Figure out how to populate the table dynamically
+    //Make a sliding animation for the card details
+  }
 
   return (
     <div className="h-screen">
-      <div className="border-2 rounded-lg m-8">
+      <div
+        className={`border-2  flex flex-col ${
+          showCard ? "mx-8 mt-8 rounded-t-lg" : "m-8 rounded-lg"
+        }`}
+      >
         <table className="table-fixed w-full text-right border-collapse">
           <tr className="text-center">
             <th className="p-2 w-14 text-white bg-black text-xl border-r-2 rounded-tl-lg">
@@ -21,7 +40,7 @@ function CardTable() {
             </th>
           </tr>
 
-          <tr onClick={() => console.log("teste")}>
+          <tr onClick={() => getCard("9999")}>
             <td className="p-2 border-r-2 border-t-2">9999</td>
             <td className="p-2 border-r-2 border-t-2 whitespace-nowrap truncate">
               Lorem ipsum dolor, sit amet consectetur adipisicing elit. Corporis
@@ -48,7 +67,7 @@ function CardTable() {
             </td>
           </tr>
 
-          <tr>
+          <tr className={showCard && "hidden"}>
             <td className="p-2 border-r-2 border-t-2">teste</td>
             <td className="p-2 border-r-2 border-t-2">teste</td>
             <td className="p-2 border-r-2 border-t-2 hidden xs:table-cell">
@@ -62,6 +81,23 @@ function CardTable() {
             </td>
           </tr>
         </table>
+      </div>
+      <div
+        className={`border-r-2 border-l-2 border-b-2 rounded-b-lg mx-8 flex flex-col p-2 ${
+          !showCard && "hidden"
+        }`}
+      >
+        Lorem ipsum dolor sit amet consectetur adipisicing elit. Accusamus eius
+        animi aliquid accusantium? Iste molestiae fuga esse excepturi, odio
+        cumque dignissimos praesentium omnis, debitis fugit earum odit mollitia,
+        enim architecto aperiam laboriosam in quam vel. Ut error, alias quam
+        culpa distinctio adipisci dolorem debitis expedita voluptas saepe at
+        voluptate laboriosam quidem aliquid explicabo a impedit magnam. Nam
+        voluptatum ad, ex officiis earum corrupti iure tempora, exercitationem
+        aut, quo quasi veritatis ea aperiam? Impedit ex dolore saepe ratione
+        nostrum, animi est doloremque unde aspernatur. Asperiores unde amet
+        libero. Iste reiciendis accusantium labore at similique, sed praesentium
+        quisquam quae numquam aliquam. Non?
       </div>
     </div>
   );
