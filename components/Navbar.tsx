@@ -5,7 +5,7 @@ import navbarElements from "../utils/navbarElements";
 
 export default function Navbar() {
   return (
-    <div className="">
+    <nav>
       <div
         className="hidden sm:flex sm:items-center sm:content-around sm:justify-center sm:space-x-2 sm:font-thin 
       bg-black whitespace-nowrap md:justify-end md:space-x-4 md:font-normal lg:text-lg lg:space-x-6"
@@ -17,6 +17,6 @@ export default function Navbar() {
       <div className="flex justify-center items-center bg-black sm:hidden">
         <HamburgerMenu />
       </div>
-    </div>
+    </nav>
   );
 }

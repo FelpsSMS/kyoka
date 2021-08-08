@@ -1,5 +1,4 @@
 import { useField } from "formik";
-import Image from "next/image";
 import React, { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { UploadIcon } from "@heroicons/react/outline";
@@ -50,12 +49,11 @@ export default function AudioDropzone(props) {
       checkFile(file);
     });
   }, []);
-  const { getRootProps, getInputProps, isDragActive, isDragReject } =
-    useDropzone({
-      accept: "audio/*",
-      maxSize: 5242880, //5MB
-      onDrop,
-    });
+  const { getRootProps, getInputProps } = useDropzone({
+    accept: "audio/*",
+    maxSize: 5242880, //5MB
+    onDrop,
+  });
 
   return (
     <div className="flex flex-col whitespace-nowrap relative space-y-4">

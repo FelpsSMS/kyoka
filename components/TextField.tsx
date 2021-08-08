@@ -23,9 +23,9 @@ export const TextField = (props) => {
         {...props}
       />
       <ErrorMessage
-        component="div"
+        component="p"
         name={field.name}
-        className="text-red-700"
+        className="text-red-700 break-words whitespace-normal mt-2"
       />
     </div>
   );

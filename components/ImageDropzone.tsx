@@ -52,12 +52,11 @@ export default function ImageDropzone(props) {
       checkFile(file);
     });
   }, []);
-  const { getRootProps, getInputProps, isDragActive, isDragReject } =
-    useDropzone({
-      accept: "image/*",
-      maxSize: 5242880, //5MB
-      onDrop,
-    });
+  const { getRootProps, getInputProps } = useDropzone({
+    accept: "image/*",
+    maxSize: 5242880, //5MB
+    onDrop,
+  });
 
   return (
     <div className="flex flex-col whitespace-nowrap relative">
