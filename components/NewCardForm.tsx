@@ -5,6 +5,7 @@ import { TextArea } from "./TextArea";
 import React from "react";
 import ImageDropzone from "./ImageDropzone";
 import AudioDropzone from "./AudioDropzone";
+import axios from "axios";
 
 export const NewCardForm = ({ deckId }) => {
   const validate = Yup.object({
@@ -14,8 +15,49 @@ export const NewCardForm = ({ deckId }) => {
   });
 
   function sendToServer(values) {
-    console.log(values);
-    console.log(deckId);
+    const files = { sentenceAudio: "", focusAudio: "" };
+
+    if (values.sentenceAudioHolder.name !== "") {
+      files["sentenceAudio"] = values.sentenceAudioHolder;
+    }
+
+    if (values.focusAudioHolder.name !== "") {
+      files["focusAudio"] = values.focusAudioHolder;
+    }
+
+    const images = [
+      values.image1Holder,
+      values.image2Holder,
+      values.image3Holder,
+      values.image4Holder,
+    ];
+
+    files["images"] = images.filter((image) => {
+      return image !== "";
+    });
+
+    const config = { headers: { "Content-Type": "multipart/form-data" } };
+    let fd = new FormData();
+
+    files["images"].map((image) => {
+      fd.append("images", image);
+    });
+
+    fd.append("sentence_audio", files["sentenceAudio"]);
+    fd.append("focus_audio", files["focusAudio"]);
+
+    fd.append("deck", deckId);
+    fd.append("sentence", values.sentence);
+    fd.append("focus", values.focus);
+    fd.append("bilingualDescription", values.bilingualDescription);
+    fd.append("monolingualDescription", values.monolingualDescription);
+
+    axios
+      .post("http://localhost:3001/cards/", fd, config)
+      .then()
+      .catch((err) => {
+        console.log(err);
+      });
   }
   return (
     <Formik

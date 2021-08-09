@@ -1,9 +1,14 @@
+import { useRouter } from "next/router";
 import Container from "../../../components/Container";
 import Footer from "../../../components/Footer";
 import Navbar from "../../../components/Navbar";
 import { NewCardForm } from "../../../components/NewCardForm";
 
-function create_card({ deckId }) {
+function create_card() {
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const router = useRouter();
+  const { deckId } = router.query;
+
   return (
     <div className="">
       <Navbar />
