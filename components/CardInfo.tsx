@@ -2,7 +2,6 @@ import { motion } from "framer-motion";
 import { CardInfoUpdateForm } from "./CardInfoUpdateForm";
 
 function CardInfo({ cardDetails: card }) {
-  console.log(card);
   return (
     <motion.div
       className="bg-white border-2"
@@ -11,7 +10,7 @@ function CardInfo({ cardDetails: card }) {
       transition={{ duration: 0.4 }}
       exit={{ opacity: 0, y: -50 }}
     >
-      <CardInfoUpdateForm deckId={card.deckId} />
+      <CardInfoUpdateForm cardDetails={card} />
     </motion.div>
   );
 }

@@ -7,7 +7,8 @@ import ImageDropzone from "./ImageDropzone";
 import AudioDropzone from "./AudioDropzone";
 import axios from "axios";
 
-export const CardInfoUpdateForm = ({ deckId }) => {
+export const CardInfoUpdateForm = ({ cardDetails: card }) => {
+  console.log(card);
   const validate = Yup.object({
     focus: Yup.string().required(
       "Por favor, adicione um foco. Isso pode ser uma palavra ou expressão"
@@ -32,28 +33,47 @@ export const CardInfoUpdateForm = ({ deckId }) => {
       values.image4Holder,
     ];
 
-    files["images"] = images.filter((image) => {
-      return image !== "";
+    files["images"] = images.map((image, i) => {
+      return image === "" && card.images[i] ? card.images[i] : image;
     });
+
+    console.log(files["images"]);
 
     const config = { headers: { "Content-Type": "multipart/form-data" } };
     let fd = new FormData();
 
     files["images"].map((image) => {
-      fd.append("images", image);
+      if (typeof image.name == "string") {
+        fd.append("images", image);
+      } else {
+        fd.append("imageStrings", image);
+      }
     });
 
     fd.append("sentence_audio", files["sentenceAudio"]);
     fd.append("focus_audio", files["focusAudio"]);
 
-    fd.append("deck", deckId);
+    fd.append("deck", card.deckId);
     fd.append("sentence", values.sentence);
     fd.append("focus", values.focus);
     fd.append("bilingualDescription", values.bilingualDescription);
     fd.append("monolingualDescription", values.monolingualDescription);
+    fd.append("translation", values.translation);
+    fd.append("notes", values.notes);
+
+    fd.append("dateAdded", card.dateAdded);
+    fd.append("dateDue", card.dateDue);
+    fd.append("lapses", card.lapses);
+
+    console.log(fd.get("images"));
+    console.log(fd.get("imageStrings"));
 
     axios
-      .post(`${process.env.NEXT_PUBLIC_API_ENDPOINT}/cards/`, fd, config)
+      .patch(
+        `${process.env.NEXT_PUBLIC_API_ENDPOINT}/cards/${card.id}`,
+        fd,
+        config
+      )
       .then()
       .catch((err) => {
         console.log(err);
@@ -62,20 +82,22 @@ export const CardInfoUpdateForm = ({ deckId }) => {
   return (
     <Formik
       initialValues={{
-        sentence: "",
-        focus: "",
-        bilingualDescription: "",
-        monolingualDescription: "",
-        sentenceAudio: "",
+        sentence: card.sentence,
+        focus: card.focus,
+        bilingualDescription: card.bilingualDescription,
+        monolingualDescription: card.monolingualDescription,
+        sentenceAudio: card.sentenceAudio.name,
         sentenceAudioHolder: { name: "" },
-        focusAudio: "",
+        //card.sentenceAudio === [] ? { name: "" } : card.sentenceAudio,
+        focusAudio: card.focusAudio.name,
         focusAudioHolder: { name: "" },
-        image1: "",
-        image2: "",
-        image3: "",
-        image4: "",
-        translation: "",
-        notes: "",
+        //card.focusAudio === [] ? { name: "" } : card.focusAudio,
+        image1: card.images[0],
+        image2: card.images[1],
+        image3: card.images[2],
+        image4: card.images[3],
+        translation: card.translation ?? "",
+        notes: card.notes ?? "",
         image1Holder: "",
         image2Holder: "",
         image3Holder: "",
@@ -103,6 +125,7 @@ export const CardInfoUpdateForm = ({ deckId }) => {
             <AudioDropzone
               label="Áudio da frase"
               name="sentenceAudio"
+              webSource={card.sentenceAudio}
               fileExchange={(audio) => {
                 formik.setFieldValue("sentenceAudioHolder", audio);
               }}
@@ -115,6 +138,7 @@ export const CardInfoUpdateForm = ({ deckId }) => {
             <AudioDropzone
               label="Áudio do foco"
               name="focusAudio"
+              webSource={card.focusAudio}
               fileExchange={(audio) => {
                 formik.setFieldValue("focusAudioHolder", audio);
               }}
@@ -133,6 +157,7 @@ export const CardInfoUpdateForm = ({ deckId }) => {
               <div className="flex space-x-4 xs:space-x-4">
                 <ImageDropzone
                   name="image1"
+                  webSource={card.images[0]}
                   fileExchange={(image) => {
                     formik.setFieldValue("image1Holder", image);
                   }}
@@ -140,6 +165,7 @@ export const CardInfoUpdateForm = ({ deckId }) => {
 
                 <ImageDropzone
                   name="image2"
+                  webSource={card.images[1]}
                   fileExchange={(image) => {
                     formik.setFieldValue("image2Holder", image);
                   }}
@@ -149,12 +175,14 @@ export const CardInfoUpdateForm = ({ deckId }) => {
               <div className="flex space-x-4 xs:space-x-4">
                 <ImageDropzone
                   name="image3"
+                  webSource={card.images[2]}
                   fileExchange={(image) => {
                     formik.setFieldValue("image3Holder", image);
                   }}
                 />
                 <ImageDropzone
                   name="image4"
+                  webSource={card.images[3]}
                   fileExchange={(image) => {
                     formik.setFieldValue("image4Holder", image);
                   }}

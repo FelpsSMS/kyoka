@@ -5,7 +5,7 @@ import { useDropzone } from "react-dropzone";
 
 export default function ImageDropzone(props) {
   const [field, meta, helpers] = useField(props);
-  const [imageContentURL, setImageContentURL] = useState("");
+  const [imageContentURL, setImageContentURL] = useState(props.webSource ?? "");
   const [rejectFile, setRejectFile] = useState(false);
   const [rejectFileSize, setRejectFileSize] = useState(false);
 
@@ -58,9 +58,9 @@ export default function ImageDropzone(props) {
   });
 
   return (
-    <div className="flex flex-col whitespace-nowrap relative">
+    <div className="relative flex flex-col whitespace-nowrap">
       <div
-        className="bg-gray-200 h-16 w-16 hover:cursor-pointer rounded-lg scale-105 hover:scale-110"
+        className="w-16 h-16 scale-105 bg-gray-200 rounded-lg hover:cursor-pointer hover:scale-110"
         {...getRootProps()}
       >
         {imageContentURL && (

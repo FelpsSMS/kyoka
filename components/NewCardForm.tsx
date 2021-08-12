@@ -51,6 +51,8 @@ export const NewCardForm = ({ deckId }) => {
     fd.append("focus", values.focus);
     fd.append("bilingualDescription", values.bilingualDescription);
     fd.append("monolingualDescription", values.monolingualDescription);
+    fd.append("translation", values.translation);
+    fd.append("notes", values.notes);
 
     axios
       .post(`${process.env.NEXT_PUBLIC_API_ENDPOINT}/cards/`, fd, config)

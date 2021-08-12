@@ -1,13 +1,15 @@
 import { useField } from "formik";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { UploadIcon } from "@heroicons/react/outline";
 
 export default function AudioDropzone(props) {
   const [field, meta, helpers] = useField(props);
-  const [audioContentURL, setAudioContentURL] = useState("");
+  const [audioContentURL, setAudioContentURL] = useState(props.webSource ?? "");
   const [rejectFile, setRejectFile] = useState(false);
   const [rejectFileSize, setRejectFileSize] = useState(false);
+
+  const audioRef = useRef(null);
 
   function checkFile(file) {
     const reader = new FileReader();
@@ -35,6 +37,8 @@ export default function AudioDropzone(props) {
       const url = URL.createObjectURL(blob);
 
       setAudioContentURL(url);
+      audioRef.current.pause();
+      audioRef.current.load();
     };
     reader.readAsArrayBuffer(file);
   }
@@ -51,10 +55,10 @@ export default function AudioDropzone(props) {
   });
 
   return (
-    <div className="flex flex-col whitespace-nowrap relative space-y-4">
-      <label className="font-normal text-xl">{props.label}</label>
+    <div className="relative flex flex-col space-y-4 whitespace-nowrap">
+      <label className="text-xl font-normal">{props.label}</label>
       <div
-        className="h-16 w-16 hover:cursor-pointer rounded-lg scale-105 hover:scale-110"
+        className="w-16 h-16 scale-105 rounded-lg hover:cursor-pointer hover:scale-110"
         {...getRootProps()}
       >
         <UploadIcon className="w-full h-full text-black" />
@@ -67,17 +71,17 @@ export default function AudioDropzone(props) {
         />
       </div>
       {audioContentURL && (
-        <audio controls>
+        <audio controls ref={audioRef}>
           <source src={audioContentURL} />
         </audio>
       )}
       {rejectFile && (
-        <p className=" text-red-700">
+        <p className="text-red-700 ">
           O arquivo precisa ser uma faixa de áudio
         </p>
       )}
       {rejectFileSize && (
-        <p className=" text-red-700">O arquivo precisa ser menor do que 5MB</p>
+        <p className="text-red-700 ">O arquivo precisa ser menor do que 5MB</p>
       )}
     </div>
   );

@@ -31,6 +31,8 @@ function CardTable({ deckId }) {
             monolingualDescription: item.monolingualDescription ?? "",
             sentence: item.sentence ?? "",
             sentenceAudio: item.sentenceAudio ?? "",
+            translation: item.translation ?? "",
+            notes: item.notes ?? "",
           };
         });
         setCards(cardsInfo);
