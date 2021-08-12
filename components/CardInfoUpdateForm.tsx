@@ -2,13 +2,15 @@ import { Formik, Form } from "formik";
 import { TextField } from "./TextField";
 import * as Yup from "yup";
 import { TextArea } from "./TextArea";
-import React from "react";
+import React, { useRef, useState } from "react";
 import ImageDropzone from "./ImageDropzone";
 import AudioDropzone from "./AudioDropzone";
 import axios from "axios";
+import DeletePrompt from "./DeletePrompt";
 
 export const CardInfoUpdateForm = ({ cardDetails: card }) => {
-  console.log(card);
+  const [showDeletePrompt, setShowDeletePrompt] = useState(false);
+
   const validate = Yup.object({
     focus: Yup.string().required(
       "Por favor, adicione um foco. Isso pode ser uma palavra ou expressão"
@@ -37,8 +39,6 @@ export const CardInfoUpdateForm = ({ cardDetails: card }) => {
       return image === "" && card.images[i] ? card.images[i] : image;
     });
 
-    console.log(files["images"]);
-
     const config = { headers: { "Content-Type": "multipart/form-data" } };
     let fd = new FormData();
 
@@ -65,9 +65,6 @@ export const CardInfoUpdateForm = ({ cardDetails: card }) => {
     fd.append("dateDue", card.dateDue);
     fd.append("lapses", card.lapses);
 
-    console.log(fd.get("images"));
-    console.log(fd.get("imageStrings"));
-
     axios
       .patch(
         `${process.env.NEXT_PUBLIC_API_ENDPOINT}/cards/${card.id}`,
@@ -79,6 +76,7 @@ export const CardInfoUpdateForm = ({ cardDetails: card }) => {
         console.log(err);
       });
   }
+
   return (
     <Formik
       initialValues={{
@@ -107,113 +105,109 @@ export const CardInfoUpdateForm = ({ cardDetails: card }) => {
       onSubmit={(values) => sendToServer(values)}
     >
       {(formik) => (
-        <Form className="flex flex-col flex-wrap m-4">
-          <div className="flex flex-col w-full space-y-4">
-            <TextField label="Frase" name="sentence" type="text" />
-            <TextField label="Foco" name="focus" type="text" />
-            <TextArea
-              label="Descrição bilíngue"
-              name="bilingualDescription"
-              type="text"
-            />
-            <TextArea
-              label="Descrição monolíngue"
-              name="monolingualDescription"
-              type="text"
-            />
-
-            <AudioDropzone
-              label="Áudio da frase"
-              name="sentenceAudio"
-              webSource={card.sentenceAudio}
-              fileExchange={(audio) => {
-                formik.setFieldValue("sentenceAudioHolder", audio);
-              }}
-            />
-            <label>{formik.values.sentenceAudioHolder.name}</label>
-
-            <input name="sentenceAudioHolder" hidden />
-            <input name="focusAudioHolder" hidden />
-
-            <AudioDropzone
-              label="Áudio do foco"
-              name="focusAudio"
-              webSource={card.focusAudio}
-              fileExchange={(audio) => {
-                formik.setFieldValue("focusAudioHolder", audio);
-              }}
-            />
-
-            <label>{formik.values.focusAudioHolder.name}</label>
-
-            <label className="text-xl font-normal">Imagens</label>
-
-            <input type="file" name="image1Holder" hidden />
-            <input type="file" name="image2Holder" hidden />
-            <input type="file" name="image3Holder" hidden />
-            <input type="file" name="image4Holder" hidden />
-
-            <div className="flex flex-col flex-wrap space-y-4 xs:space-x-4 xs:space-y-0 xs:flex-row">
-              <div className="flex space-x-4 xs:space-x-4">
-                <ImageDropzone
-                  name="image1"
-                  webSource={card.images[0]}
-                  fileExchange={(image) => {
-                    formik.setFieldValue("image1Holder", image);
-                  }}
-                />
-
-                <ImageDropzone
-                  name="image2"
-                  webSource={card.images[1]}
-                  fileExchange={(image) => {
-                    formik.setFieldValue("image2Holder", image);
-                  }}
-                />
+        <div>
+          <DeletePrompt
+            show={showDeletePrompt}
+            setShow={() => setShowDeletePrompt(false)}
+            id={card.id}
+          />
+          <Form className="flex flex-col flex-wrap m-4">
+            <div className="flex flex-col w-full space-y-4">
+              <TextField label="Frase" name="sentence" type="text" />
+              <TextField label="Foco" name="focus" type="text" />
+              <TextArea
+                label="Descrição bilíngue"
+                name="bilingualDescription"
+                type="text"
+              />
+              <TextArea
+                label="Descrição monolíngue"
+                name="monolingualDescription"
+                type="text"
+              />
+              <AudioDropzone
+                label="Áudio da frase"
+                name="sentenceAudio"
+                webSource={card.sentenceAudio}
+                fileExchange={(audio) => {
+                  formik.setFieldValue("sentenceAudioHolder", audio);
+                }}
+              />
+              <label>{formik.values.sentenceAudioHolder.name}</label>
+              <input name="sentenceAudioHolder" hidden />
+              <input name="focusAudioHolder" hidden />
+              <AudioDropzone
+                label="Áudio do foco"
+                name="focusAudio"
+                webSource={card.focusAudio}
+                fileExchange={(audio) => {
+                  formik.setFieldValue("focusAudioHolder", audio);
+                }}
+              />
+              <label>{formik.values.focusAudioHolder.name}</label>
+              <label className="text-xl font-normal">Imagens</label>
+              <input type="file" name="image1Holder" hidden />
+              <input type="file" name="image2Holder" hidden />
+              <input type="file" name="image3Holder" hidden />
+              <input type="file" name="image4Holder" hidden />
+              <div className="flex flex-col flex-wrap space-y-4 xs:space-x-4 xs:space-y-0 xs:flex-row">
+                <div className="flex space-x-4 xs:space-x-4">
+                  <ImageDropzone
+                    name="image1"
+                    webSource={card.images[0]}
+                    fileExchange={(image) => {
+                      formik.setFieldValue("image1Holder", image);
+                    }}
+                  />
+                  <ImageDropzone
+                    name="image2"
+                    webSource={card.images[1]}
+                    fileExchange={(image) => {
+                      formik.setFieldValue("image2Holder", image);
+                    }}
+                  />
+                </div>
+                <div className="flex space-x-4 xs:space-x-4">
+                  <ImageDropzone
+                    name="image3"
+                    webSource={card.images[2]}
+                    fileExchange={(image) => {
+                      formik.setFieldValue("image3Holder", image);
+                    }}
+                  />
+                  <ImageDropzone
+                    name="image4"
+                    webSource={card.images[3]}
+                    fileExchange={(image) => {
+                      formik.setFieldValue("image4Holder", image);
+                    }}
+                  />
+                </div>
               </div>
-
-              <div className="flex space-x-4 xs:space-x-4">
-                <ImageDropzone
-                  name="image3"
-                  webSource={card.images[2]}
-                  fileExchange={(image) => {
-                    formik.setFieldValue("image3Holder", image);
-                  }}
-                />
-                <ImageDropzone
-                  name="image4"
-                  webSource={card.images[3]}
-                  fileExchange={(image) => {
-                    formik.setFieldValue("image4Holder", image);
-                  }}
-                />
-              </div>
+              <TextField
+                label="Tradução da frase"
+                name="translation"
+                type="text"
+              />
+              <TextArea label="Observações" name="notes" type="text" />
             </div>
-
-            <TextField
-              label="Tradução da frase"
-              name="translation"
-              type="text"
-            />
-
-            <TextArea label="Observações" name="notes" type="text" />
-          </div>
-
-          <div className="flex items-center justify-center space-x-2 sm:space-x-4">
-            <button
-              className="px-8 mt-4 confirmation-button sm:px-16"
-              type="submit"
-            >
-              Atualizar
-            </button>
-            <button
-              className="px-8 mt-4 confirmation-button sm:px-16"
-              type="submit"
-            >
-              Excluir
-            </button>
-          </div>
-        </Form>
+            <div className="flex items-center justify-center space-x-2 sm:space-x-4">
+              <button
+                className="px-8 mt-4 confirmation-button sm:px-16"
+                type="submit"
+              >
+                Atualizar
+              </button>
+              <button
+                className="px-8 mt-4 confirmation-button sm:px-16"
+                onClick={() => setShowDeletePrompt(true)}
+                type="button"
+              >
+                Excluir
+              </button>
+            </div>
+          </Form>
+        </div>
       )}
     </Formik>
   );
