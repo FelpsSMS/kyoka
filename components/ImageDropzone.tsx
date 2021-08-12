@@ -38,7 +38,6 @@ export default function ImageDropzone(props) {
 
       const binaryStr = reader.result;
 
-      //console.log(binaryStr);
       const blob = new Blob([binaryStr]);
       const url = URL.createObjectURL(blob);
 

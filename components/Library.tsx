@@ -7,14 +7,16 @@ export default function Library() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:3001/decks/")
+      .get(`${process.env.NEXT_PUBLIC_API_ENDPOINT}/decks/`)
       .then(async (res) => {
         const data = res.data;
 
         const formattedData = await Promise.all(
           data.map(async (item) => {
             const numberOfCards = await axios
-              .get(`http://localhost:3001/cards/get_cards/${item._id}`)
+              .get(
+                `${process.env.NEXT_PUBLIC_API_ENDPOINT}/cards/get_cards/${item._id}`
+              )
               .then((res) => {
                 return res.data.length;
               });

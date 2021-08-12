@@ -53,7 +53,7 @@ export const CardInfoUpdateForm = ({ deckId }) => {
     fd.append("monolingualDescription", values.monolingualDescription);
 
     axios
-      .post("http://localhost:3001/cards/", fd, config)
+      .post(`${process.env.NEXT_PUBLIC_API_ENDPOINT}/cards/`, fd, config)
       .then()
       .catch((err) => {
         console.log(err);
@@ -85,7 +85,7 @@ export const CardInfoUpdateForm = ({ deckId }) => {
       onSubmit={(values) => sendToServer(values)}
     >
       {(formik) => (
-        <Form className="flex flex-col m-4">
+        <Form className="flex flex-col flex-wrap m-4">
           <div className="flex flex-col w-full space-y-4">
             <TextField label="Frase" name="sentence" type="text" />
             <TextField label="Foco" name="focus" type="text" />
@@ -122,14 +122,14 @@ export const CardInfoUpdateForm = ({ deckId }) => {
 
             <label>{formik.values.focusAudioHolder.name}</label>
 
-            <label className="font-normal text-xl">Imagens</label>
+            <label className="text-xl font-normal">Imagens</label>
 
             <input type="file" name="image1Holder" hidden />
             <input type="file" name="image2Holder" hidden />
             <input type="file" name="image3Holder" hidden />
             <input type="file" name="image4Holder" hidden />
 
-            <div className="flex flex-wrap flex-col space-y-4 xs:space-x-4 xs:space-y-0 xs:flex-row">
+            <div className="flex flex-col flex-wrap space-y-4 xs:space-x-4 xs:space-y-0 xs:flex-row">
               <div className="flex space-x-4 xs:space-x-4">
                 <ImageDropzone
                   name="image1"
@@ -171,11 +171,17 @@ export const CardInfoUpdateForm = ({ deckId }) => {
             <TextArea label="Observações" name="notes" type="text" />
           </div>
 
-          <div className="flex items-center justify-center space-x-4">
-            <button className="confirmation-button mt-4" type="submit">
+          <div className="flex items-center justify-center space-x-2 sm:space-x-4">
+            <button
+              className="px-8 mt-4 confirmation-button sm:px-16"
+              type="submit"
+            >
               Atualizar
             </button>
-            <button className="confirmation-button mt-4" type="submit">
+            <button
+              className="px-8 mt-4 confirmation-button sm:px-16"
+              type="submit"
+            >
               Excluir
             </button>
           </div>

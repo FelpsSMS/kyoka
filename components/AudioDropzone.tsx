@@ -19,7 +19,6 @@ export default function AudioDropzone(props) {
 
     if (file.size > 5242880) {
       //5MB
-      console.log(file.size);
       setRejectFileSize(true);
       return;
     }
@@ -31,11 +30,7 @@ export default function AudioDropzone(props) {
     reader.onabort = () => console.log("file reading was aborted");
     reader.onerror = () => console.log("file reading has failed");
     reader.onload = () => {
-      // Do whatever you want with the file contents
-
       const binaryStr = reader.result;
-
-      //console.log(binaryStr);
       const blob = new Blob([binaryStr]);
       const url = URL.createObjectURL(blob);
 

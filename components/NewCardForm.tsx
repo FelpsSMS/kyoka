@@ -53,7 +53,7 @@ export const NewCardForm = ({ deckId }) => {
     fd.append("monolingualDescription", values.monolingualDescription);
 
     axios
-      .post("http://localhost:3001/cards/", fd, config)
+      .post(`${process.env.NEXT_PUBLIC_API_ENDPOINT}/cards/`, fd, config)
       .then()
       .catch((err) => {
         console.log(err);
