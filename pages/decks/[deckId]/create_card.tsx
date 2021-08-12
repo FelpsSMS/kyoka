@@ -10,7 +10,7 @@ function create_card() {
   const { deckId } = router.query;
 
   return (
-    <div className="">
+    <div className="flex flex-col">
       <Navbar />
       <Container>
         <NewCardForm deckId={deckId} />

@@ -17,9 +17,9 @@ export default function index() {
     <div className="">
       <Navbar />
       <DeckNavbar deckId={deckId} />
-      <Container>
-        <CardTable />
-      </Container>
+      <div className="flex flex-col justify-start items-center min-h-screen min-w-screen h-full">
+        <CardTable deckId={deckId} />
+      </div>
       <Footer />
     </div>
   );

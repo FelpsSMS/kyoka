@@ -1,16 +1,9 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
+import CardInfo from "./CardInfo";
+import CardTableItem from "./CardTableItem";
 
-function CardTable() {
-  const [cardId, setCardId] = useState("");
-  const [showCard, setShowCard] = useState(false);
-
-  function getCard(id) {
-    setCardId(id);
-
-    setShowCard(!showCard);
-  }
-
+function CardTable({ deckId }) {
   function populateTable() {
     //To do here
     //Figure out how to populate the table dynamically
@@ -18,54 +11,15 @@ function CardTable() {
   }
 
   return (
-    <div className="h-screen w-screen">
-      <div className="flex flex-col mx-4 sm:mx-16 my-8 border-b-2">
-        {/* Row */}
-        <div className="flex border-r-2 border-l-2 border-t-2">
-          {/* Col */}
-          <div className=" flex flex-col w-16 border-r-2">
-            <div className="text-center bg-black text-white p-2 border-b-2">
-              #
-            </div>
-            <div className="text-right text-black p-2">9999</div>
-          </div>
-
-          {/* Col */}
-          <div className="flex flex-col w-full border-r-2 min-w-0">
-            {/* Min width to make it so truncate doesn't overflow */}
-            <div className="text-center bg-black text-white p-2 border-b-2">
-              Foco
-            </div>
-            <div className="text-right text-black p-2 truncate">aaaaaaa</div>
-          </div>
-
-          {/* Col */}
-          <div className="flex-col w-32 hidden ms:inline-block border-r-2">
-            <div className="text-center bg-black text-white p-2 whitespace-nowrap border-b-2">
-              Próxima revisão
-            </div>
-            <div className="text-right text-black p-2">01/01/2021</div>
-          </div>
-
-          {/* Col */}
-          <div className="flex-col w-32 whitespace-nowrap border-r-2 hidden sm:inline-block">
-            <div className="text-center bg-black text-white border-b-2 p-2">
-              Data de adição
-            </div>
-            <div className="text-right text-black p-2">01/01/2021</div>
-          </div>
-
-          {/* Col */}
-
-          <div className="flex-col w-16 hidden sm:inline-block">
-            <div className="text-center bg-black text-white p-2 border-b-2">
-              Lapsos
-            </div>
-            <div className="text-right text-black p-2">9999</div>
-          </div>
-        </div>
-
-        {/*          <div className="border-r-2 p-2 w-full">Foco</div>
+    <div className="w-screen">
+      <CardTableItem
+        cardDetails={{
+          focus: "AAAA",
+          dateDue: "01/01/2021",
+          deckId: deckId,
+        }}
+      />
+      {/*          <div className="border-r-2 p-2 w-full">Foco</div>
           <div className="border-r-2 p-2 w-64">Próxima revisão</div>
           <div className="border-r-2 p-2 w-64 hidden sm:inline-block">
             Data de adição
@@ -85,7 +39,7 @@ function CardTable() {
             <div className="p-2 w-16 hidden sm:inline-block">9999</div>
           </div>
         </div> */}
-        {/*         <table className="table-fixed w-full text-right border-collapse ">
+      {/*         <table className="table-fixed w-full text-right border-collapse ">
           <tr className="text-center border-2">
             <th className="p-2 w-14 text-white bg-black text-xl border-r-2">
               #
@@ -105,18 +59,7 @@ function CardTable() {
           <tr className="border-2" onClick={() => getCard("9999")}>
             <td className="p-2 border-r-2 border-t-2">9999</td>
             <td className="p-2 border-r-2 border-t-2 whitespace-nowrap truncate">
-              Lorem ipsum dolor, sit amet consectetur adipisicing elit. Corporis
-              placeat velit repudiandae temporibus culpa, reiciendis tenetur
-              cupiditate fuga magni ab natus odio quia perferendis distinctio
-              nisi veritatis officiis magnam sunt fugit! Qui doloribus facere
-              saepe voluptatibus a omnis ratione. Molestias, sunt unde inventore
-              sapiente omnis accusamus. Doloribus explicabo perferendis quas
-              accusantium soluta veniam, incidunt error hic architecto corporis
-              harum earum ipsa asperiores repellendus odio officia eum tenetur
-              alias laudantium maxime quos quaerat, temporibus qui! Amet,
-              dolores voluptates. Laudantium eos ducimus quam quas, et
-              necessitatibus nobis error fugit, facilis voluptatem aspernatur
-              quae illo eum quo aut accusamus vero commodi, laborum provident.
+              Lorem ipsum dolor, sit
             </td>
             <td className="p-2 border-r-2 hidden sm:table-cell">01/01/2021</td>
             <td className="p-2 border-r-2 hidden xs:table-cell">01/01/2021</td>
@@ -132,19 +75,7 @@ function CardTable() {
                   transition={{ duration: 0.4 }}
                   exit={{ opacity: 0, y: -50 }}
                 >
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                  Accusamus eius animi aliquid accusantium? Iste molestiae fuga
-                  esse excepturi, odio cumque dignissimos praesentium omnis,
-                  debitis fugit earum odit mollitia, enim architecto aperiam
-                  laboriosam in quam vel. Ut error, alias quam culpa distinctio
-                  adipisci dolorem debitis expedita voluptas saepe at voluptate
-                  laboriosam quidem aliquid explicabo a impedit magnam. Nam
-                  voluptatum ad, ex officiis earum corrupti iure tempora,
-                  exercitationem aut, quo quasi veritatis ea aperiam? Impedit ex
-                  dolore saepe ratione nostrum, animi est doloremque unde
-                  aspernatur. Asperiores unde amet libero. Iste reiciendis
-                  accusantium labore at similique, sed praesentium quisquam quae
-                  numquam aliquam. Non?
+                  Lorem ipsum dolor sit
                 </motion.div>
               </tr>
             )}
@@ -171,7 +102,6 @@ function CardTable() {
             </motion.tr>
           </AnimatePresence>
         </table> */}
-      </div>
     </div>
   );
 }
