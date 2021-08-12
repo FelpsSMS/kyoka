@@ -5,25 +5,33 @@ import LibraryItem from "./LibraryItem";
 export default function Library() {
   const [library, setLibrary] = useState([]);
 
-  function getDecks() {
+  useEffect(() => {
     axios
       .get("http://localhost:3001/decks/")
-      .then((res) => {
+      .then(async (res) => {
         const data = res.data;
 
-        const formattedData = data.map((item) => {
-          return { title: item.name, id: item._id };
-        });
+        const formattedData = await Promise.all(
+          data.map(async (item) => {
+            const numberOfCards = await axios
+              .get(`http://localhost:3001/cards/get_cards/${item._id}`)
+              .then((res) => {
+                return res.data.length;
+              });
+
+            return {
+              title: item.name,
+              id: item._id,
+              numberOfCards: numberOfCards,
+            };
+          })
+        );
 
         setLibrary(formattedData);
       })
       .catch((err) => {
         console.log(err);
       });
-  }
-
-  useEffect(() => {
-    getDecks();
   }, []);
 
   return (
@@ -37,7 +45,7 @@ export default function Library() {
           <LibraryItem
             key={i}
             title={item.title}
-            numberOfCards={0}
+            numberOfCards={item.numberOfCards}
             id={item.id}
           />
         );

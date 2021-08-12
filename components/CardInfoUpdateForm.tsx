@@ -171,9 +171,14 @@ export const CardInfoUpdateForm = ({ deckId }) => {
             <TextArea label="Observações" name="notes" type="text" />
           </div>
 
-          <button className="confirmation-button" type="submit">
-            Atualizar
-          </button>
+          <div className="flex items-center justify-center space-x-4">
+            <button className="confirmation-button mt-4" type="submit">
+              Atualizar
+            </button>
+            <button className="confirmation-button mt-4" type="submit">
+              Excluir
+            </button>
+          </div>
         </Form>
       )}
     </Formik>

@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { AnimatePresence } from "framer-motion";
+import React, { useState } from "react";
 import CardInfo from "./CardInfo";
 
 function CardTableItem({ cardDetails }) {
@@ -53,7 +54,10 @@ function CardTableItem({ cardDetails }) {
           <div className="text-right text-black p-2">9999</div>
         </div>
       </div>
-      {showCardInfo && <CardInfo cardDetails={cardDetails} />}
+      <AnimatePresence>
+        {/* You need to place the AnimatePresence before the conditional to make exit activate  */}
+        {showCardInfo && <CardInfo cardDetails={cardDetails} />}
+      </AnimatePresence>
     </div>
   );
 }
