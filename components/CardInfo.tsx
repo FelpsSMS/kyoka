@@ -4,7 +4,8 @@ import { CardInfoUpdateForm } from "./CardInfoUpdateForm";
 function CardInfo({ cardDetails: card }) {
   return (
     <motion.div
-      className="bg-white border-2"
+      className="bg-white border-t-2"
+      layout
       initial={{ opacity: 0, y: -50 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}

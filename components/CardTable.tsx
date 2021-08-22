@@ -1,17 +1,11 @@
 import axios from "axios";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, AnimateSharedLayout } from "framer-motion";
 import { useEffect, useState } from "react";
 import CardInfo from "./CardInfo";
 import CardTableItem from "./CardTableItem";
 
 function CardTable({ deckId }) {
   const [cards, setCards] = useState([]);
-
-  function populateTable() {
-    //To do here
-    //Figure out how to populate the table dynamically
-    //Make a sliding animation for the card details
-  }
 
   useEffect(() => {
     axios
@@ -44,17 +38,21 @@ function CardTable({ deckId }) {
 
   return (
     <div className="w-screen">
-      {cards.map((card, i) => {
-        return (
-          <CardTableItem
-            key={i}
-            cardDetails={{
-              tableKey: i + 1,
-              card,
-            }}
-          />
-        );
-      })}
+      <AnimateSharedLayout>
+        <motion.ul layout>
+          {cards.map((card, i) => {
+            return (
+              <CardTableItem
+                key={i}
+                cardDetails={{
+                  tableKey: i + 1,
+                  card,
+                }}
+              />
+            );
+          })}
+        </motion.ul>
+      </AnimateSharedLayout>
     </div>
   );
 }
