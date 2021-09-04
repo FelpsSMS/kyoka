@@ -1,11 +1,12 @@
 import axios from "axios";
 import { AnimatePresence, motion, AnimateSharedLayout } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import CardInfo from "./CardInfo";
 import CardTableItem from "./CardTableItem";
 
 function CardTable({ deckId }) {
   const [cards, setCards] = useState([]);
+  const hasCards = useRef(true);
 
   useEffect(() => {
     axios
@@ -29,6 +30,11 @@ function CardTable({ deckId }) {
             notes: item.notes ?? "",
           };
         });
+
+        if (cardsInfo.length === 0) {
+          hasCards.current = false;
+        }
+
         setCards(cardsInfo);
       })
       .catch((err) => {
@@ -40,17 +46,23 @@ function CardTable({ deckId }) {
     <div className="w-screen">
       <AnimateSharedLayout>
         <motion.ul layout>
-          {cards.map((card, i) => {
-            return (
-              <CardTableItem
-                key={i}
-                cardDetails={{
-                  tableKey: i + 1,
-                  card,
-                }}
-              />
-            );
-          })}
+          {hasCards.current ? (
+            cards.map((card, i) => {
+              return (
+                <CardTableItem
+                  key={i}
+                  cardDetails={{
+                    tableKey: i + 1,
+                    card,
+                  }}
+                />
+              );
+            })
+          ) : (
+            <div className="flex items-center justify-center p-4 font-bold italic">
+              <p className="text-3xl">Ainda não há nenhuma carta neste deck</p>
+            </div>
+          )}
         </motion.ul>
       </AnimateSharedLayout>
     </div>
