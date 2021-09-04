@@ -3,6 +3,7 @@ import React from "react";
 import CardTable from "../../../components/CardTable";
 import Container from "../../../components/Container";
 import DeckNavbar from "../../../components/DeckNavbar";
+import DeckOptionsNavbar from "../../../components/DeckOptionsNavbar";
 import Footer from "../../../components/Footer";
 import Navbar from "../../../components/Navbar";
 import { NewCardForm } from "../../../components/NewCardForm";
@@ -20,6 +21,7 @@ export default function index() {
       <div className="flex flex-col justify-start items-center min-h-screen min-w-screen h-full">
         <CardTable deckId={deckId} />
       </div>
+      <DeckOptionsNavbar deckId={deckId} />
       <Footer />
     </div>
   );

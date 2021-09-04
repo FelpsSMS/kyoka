@@ -110,6 +110,8 @@ export const CardInfoUpdateForm = ({ cardDetails: card }) => {
             show={showDeletePrompt}
             setShow={() => setShowDeletePrompt(false)}
             id={card.id}
+            routeName={"cards"}
+            title="Você realmente deseja excluir esta carta?"
           />
           <Form className="flex flex-col flex-wrap m-4">
             <div className="flex flex-col w-full space-y-4">

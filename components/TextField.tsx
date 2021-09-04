@@ -21,6 +21,7 @@ export const TextField = (props) => {
         }`}
         {...field}
         {...props}
+        ref={props.innerRef}
       />
       <ErrorMessage
         component="p"

@@ -3,7 +3,7 @@ import router from "next/router";
 import React from "react";
 
 function DeckNavbar({ deckId }) {
-  function handleClick(id: any) {
+  function handleCardCreation(id: any) {
     router.push({
       pathname: `[deckId]/create_card`,
       query: { deckId: id },
@@ -21,9 +21,10 @@ function DeckNavbar({ deckId }) {
             " //In tailwind, 2px = 0.5
         />
       </div>
+
       <button
         className="confirmation-button mx-2 mb-2 md:mt-4 md:mb-4 md:mx-4 whitespace-nowrap"
-        onClick={() => handleClick(deckId)}
+        onClick={() => handleCardCreation(deckId)}
       >
         Criar carta
       </button>

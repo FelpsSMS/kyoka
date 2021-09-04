@@ -3,12 +3,12 @@ import axios from "axios";
 import { AnimatePresence, motion } from "framer-motion";
 import React, { useRef, useState } from "react";
 
-function DeletePrompt({ show, setShow, id }) {
+function DeletePrompt({ show, setShow, id, routeName, title }) {
   const completeButtonRef = useRef(null);
 
   function confirmFunction() {
     axios
-      .delete(`${process.env.NEXT_PUBLIC_API_ENDPOINT}/cards/${id}`)
+      .delete(`${process.env.NEXT_PUBLIC_API_ENDPOINT}/${routeName}/${id}`)
       .catch((err) => {
         console.log(err);
       });
@@ -46,7 +46,7 @@ function DeletePrompt({ show, setShow, id }) {
                   transition={{ duration: 0.4 }}
                 >
                   <Dialog.Title className="text-xl font-bold sm:text-2xl">
-                    Você realmente deseja excluir esta carta?
+                    {title}
                   </Dialog.Title>
 
                   <div className="flex space-x-2 sm:space-x-8">
