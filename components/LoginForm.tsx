@@ -38,7 +38,7 @@ export const LoginForm = () => {
         password,
       })
       .then((response) => {
-        if (response.data) {
+        if (response.data.success) {
           //Set jwt token as a cookie
 
           setCookie(undefined, "kyoka-token", response.data.token, {
