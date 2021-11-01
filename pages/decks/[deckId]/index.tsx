@@ -13,12 +13,13 @@ export default function index() {
   const router = useRouter();
 
   const { deckId } = router.query;
+  console.log(deckId);
 
   return (
     <div className="">
       <Navbar />
       <DeckNavbar deckId={deckId} />
-      <div className="flex flex-col justify-start items-center min-h-screen min-w-screen h-full">
+      <div className="flex flex-col justify-start items-center min-h-screen min-w-screen h-full overflow-x-hidden">
         <CardTable deckId={deckId} />
       </div>
       <DeckOptionsNavbar deckId={deckId} />
