@@ -1,13 +1,21 @@
 import { SearchIcon } from "@heroicons/react/outline";
 import router from "next/router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import NewDeckPrompt from "./NewDeckPrompt";
 
-function LibraryNavbar(
-  {
-    /* deckId */
-  }
-) {
+function LibraryNavbar({
+  setSorting,
+  libraryChanged,
+  setLibraryChanged,
+  setSearch,
+}) {
+  const [query, setQuery] = useState("");
+
+  useEffect(() => {
+    const timeOutId = setTimeout(() => setSearch(query), 300); //debounce
+    return () => clearTimeout(timeOutId);
+  }, [query, setSearch]);
+
   /*   function handleClick(id: any) {
     router.push({
       pathname: `[deckId]/create_card`,
@@ -22,6 +30,8 @@ function LibraryNavbar(
       <NewDeckPrompt
         show={showNewDeckPrompt}
         setShow={() => setShowNewDeckPrompt(false)}
+        libraryChanged={libraryChanged}
+        setLibraryChanged={setLibraryChanged}
       />
       <div className="flex items-center md:w-2/3">
         <SearchIcon className="bg-gray-900 text-white h-12 ml-2 rounded-l-lg p-2 md:my-4" />
@@ -30,6 +40,7 @@ function LibraryNavbar(
           className="w-full rounded-r-lg bg-gray-200 text-xl p-2 outline-none focus:border-2 border-black my-2 mr-2 
           focus:my-1.5
             " //In tailwind, 2px = 0.5
+          onChange={(e) => setQuery(e.target.value)}
         />
       </div>
       <button
@@ -38,7 +49,11 @@ function LibraryNavbar(
       >
         Criar deck
       </button>
-      <button className="confirmation-button mx-2 mb-2 md:mt-4 md:mb-4 md:mx-4">
+      <button
+        className="confirmation-button mx-2 mb-2 md:mt-4 md:mb-4 md:mx-4"
+        //onClick={() => setSorting("numberOfCards")}
+        onClick={() => setSorting("A-Z")}
+      >
         Ordenar
       </button>
     </nav>

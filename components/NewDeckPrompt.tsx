@@ -14,9 +14,17 @@ interface newDeckPromptProps {
   show: boolean;
   setShow: any;
   deckId?: string;
+  libraryChanged: boolean;
+  setLibraryChanged: any;
 }
 
-function NewDeckPrompt({ show, setShow, deckId }: newDeckPromptProps) {
+function NewDeckPrompt({
+  show,
+  setShow,
+  deckId,
+  libraryChanged,
+  setLibraryChanged,
+}: newDeckPromptProps) {
   const completeButtonRef = useRef(null);
   const deckNameFieldRef = useRef(null);
 
@@ -67,7 +75,10 @@ function NewDeckPrompt({ show, setShow, deckId }: newDeckPromptProps) {
               deck: recentlyCreatedId,
               readOnly: false,
             })
-            .then(() => router.reload()) //reload the page once everything is finished to reflect changes
+            .then(() => {
+              setLibraryChanged(!libraryChanged);
+              setShow();
+            })
             .catch((err) => {
               console.log(err);
             });

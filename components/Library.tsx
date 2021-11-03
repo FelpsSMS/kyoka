@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { api, verifyToken } from "../utils/api";
 import LibraryItem from "./LibraryItem";
 
-export default function Library() {
+export default function Library({ sorting, libraryChanged, search }) {
   const [library, setLibrary] = useState([]);
 
   useEffect(() => {
@@ -14,9 +14,10 @@ export default function Library() {
         userId: userId,
       })
       .then(async (res) => {
+        let decks;
         const data = res.data;
 
-        const decks = await Promise.all(
+        decks = await Promise.all(
           data.map(async (item) => {
             const deck = api.get(`decks/${item.deck}`).then((res) => {
               return res.data;
@@ -25,6 +26,14 @@ export default function Library() {
             return deck;
           })
         );
+
+        if (search) {
+          decks = decks.filter((item: any) => {
+            if (item.name.toUpperCase().includes(search.toUpperCase())) {
+              return item;
+            }
+          });
+        }
 
         const formattedData = await Promise.all(
           decks.map(async (item: any) => {
@@ -42,12 +51,32 @@ export default function Library() {
           })
         );
 
+        if (sorting === "numberOfCards") {
+          formattedData.sort((a: any, b: any) => {
+            return b.numberOfCards - a.numberOfCards;
+          });
+        }
+
+        if (sorting === "A-Z") {
+          formattedData.sort((a: any, b: any) => {
+            const titleA = a.title.toUpperCase(); // ignore upper and lowercase
+            const titleB = b.title.toUpperCase(); // ignore upper and lowercase
+
+            if (titleA < titleB) {
+              return -1;
+            }
+            if (titleA > titleB) {
+              return 1;
+            }
+          });
+        }
+
         setLibrary(formattedData);
       })
       .catch((err) => {
         console.log(err);
       });
-  }, []);
+  }, [sorting, libraryChanged, search]);
 
   /*axios
       .get(`${process.env.NEXT_PUBLIC_API_ENDPOINT}/decks/`)
