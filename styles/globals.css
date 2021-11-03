@@ -8,7 +8,7 @@
   }
 
   .confirmation-button {
-    @apply bg-gray-900 text-white p-2 px-16 rounded-sm text-xl font-bold focus:text-gray-200 
-    focus:bg-black hover:text-gray-200 hover:bg-black outline-none;
+    @apply bg-gray-900 text-white p-2 sm:px-16 rounded-sm text-xl font-bold focus:text-gray-200 
+    focus:bg-black hover:text-gray-200 hover:bg-black outline-none rounded;
   }
 }

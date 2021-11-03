@@ -2,6 +2,7 @@ import { SearchIcon } from "@heroicons/react/outline";
 import router from "next/router";
 import React, { useEffect, useState } from "react";
 import NewDeckPrompt from "./NewDeckPrompt";
+import Select from "./Select";
 
 function LibraryNavbar({
   setSorting,
@@ -25,8 +26,12 @@ function LibraryNavbar({
 
   const [showNewDeckPrompt, setShowNewDeckPrompt] = useState(false);
 
+  const sortingOptions = ["A-Z", "Quantidade"];
+
+  const [selectSorting, setSelectSorting] = useState();
+
   return (
-    <nav className="bg-gray-500 flex justify-center flex-col md:flex-row md:justify-end">
+    <nav className="bg-gray-500 flex justify-center flex-col md:flex-row">
       <NewDeckPrompt
         show={showNewDeckPrompt}
         setShow={() => setShowNewDeckPrompt(false)}
@@ -43,19 +48,31 @@ function LibraryNavbar({
           onChange={(e) => setQuery(e.target.value)}
         />
       </div>
-      <button
-        className="confirmation-button mx-2 mb-2 md:mt-4 md:mb-4 md:mx-4 whitespace-nowrap"
-        onClick={() => setShowNewDeckPrompt(true)}
-      >
-        Criar deck
-      </button>
-      <button
+      <div className="flex">
+        <button
+          className="confirmation-button mx-2 mb-2 md:mt-4 md:mb-4 md:mx-4 whitespace-nowrap w-1/2"
+          onClick={() => setShowNewDeckPrompt(true)}
+        >
+          Criar deck
+        </button>
+        <Select
+          className="mx-2 mb-2 md:mt-4 md:mb-4 md:mx-4 w-1/2"
+          className2="sm:px-20 font-bold bg-white py-2 text-xl w-full focus:outline-none 
+          focus:shadow-outline-blue focus:border-blue-300 relative border shadow-sm 
+          border-gray-300 rounded text-gray-800"
+          selectedItem={selectSorting}
+          setSelectedItem={setSelectSorting}
+          items={sortingOptions}
+          setSorting={setSorting}
+        />
+      </div>
+      {/*       <button
         className="confirmation-button mx-2 mb-2 md:mt-4 md:mb-4 md:mx-4"
         //onClick={() => setSorting("numberOfCards")}
         onClick={() => setSorting("A-Z")}
       >
         Ordenar
-      </button>
+      </button> */}
     </nav>
   );
 }

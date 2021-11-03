@@ -51,13 +51,7 @@ export default function Library({ sorting, libraryChanged, search }) {
           })
         );
 
-        if (sorting === "numberOfCards") {
-          formattedData.sort((a: any, b: any) => {
-            return b.numberOfCards - a.numberOfCards;
-          });
-        }
-
-        if (sorting === "A-Z") {
+        if (sorting == 0) {
           formattedData.sort((a: any, b: any) => {
             const titleA = a.title.toUpperCase(); // ignore upper and lowercase
             const titleB = b.title.toUpperCase(); // ignore upper and lowercase
@@ -68,6 +62,12 @@ export default function Library({ sorting, libraryChanged, search }) {
             if (titleA > titleB) {
               return 1;
             }
+          });
+        }
+
+        if (sorting == 1) {
+          formattedData.sort((a: any, b: any) => {
+            return b.numberOfCards - a.numberOfCards;
           });
         }
 
