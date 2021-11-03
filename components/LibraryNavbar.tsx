@@ -17,8 +17,6 @@ function LibraryNavbar(
 
   const [showNewDeckPrompt, setShowNewDeckPrompt] = useState(false);
 
-  function handleClick() {}
-
   return (
     <nav className="bg-gray-500 flex justify-center flex-col md:flex-row md:justify-end">
       <NewDeckPrompt

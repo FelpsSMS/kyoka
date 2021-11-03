@@ -2,9 +2,13 @@ import { Dialog } from "@headlessui/react";
 import axios from "axios";
 import { Form, Formik } from "formik";
 import { AnimatePresence, motion } from "framer-motion";
+import { parseCookies } from "nookies";
 import React, { useRef, useState } from "react";
 import * as Yup from "yup";
 import { TextField } from "./TextField";
+
+import { api, verifyToken } from "../utils/api";
+import Router, { useRouter } from "next/router";
 
 interface newDeckPromptProps {
   show: boolean;
@@ -18,6 +22,8 @@ function NewDeckPrompt({ show, setShow, deckId }: newDeckPromptProps) {
 
   const maxNameSize = 10;
 
+  const router = useRouter();
+
   const validate = Yup.object({
     deckName: Yup.string()
       .required("Por favor, adicione um nome")
@@ -27,13 +33,13 @@ function NewDeckPrompt({ show, setShow, deckId }: newDeckPromptProps) {
       ),
   });
 
-  function sendToServer(values) {
+  async function sendToServer(values) {
     const deckName = values.deckName;
 
     //if deck id is passed, then update
     if (deckId) {
-      axios
-        .patch(`${process.env.NEXT_PUBLIC_API_ENDPOINT}/decks/${deckId}`, {
+      api
+        .patch(`/decks/${deckId}`, {
           name: deckName,
         })
         .then()
@@ -42,11 +48,30 @@ function NewDeckPrompt({ show, setShow, deckId }: newDeckPromptProps) {
         });
     } else {
       //if not, create a new deck
-      axios
-        .post(`${process.env.NEXT_PUBLIC_API_ENDPOINT}/decks`, {
+      api
+        .post(`/decks`, {
           name: deckName,
         })
-        .then()
+        .then((res) => {
+          const recentlyCreatedId = res.data._id;
+
+          //Get user ID from jwt token
+          const userId = verifyToken();
+
+          //Create SRS stats for the deck
+
+          api
+            .post("/deck-stats", {
+              user: userId,
+              active: true,
+              deck: recentlyCreatedId,
+              readOnly: false,
+            })
+            .then(() => router.reload()) //reload the page once everything is finished to reflect changes
+            .catch((err) => {
+              console.log(err);
+            });
+        })
         .catch((err) => {
           console.log(err);
         });
@@ -108,7 +133,9 @@ function NewDeckPrompt({ show, setShow, deckId }: newDeckPromptProps) {
                             className="bg-blue-800 text-white p-2 sm:px-16 rounded-sm text-xl font-bold focus:text-gray-200 
                     focus:bg-blue-900 hover:text-gray-200 hover:bg-blue-900 outline-none px-2"
                             type="submit"
-                            onClick={formik.submitForm}
+                            onClick={() => {
+                              formik.submitForm();
+                            }}
                           >
                             Confirmar
                           </button>

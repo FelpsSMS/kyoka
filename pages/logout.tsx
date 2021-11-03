@@ -11,7 +11,6 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { ["kyoka-token"]: token } = parseCookies(ctx);
 
   if (token) {
-    console.log("ue");
     destroyCookie(ctx, "kyoka-token", { path: "/" });
 
     return {

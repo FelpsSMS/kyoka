@@ -12,7 +12,9 @@ import { setCookie } from "nookies";
 
 export const LoginForm = () => {
   const [newUserForm, setNewUserForm] = useState(false);
+  const [forgotPasswordForm, setForgotPasswordForm] = useState(false);
   const [loginSuccessful, setLoginSuccessful] = useState(false);
+  const [passwordResetSuccessful, setPasswordResetSuccessful] = useState(false);
 
   const validateLogin = Yup.object({
     email: Yup.string()
@@ -29,6 +31,12 @@ export const LoginForm = () => {
     passwordConfirmation: Yup.string()
       .required("As senhas devem corresponder")
       .oneOf([Yup.ref("password"), null], "As senhas devem corresponder"),
+  });
+
+  const validateForgot = Yup.object({
+    email: Yup.string()
+      .required("Por favor, insira seu e-mail de login")
+      .email("Por favor, insira um e-mail válido"),
   });
 
   async function handleLogin({ email, password }) {
@@ -58,6 +66,16 @@ export const LoginForm = () => {
       email,
       password,
     });
+  }
+
+  async function handleForgot({ email }) {
+    await api
+      .post("/users/forgot", {
+        email,
+      })
+      .then((response) => {
+        setPasswordResetSuccessful(response.data.success);
+      });
   }
 
   return (
@@ -93,14 +111,20 @@ export const LoginForm = () => {
             <div className="flex space-x-4">
               <label
                 className="text-blue-300 hover:cursor-pointer hover:text-blue-500"
-                onClick={() => setNewUserForm(!newUserForm)}
+                onClick={() => {
+                  setNewUserForm(!newUserForm);
+                  setForgotPasswordForm(false);
+                }}
               >
                 Criar conta
               </label>
 
               <label
                 className="text-blue-300 hover:cursor-pointer hover:text-blue-500"
-                onClick={() => console.log("teste")}
+                onClick={() => {
+                  setForgotPasswordForm(!forgotPasswordForm);
+                  setNewUserForm(false);
+                }}
               >
                 Esqueceu sua senha?
               </label>
@@ -133,6 +157,41 @@ export const LoginForm = () => {
                   name="passwordConfirmation"
                   type="password"
                 />
+              </div>
+              <button className="confirmation-button" type="submit">
+                Enviar
+              </button>
+            </Form>
+          )}
+        </Formik>
+      )}
+
+      {forgotPasswordForm && (
+        <Formik
+          initialValues={{
+            email: "",
+          }}
+          validationSchema={validateForgot}
+          onSubmit={(values) => handleForgot(values)}
+        >
+          {(formik) => (
+            <Form
+              className="bg-white flex flex-col justify-center items-center sm:my-8 space-y-8 w-full
+            sm:shadow-lg lg:w-2/5 md:w-3/5 sm:rounded-lg sm:w-4/5 sm:items-start sm:justify-start p-4
+            whitespace-nowrap"
+            >
+              {passwordResetSuccessful && (
+                <div className="bg-green-200 p-4 rounded-lg w-full">
+                  <label className="text-green-900">
+                    Uma confirmação foi enviada para o e-mail informado
+                  </label>
+                </div>
+              )}
+              <h1 className="font-black text-3xl sm:text-5xl">
+                Insira seu e-mail
+              </h1>
+              <div className="flex flex-col w-full space-y-4">
+                <TextField label="E-mail" name="email" type="text" />
               </div>
               <button className="confirmation-button" type="submit">
                 Enviar
