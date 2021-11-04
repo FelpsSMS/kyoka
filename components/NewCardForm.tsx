@@ -6,6 +6,8 @@ import React from "react";
 import ImageDropzone from "./ImageDropzone";
 import AudioDropzone from "./AudioDropzone";
 import axios from "axios";
+import { api, verifyToken } from "../utils/api";
+import router from "next/router";
 
 export const NewCardForm = ({ deckId }) => {
   const validate = Yup.object({
@@ -54,9 +56,23 @@ export const NewCardForm = ({ deckId }) => {
     fd.append("translation", values.translation);
     fd.append("notes", values.notes);
 
-    axios
-      .post(`${process.env.NEXT_PUBLIC_API_ENDPOINT}/cards/`, fd, config)
-      .then()
+    api
+      .post(`cards/`, fd, config)
+      .then((res) => {
+        //Get card ID
+        const cardId = res.data._id;
+
+        //Get user ID from jwt token
+        const userId = verifyToken();
+
+        //Create SRS stats for the card
+        api
+          .post("/card-stats", {
+            card: cardId,
+            user: userId,
+          })
+          .then(() => router.back()); //redirect user to the deck page
+      })
       .catch((err) => {
         console.log(err);
       });

@@ -7,6 +7,7 @@ import ImageDropzone from "./ImageDropzone";
 import AudioDropzone from "./AudioDropzone";
 import axios from "axios";
 import DeletePrompt from "./DeletePrompt";
+import { api } from "../utils/api";
 
 export const CardInfoUpdateForm = ({ cardDetails: card }) => {
   const [showDeletePrompt, setShowDeletePrompt] = useState(false);
@@ -61,16 +62,12 @@ export const CardInfoUpdateForm = ({ cardDetails: card }) => {
     fd.append("translation", values.translation);
     fd.append("notes", values.notes);
 
-    fd.append("dateAdded", card.dateAdded);
-    fd.append("dateDue", card.dateDue);
-    fd.append("lapses", card.lapses);
+    //fd.append("dateAdded", card.dateAdded);
+    //fd.append("dateDue", card.dateDue);
+    //fd.append("lapses", card.lapses);
 
-    axios
-      .patch(
-        `${process.env.NEXT_PUBLIC_API_ENDPOINT}/cards/${card.id}`,
-        fd,
-        config
-      )
+    api
+      .patch(`cards/${card.id}`, fd, config)
       .then()
       .catch((err) => {
         console.log(err);

@@ -13,7 +13,6 @@ export default function index() {
   const router = useRouter();
 
   const { deckId } = router.query;
-  console.log(deckId);
 
   return (
     <div className="">

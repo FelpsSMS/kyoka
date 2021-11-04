@@ -1,14 +1,11 @@
 import { Dialog } from "@headlessui/react";
-import axios from "axios";
 import { Form, Formik } from "formik";
 import { AnimatePresence, motion } from "framer-motion";
-import { parseCookies } from "nookies";
 import React, { useRef, useState } from "react";
 import * as Yup from "yup";
 import { TextField } from "./TextField";
 
 import { api, verifyToken } from "../utils/api";
-import Router, { useRouter } from "next/router";
 
 interface newDeckPromptProps {
   show: boolean;
@@ -29,8 +26,6 @@ function NewDeckPrompt({
   const deckNameFieldRef = useRef(null);
 
   const maxNameSize = 10;
-
-  const router = useRouter();
 
   const validate = Yup.object({
     deckName: Yup.string()
