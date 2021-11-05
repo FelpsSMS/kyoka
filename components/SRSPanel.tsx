@@ -5,9 +5,13 @@ import { api, verifyToken } from "../utils/api";
 import Image from "next/image";
 import ToggleBox from "./ToggleBox";
 import PlayAudioButton from "./PlayAudioButton";
+import ImagePopup from "./ImagePopup";
 
 function SRSPanel() {
   let animationHeight = "";
+
+  const [show, setShow] = useState(false);
+  const [src, setSRC] = useState("");
 
   const imageLoader = ({ src }) => {
     return src;
@@ -26,10 +30,6 @@ function SRSPanel() {
   const [isPageLoaded, setIsPageLoaded] = useState(false);
 
   const [isCardFlipped, setIsCardFlipped] = useState(false);
-
-  function getTotalCards() {
-    return newCardsNumber + relearnedCardsNumber + reviewedCardsNumber;
-  }
 
   function addLapse(id, totalLapses, consecutiveLapses) {
     api.patch(`card-stats/${id}`, {
@@ -61,7 +61,8 @@ function SRSPanel() {
   }
 
   function showImage(item) {
-    console.log(item);
+    setSRC(item);
+    setShow(true);
   }
 
   function parseSRSResponse(cardInfo, pass) {
@@ -272,6 +273,7 @@ function SRSPanel() {
       animate={{ height: animationHeight, opacity: 1 }}
       transition={{ duration: 0.2 }}
     >
+      <ImagePopup show={show} setShow={() => setShow(false)} src={src} />
       {sessionStart && isPageLoaded ? (
         isCardFlipped ? (
           <div className="flex flex-col items-center justify-center space-y-4">
