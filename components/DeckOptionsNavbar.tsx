@@ -12,12 +12,12 @@ function DeckOptionsNavbar({ deckId }) {
 
   return (
     <nav className="bg-gray-500 flex justify-center flex-col md:flex-row md:justify-end">
+      {/*@ts-ignore: Unreachable code error*/}
       <NewDeckPrompt
         show={showDeckNameChangePrompt}
         setShow={() => setShowDeckNameChangePrompt(false)}
         deckId={deckId}
       />
-
       <DeletePrompt
         show={showDeletePrompt}
         setShow={() => setShowDeletePrompt(false)}
@@ -25,7 +25,6 @@ function DeckOptionsNavbar({ deckId }) {
         routeName={"decks"}
         title="Você realmente deseja excluir este deck?"
       />
-
       <button
         className="confirmation-button mx-2 mb-2 mt-2 md:mt-4 md:mb-4 md:mx-4 whitespace-nowrap"
         onClick={() => setShowDeckNameChangePrompt(true)}

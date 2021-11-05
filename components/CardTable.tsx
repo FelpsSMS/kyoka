@@ -5,7 +5,7 @@ import { api } from "../utils/api";
 import CardInfo from "./CardInfo";
 import CardTableItem from "./CardTableItem";
 
-function CardTable({ deckId }) {
+function CardTable({ deckId, search, sorting }) {
   const [cards, setCards] = useState([]);
   const [hasCards, setHasCards] = useState(true);
 
@@ -13,7 +13,7 @@ function CardTable({ deckId }) {
     api
       .get(`cards/get_cards/${deckId}`)
       .then(async (res) => {
-        const cardsInfo = await Promise.all(
+        let cardsInfo: any = await Promise.all(
           res.data.map(async (item) => {
             const cardStats = await api
               .post(`card-stats/card`, {
@@ -27,7 +27,7 @@ function CardTable({ deckId }) {
               id: item._id,
               focus: item.focus,
               dateAdded: item.dateAdded,
-              dateDue: cardStats.dueDate,
+              dueDate: cardStats.dueDate,
               lapses: cardStats.totalLapses,
               deckId: item.deck,
               bilingualDescription: item.bilingualDescription ?? "",
@@ -42,8 +42,36 @@ function CardTable({ deckId }) {
           })
         );
 
-        if (cardsInfo.length < 1 && deckId != undefined) {
+        if (search) {
+          cardsInfo = cardsInfo.filter((item: any) => {
+            if (item.focus.toUpperCase().includes(search.toUpperCase())) {
+              return item;
+            }
+          });
+        }
+
+        if (cardsInfo.length < 1 && deckId != undefined && !search) {
           setHasCards(false);
+        }
+
+        if (sorting == 0) {
+          cardsInfo.sort((a: any, b: any) => {
+            const titleA = a.focus.toUpperCase(); // ignore upper and lowercase
+            const titleB = b.focus.toUpperCase(); // ignore upper and lowercase
+
+            if (titleA < titleB) {
+              return -1;
+            }
+            if (titleA > titleB) {
+              return 1;
+            }
+          });
+        }
+
+        if (sorting == 1) {
+          cardsInfo.sort((a: any, b: any) => {
+            return a.dueDate - b.dueDate;
+          });
         }
 
         setCards(cardsInfo);
@@ -52,7 +80,7 @@ function CardTable({ deckId }) {
       .catch((err) => {
         console.log(err);
       });
-  }, [deckId]);
+  }, [deckId, search, sorting]);
 
   return (
     <div className="w-screen">

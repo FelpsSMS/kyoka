@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import React from "react";
+import React, { useState } from "react";
 import CardTable from "../../../components/CardTable";
 import Container from "../../../components/Container";
 import DeckNavbar from "../../../components/DeckNavbar";
@@ -12,14 +12,23 @@ export default function index() {
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const router = useRouter();
 
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const [sorting, setSorting] = useState();
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const [search, setSearch] = useState("");
+
   const { deckId } = router.query;
 
   return (
     <div className="">
       <Navbar />
-      <DeckNavbar deckId={deckId} />
+      <DeckNavbar
+        deckId={deckId}
+        setSorting={setSorting}
+        setSearch={setSearch}
+      />
       <div className="flex flex-col justify-start items-center min-h-screen min-w-screen h-full overflow-x-hidden">
-        <CardTable deckId={deckId} />
+        <CardTable search={search} sorting={sorting} deckId={deckId} />
       </div>
       <DeckOptionsNavbar deckId={deckId} />
       <Footer />

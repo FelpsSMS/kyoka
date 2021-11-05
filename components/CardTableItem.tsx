@@ -8,7 +8,7 @@ function CardTableItem({ cardDetails: { card, tableKey } }) {
   const formattedDateAdded = new Date(card.dateAdded).toLocaleDateString(
     "pt-br"
   );
-  const formattedDateDue = new Date(card.dateDue).toLocaleDateString("pt-br");
+  const formattedDueDate = new Date(card.dueDate).toLocaleDateString("pt-br");
 
   return (
     <motion.li
@@ -40,7 +40,7 @@ function CardTableItem({ cardDetails: { card, tableKey } }) {
             <div className="text-center bg-black text-white p-2 whitespace-nowrap border-b-2">
               Próxima revisão
             </div>
-            <div className="text-right text-black p-2">{formattedDateDue}</div>
+            <div className="text-right text-black p-2">{formattedDueDate}</div>
           </div>
           {/* Col */}
           <div className="flex-col w-32 whitespace-nowrap border-r-2 hidden sm:inline-block">
