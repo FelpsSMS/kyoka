@@ -1,14 +1,19 @@
 import { Dialog } from "@headlessui/react";
 import axios from "axios";
 import { AnimatePresence, motion } from "framer-motion";
+import { useRouter } from "next/router";
 import React, { useRef, useState } from "react";
 
 function DeletePrompt({ show, setShow, id, routeName, title }) {
   const completeButtonRef = useRef(null);
+  const router = useRouter();
 
   function confirmFunction() {
     axios
       .delete(`${process.env.NEXT_PUBLIC_API_ENDPOINT}/${routeName}/${id}`)
+      .then(() => {
+        router.back();
+      })
       .catch((err) => {
         console.log(err);
       });

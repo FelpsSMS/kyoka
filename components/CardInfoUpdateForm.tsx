@@ -8,9 +8,11 @@ import AudioDropzone from "./AudioDropzone";
 import axios from "axios";
 import DeletePrompt from "./DeletePrompt";
 import { api } from "../utils/api";
+import { useRouter } from "next/router";
 
 export const CardInfoUpdateForm = ({ cardDetails: card }) => {
   const [showDeletePrompt, setShowDeletePrompt] = useState(false);
+  const router = useRouter();
 
   const validate = Yup.object({
     focus: Yup.string().required(
@@ -68,7 +70,7 @@ export const CardInfoUpdateForm = ({ cardDetails: card }) => {
 
     api
       .patch(`cards/${card.id}`, fd, config)
-      .then()
+      .then(() => router.back())
       .catch((err) => {
         console.log(err);
       });

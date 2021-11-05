@@ -2,9 +2,16 @@ import { motion } from "framer-motion";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { api, verifyToken } from "../utils/api";
+import Image from "next/image";
+import ToggleBox from "./ToggleBox";
+import PlayAudioButton from "./PlayAudioButton";
 
 function SRSPanel() {
   let animationHeight = "";
+
+  const imageLoader = ({ src }) => {
+    return src;
+  };
 
   const [newCardsNumber, setNewCardsNumber] = useState(0);
   const [reviewedCardsNumber, setReviewedCardsNumber] = useState(0);
@@ -17,6 +24,8 @@ function SRSPanel() {
   const [sessionStart, setSessionStart] = useState(false);
 
   const [isPageLoaded, setIsPageLoaded] = useState(false);
+
+  const [isCardFlipped, setIsCardFlipped] = useState(false);
 
   function getTotalCards() {
     return newCardsNumber + relearnedCardsNumber + reviewedCardsNumber;
@@ -49,6 +58,10 @@ function SRSPanel() {
     api.patch(`card-stats/${id}`, {
       state: newState,
     });
+  }
+
+  function showImage(item) {
+    console.log(item);
   }
 
   function parseSRSResponse(cardInfo, pass) {
@@ -116,6 +129,7 @@ function SRSPanel() {
     }
 
     setCardCounter(cardCounter + 1);
+    setIsCardFlipped(false);
   }
 
   useEffect(() => {
@@ -138,6 +152,7 @@ function SRSPanel() {
             });
 
             return { deck: deck, active: item.active };
+            // eslint-disable-next-line react-hooks/exhaustive-deps
           })
         );
 
@@ -226,14 +241,14 @@ function SRSPanel() {
           userInfo.numberOfCards
         );
 
-        setCardsToBeShowed([
-          ...cardsToBeAdded,
-          ...cardsBeingReviewed,
-          ...cardsBeingLearned,
-          ...cardsBeingRelearned,
-        ]);
-
-        console.log(cardsToBeShowed);
+        setCardsToBeShowed(
+          [
+            ...cardsToBeAdded,
+            ...cardsBeingReviewed,
+            ...cardsBeingLearned,
+            ...cardsBeingRelearned,
+          ].sort(() => Math.random() - 0.5) //shuffle the list a bit
+        );
 
         setNewCardsNumber(cardsToBeAdded.length);
 
@@ -244,44 +259,144 @@ function SRSPanel() {
         setRelearnedCardsNumber(cardsBeingRelearned.length);
 
         setIsPageLoaded(true);
+
+        console.log(cardsToBeAdded);
       });
   }, []);
 
   return (
     <motion.div
-      className="bg-white flex h-screen w-screen items-center justify-center sm:rounded-lg 
-      sm:shadow-lg sm:my-8 sm:mx-8 md:my-8 md:mx-16 lg:my-16 lg:mx-32"
+      className="bg-white flex min-h-screen w-screen items-center justify-center sm:rounded-lg 
+      sm:shadow-lg sm:my-8 sm:mx-8 md:mx-16 lg:my-16 lg:mx-32"
       initial={{ height: 0, opacity: 0 }}
       animate={{ height: animationHeight, opacity: 1 }}
       transition={{ duration: 0.2 }}
     >
       {sessionStart && isPageLoaded ? (
-        <div className="flex flex-col items-center justify-center space-y-48">
-          <p className="text-5xl font-bol">
-            {cardsToBeShowed[cardCounter]
-              ? cardsToBeShowed[cardCounter].card.focus
-              : setSessionStart(false)}
-          </p>
+        isCardFlipped ? (
+          <div className="flex flex-col items-center justify-center space-y-4">
+            <div className="flex">
+              {cardsToBeShowed[cardCounter].card.images[0] && (
+                <div className="grid grid-cols-2 gap-2 sm:flex sm:space-x-2 2xl:space-x-4">
+                  {cardsToBeShowed[cardCounter].card.images.map((item, i) => {
+                    return (
+                      <div
+                        className="w-16 h-16 sm:w-32 sm:h-32 2xl:w-48 2xl:h-48 scale-105 rounded-lg hover:cursor-pointer hover:scale-110"
+                        key={i}
+                      >
+                        <Image
+                          loader={imageLoader}
+                          src={item}
+                          alt="Uploaded image"
+                          layout="fill"
+                          objectFit="contain"
+                          onClick={() => showImage(item)}
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
 
-          <div className="flex space-x-2">
-            <button
-              className="confirmation-button"
-              onClick={() =>
-                parseSRSResponse(cardsToBeShowed[cardCounter], true)
-              }
-            >
-              Acertei
-            </button>
-            <button
-              className="confirmation-button"
-              onClick={() =>
-                parseSRSResponse(cardsToBeShowed[cardCounter].cardStats, false)
-              }
-            >
-              Errei
-            </button>
+            <p className="text-4xl sm:text-5xl font-bol p-4">
+              {cardsToBeShowed[cardCounter]
+                ? cardsToBeShowed[cardCounter].card.sentence
+                : setSessionStart(false)}
+            </p>
+
+            <p className="text-2xl sm:text-3xl font-bold">
+              {cardsToBeShowed[cardCounter]
+                ? cardsToBeShowed[cardCounter].card.focus
+                : setSessionStart(false)}
+            </p>
+
+            <div className="flex flex-col">
+              {cardsToBeShowed[cardCounter].card.bilingualDescription && (
+                <ToggleBox
+                  title={"Descrição bilíngue"}
+                  text={cardsToBeShowed[cardCounter].card.bilingualDescription}
+                />
+              )}
+              {cardsToBeShowed[cardCounter].card.monolingualDescription && (
+                <ToggleBox
+                  title={"Descrição monolíngue"}
+                  text={
+                    cardsToBeShowed[cardCounter].card.monolingualDescription
+                  }
+                />
+              )}
+              {cardsToBeShowed[cardCounter].card.translation && (
+                <ToggleBox
+                  title={"Tradução"}
+                  text={cardsToBeShowed[cardCounter].card.translation}
+                />
+              )}
+              {cardsToBeShowed[cardCounter].card.notes && (
+                <ToggleBox
+                  title={"Observações"}
+                  text={cardsToBeShowed[cardCounter].card.notes}
+                />
+              )}
+            </div>
+            {cardsToBeShowed[cardCounter].card.sentenceAudio[0] && (
+              <div className="flex space-x-2">
+                {cardsToBeShowed[cardCounter].card.sentenceAudio.map(
+                  (item, i) => {
+                    return <PlayAudioButton audio={item} key={i} />;
+                  }
+                )}
+                {cardsToBeShowed[cardCounter].card.focusAudio[0] &&
+                  cardsToBeShowed[cardCounter].card.focusAudio.map(
+                    (item, i) => {
+                      return <PlayAudioButton audio={item} key={i} />;
+                    }
+                  )}
+              </div>
+            )}
+
+            <div className="flex space-x-2 p-4">
+              <button
+                className="confirmation-button"
+                onClick={() =>
+                  parseSRSResponse(cardsToBeShowed[cardCounter], true)
+                }
+              >
+                Acertei
+              </button>
+              <button
+                className="confirmation-button"
+                onClick={() =>
+                  parseSRSResponse(
+                    cardsToBeShowed[cardCounter].cardStats,
+                    false
+                  )
+                }
+              >
+                Errei
+              </button>
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center space-y-48">
+            <p className="text-5xl font-bol">
+              {cardsToBeShowed[cardCounter]
+                ? cardsToBeShowed[cardCounter].card.sentence //try to show the sentence, if theres no sentence, show the focus
+                  ? cardsToBeShowed[cardCounter].card.sentence
+                  : cardsToBeShowed[cardCounter].card.focus
+                : setSessionStart(false)}
+            </p>
+
+            <div className="flex space-x-2">
+              <button
+                className="confirmation-button"
+                onClick={() => setIsCardFlipped(true)}
+              >
+                Virar carta
+              </button>
+            </div>
+          </div>
+        )
       ) : (
         <div className="flex flex-col space-y-2">
           <p className="text-3xl font-bol">Bem-vindo de volta!</p>
