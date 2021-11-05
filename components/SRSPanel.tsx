@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { api, verifyToken } from "../utils/api";
 
@@ -8,6 +9,114 @@ function SRSPanel() {
   const [newCardsNumber, setNewCardsNumber] = useState(0);
   const [reviewedCardsNumber, setReviewedCardsNumber] = useState(0);
   const [relearnedCardsNumber, setRelearnedCardsNumber] = useState(0);
+
+  const [cardCounter, setCardCounter] = useState(0);
+
+  const [cardsToBeShowed, setCardsToBeShowed] = useState([]);
+
+  const [sessionStart, setSessionStart] = useState(false);
+
+  const [isPageLoaded, setIsPageLoaded] = useState(false);
+
+  function getTotalCards() {
+    return newCardsNumber + relearnedCardsNumber + reviewedCardsNumber;
+  }
+
+  function addLapse(id, totalLapses, consecutiveLapses) {
+    api.patch(`card-stats/${id}`, {
+      totalLapses: totalLapses + 1,
+      consecutiveLapses: consecutiveLapses + 1,
+    });
+  }
+
+  function removeConsecutiveLapses(id) {
+    api.patch(`card-stats/${id}`, {
+      consecutiveLapses: 0,
+    });
+  }
+
+  function calculateInterval(repetitions, efactor, dueDate, pass, _id) {
+    api.post("card-stats/srs", {
+      repetitions: repetitions,
+      efactor: efactor,
+      dueDate: dueDate,
+      pass: pass,
+      statId: _id,
+    });
+  }
+
+  function changeState(id, newState) {
+    api.patch(`card-stats/${id}`, {
+      state: newState,
+    });
+  }
+
+  function parseSRSResponse(cardInfo, pass) {
+    console.log(pass);
+
+    const { cardStats } = cardInfo;
+    const {
+      state,
+      repetitions,
+      efactor,
+      dueDate,
+      _id,
+      totalLapses,
+      consecutiveLapses,
+    } = cardStats;
+
+    if (state === 0) {
+      changeState(_id, 1); //if the card is new, change state from new to learning
+      setNewCardsNumber(newCardsNumber - 1);
+      setReviewedCardsNumber(reviewedCardsNumber + 1);
+
+      setCardsToBeShowed([...cardsToBeShowed, cardInfo]);
+    }
+
+    if (pass) {
+      switch (state) {
+        case 1:
+          changeState(_id, 3); //if the card is in the learning state, change state to reviewing
+          setCardsToBeShowed([...cardsToBeShowed, cardInfo]);
+          break;
+
+        case 2:
+          changeState(_id, 3); //if the card is in the relearning state, change state to reviewing and remove consecutive lapses
+          removeConsecutiveLapses(_id);
+
+          setRelearnedCardsNumber(relearnedCardsNumber - 1);
+          setReviewedCardsNumber(reviewedCardsNumber + 1);
+
+          setCardsToBeShowed([...cardsToBeShowed, cardInfo]);
+
+          break;
+
+        case 3:
+          //if the card is in the reviewing state, calculate the interval for the next review and proceed
+          calculateInterval(repetitions, efactor, dueDate, pass, _id);
+          setReviewedCardsNumber(reviewedCardsNumber - 1);
+
+          break;
+      }
+    } else {
+      switch (state) {
+        case 1 || 2:
+          //if the user fails the card in the learning or relearning state, just send it to the end of the list
+          setCardsToBeShowed([...cardsToBeShowed, cardInfo]);
+          break;
+
+        case 3:
+          //if the user fails the card in the reviewing state, add a lapse and change it's state to relearning
+          changeState(_id, 3);
+          addLapse(_id, totalLapses, consecutiveLapses);
+          setCardsToBeShowed([...cardsToBeShowed, cardInfo]);
+
+          break;
+      }
+    }
+
+    setCardCounter(cardCounter + 1);
+  }
 
   useEffect(() => {
     animationHeight = window.innerWidth > 640 ? "80%" : "100%"; //640px is the cutoff for sm in tailwind
@@ -86,10 +195,8 @@ function SRSPanel() {
 
         const cardDataForTheDay = cardData.filter(
           (item: any) =>
-            new Date(item.cardStats.dueDate).getDay() === new Date().getDay()
+            new Date(item.cardStats.dueDate).getDay() <= new Date().getDay()
         );
-
-        console.log(cardDataForTheDay);
 
         //for the other states, grab only the cards due for the day
 
@@ -119,18 +226,24 @@ function SRSPanel() {
           userInfo.numberOfCards
         );
 
-        setNewCardsNumber(cardsToBeAdded.length);
+        setCardsToBeShowed([
+          ...cardsToBeAdded,
+          ...cardsBeingReviewed,
+          ...cardsBeingLearned,
+          ...cardsBeingRelearned,
+        ]);
 
-        console.log(cardsToBeAdded);
-        console.log(cardsBeingLearned);
-        console.log(cardsBeingRelearned);
-        console.log(cardsBeingReviewed);
+        console.log(cardsToBeShowed);
+
+        setNewCardsNumber(cardsToBeAdded.length);
 
         const totalReviewedCards =
           cardsBeingLearned.length + cardsBeingReviewed.length;
 
         setReviewedCardsNumber(totalReviewedCards);
         setRelearnedCardsNumber(cardsBeingRelearned.length);
+
+        setIsPageLoaded(true);
       });
   }, []);
 
@@ -142,26 +255,63 @@ function SRSPanel() {
       animate={{ height: animationHeight, opacity: 1 }}
       transition={{ duration: 0.2 }}
     >
-      <div className="flex flex-col space-y-2">
-        <p className="text-2xl">Bem-vindo de volta!</p>
-
-        <div className="flex flex-col">
-          <div className="flex space-x-2">
-            <p>Novas cartas: </p>
-            <p className="text-blue-700">{newCardsNumber}</p>
-          </div>
-
-          <div className="flex space-x-2">
-            <p>Cartas para revisão: </p>
-            <p className="text-green-700">{reviewedCardsNumber}</p>
-          </div>
+      {sessionStart && isPageLoaded ? (
+        <div className="flex flex-col items-center justify-center space-y-48">
+          <p className="text-5xl font-bol">
+            {cardsToBeShowed[cardCounter]
+              ? cardsToBeShowed[cardCounter].card.focus
+              : setSessionStart(false)}
+          </p>
 
           <div className="flex space-x-2">
-            <p>Cartas a serem reaprendidas: </p>
-            <p className="text-red-700">{relearnedCardsNumber}</p>
+            <button
+              className="confirmation-button"
+              onClick={() =>
+                parseSRSResponse(cardsToBeShowed[cardCounter], true)
+              }
+            >
+              Acertei
+            </button>
+            <button
+              className="confirmation-button"
+              onClick={() =>
+                parseSRSResponse(cardsToBeShowed[cardCounter].cardStats, false)
+              }
+            >
+              Errei
+            </button>
           </div>
         </div>
-      </div>
+      ) : (
+        <div className="flex flex-col space-y-2">
+          <p className="text-3xl font-bol">Bem-vindo de volta!</p>
+
+          <div className="flex flex-col">
+            <div className="flex space-x-2">
+              <p>Novas cartas: </p>
+              <p className="text-blue-700">{newCardsNumber}</p>
+            </div>
+
+            <div className="flex space-x-2">
+              <p>Cartas para revisão: </p>
+              <p className="text-green-700">{reviewedCardsNumber}</p>
+            </div>
+
+            <div className="flex space-x-2">
+              <p>Cartas a serem reaprendidas: </p>
+              <p className="text-red-700">{relearnedCardsNumber}</p>
+            </div>
+          </div>
+          <button
+            className="confirmation-button"
+            onClick={() => {
+              setSessionStart(true);
+            }}
+          >
+            Começar
+          </button>
+        </div>
+      )}
     </motion.div>
   );
 }
