@@ -54,10 +54,17 @@ function SRSPanel() {
     });
   }
 
-  function changeState(id, newState) {
-    api.patch(`card-stats/${id}`, {
-      state: newState,
-    });
+  function changeState(id, newState): any {
+    api
+      .patch(`card-stats/${id}`, {
+        state: newState,
+      })
+      .then((res) => {
+        return res.data.state;
+      })
+      .catch((err) => {
+        return null;
+      });
   }
 
   function showImage(item) {
@@ -66,8 +73,6 @@ function SRSPanel() {
   }
 
   function parseSRSResponse(cardInfo, pass) {
-    console.log(pass);
-
     const { cardStats } = cardInfo;
     const {
       state,
@@ -79,23 +84,35 @@ function SRSPanel() {
       consecutiveLapses,
     } = cardStats;
 
+    console.log(cardCounter);
+    console.log(cardsToBeShowed);
+
     if (state === 0) {
+      console.log("STATE 0");
       changeState(_id, 1); //if the card is new, change state from new to learning
       setNewCardsNumber(newCardsNumber - 1);
       setReviewedCardsNumber(reviewedCardsNumber + 1);
 
       setCardsToBeShowed([...cardsToBeShowed, cardInfo]);
     }
+    let newState;
 
     if (pass) {
       switch (state) {
         case 1:
-          changeState(_id, 3); //if the card is in the learning state, change state to reviewing
+          console.log("STATE 1");
+          newState = changeState(_id, 3); //if the card is in the learning state, change state to reviewing
+          if (newState) cardInfo.cardStats.state = newState; //change the state in the current session
+
           setCardsToBeShowed([...cardsToBeShowed, cardInfo]);
           break;
 
         case 2:
-          changeState(_id, 3); //if the card is in the relearning state, change state to reviewing and remove consecutive lapses
+          console.log("STATE 2");
+
+          newState = changeState(_id, 3); //if the card is in the relearning state, change state to reviewing and remove consecutive lapses
+          if (newState) cardInfo.cardStats.state = newState; //change the state in the current session
+
           removeConsecutiveLapses(_id);
 
           setRelearnedCardsNumber(relearnedCardsNumber - 1);
@@ -106,6 +123,8 @@ function SRSPanel() {
           break;
 
         case 3:
+          console.log("STATE 3");
+
           //if the card is in the reviewing state, calculate the interval for the next review and proceed
           calculateInterval(repetitions, efactor, dueDate, pass, _id);
           setReviewedCardsNumber(reviewedCardsNumber - 1);
@@ -114,14 +133,17 @@ function SRSPanel() {
       }
     } else {
       switch (state) {
-        case 1 || 2:
+        case 1:
+        case 2:
           //if the user fails the card in the learning or relearning state, just send it to the end of the list
           setCardsToBeShowed([...cardsToBeShowed, cardInfo]);
           break;
 
         case 3:
           //if the user fails the card in the reviewing state, add a lapse and change it's state to relearning
-          changeState(_id, 3);
+          newState = changeState(_id, 3);
+          if (newState) cardInfo.cardStats.state = newState; //change the state in the current session
+
           addLapse(_id, totalLapses, consecutiveLapses);
           setCardsToBeShowed([...cardsToBeShowed, cardInfo]);
 

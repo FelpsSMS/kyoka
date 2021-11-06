@@ -17,6 +17,8 @@ export default function Library({ sorting, libraryChanged, search }) {
         let decks;
         const data = res.data;
 
+        console.log(data);
+
         decks = await Promise.all(
           data.map(async (item) => {
             const deck = api.get(`decks/${item.deck}`).then((res) => {

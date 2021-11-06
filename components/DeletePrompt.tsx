@@ -3,16 +3,30 @@ import axios from "axios";
 import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/router";
 import React, { useRef, useState } from "react";
+import { api } from "../utils/api";
 
 function DeletePrompt({ show, setShow, id, routeName, title }) {
   const completeButtonRef = useRef(null);
   const router = useRouter();
 
   function confirmFunction() {
-    axios
-      .delete(`${process.env.NEXT_PUBLIC_API_ENDPOINT}/${routeName}/${id}`)
+    api
+      .delete(`${routeName}/${id}`)
       .then(() => {
-        router.back();
+        if (routeName == "cards") {
+          api.post("card-stats/delete-by-card-id", {
+            cardId: id,
+          });
+        }
+
+        if (routeName == "decks") {
+          api.post("deck-stats/delete-by-deck-id", {
+            deckId: id,
+          });
+        }
+      })
+      .then(() => {
+        setTimeout(() => router.back(), 500); //small delay before going back just in case
       })
       .catch((err) => {
         console.log(err);
