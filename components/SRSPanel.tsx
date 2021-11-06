@@ -54,17 +54,18 @@ function SRSPanel() {
     });
   }
 
-  function changeState(id, newState): any {
-    api
+  async function changeState(id, state) {
+    const newState = await api
       .patch(`card-stats/${id}`, {
-        state: newState,
+        state: state,
       })
-      .then((res) => {
-        return res.data.state;
-      })
+
       .catch((err) => {
+        console.log(err);
         return null;
       });
+
+    return newState.data.state;
   }
 
   function showImage(item) {
@@ -72,7 +73,7 @@ function SRSPanel() {
     setShow(true);
   }
 
-  function parseSRSResponse(cardInfo, pass) {
+  async function parseSRSResponse(cardInfo, pass) {
     const { cardStats } = cardInfo;
     const {
       state,
@@ -84,34 +85,34 @@ function SRSPanel() {
       consecutiveLapses,
     } = cardStats;
 
-    console.log(cardCounter);
-    console.log(cardsToBeShowed);
+    let newState;
 
-    if (state === 0) {
-      console.log("STATE 0");
-      changeState(_id, 1); //if the card is new, change state from new to learning
+    if (state == 0) {
+      newState = await changeState(_id, 1); //if the card is new, change state from new to learning
+      if (newState) cardInfo.cardStats.state = newState; //change the state in the current session
+
       setNewCardsNumber(newCardsNumber - 1);
       setReviewedCardsNumber(reviewedCardsNumber + 1);
 
       setCardsToBeShowed([...cardsToBeShowed, cardInfo]);
     }
-    let newState;
 
     if (pass) {
       switch (state) {
         case 1:
-          console.log("STATE 1");
-          newState = changeState(_id, 3); //if the card is in the learning state, change state to reviewing
+          newState = await changeState(_id, 3); //if the card is in the learning state, change state to reviewing
           if (newState) cardInfo.cardStats.state = newState; //change the state in the current session
+
+          //if (newState) cardInfo.cardStats.state = newState; //change the state in the current session
 
           setCardsToBeShowed([...cardsToBeShowed, cardInfo]);
           break;
 
         case 2:
-          console.log("STATE 2");
-
-          newState = changeState(_id, 3); //if the card is in the relearning state, change state to reviewing and remove consecutive lapses
+          newState = await changeState(_id, 3); //if the card is in the relearning state, change state to reviewing and remove consecutive lapses
           if (newState) cardInfo.cardStats.state = newState; //change the state in the current session
+
+          //if (newState) cardInfo.cardStats.state = newState; //change the state in the current session
 
           removeConsecutiveLapses(_id);
 
@@ -123,8 +124,6 @@ function SRSPanel() {
           break;
 
         case 3:
-          console.log("STATE 3");
-
           //if the card is in the reviewing state, calculate the interval for the next review and proceed
           calculateInterval(repetitions, efactor, dueDate, pass, _id);
           setReviewedCardsNumber(reviewedCardsNumber - 1);
@@ -141,8 +140,10 @@ function SRSPanel() {
 
         case 3:
           //if the user fails the card in the reviewing state, add a lapse and change it's state to relearning
-          newState = changeState(_id, 3);
+          newState = await changeState(_id, 3);
           if (newState) cardInfo.cardStats.state = newState; //change the state in the current session
+
+          //if (newState) cardInfo.cardStats.state = newState; //change the state in the current session
 
           addLapse(_id, totalLapses, consecutiveLapses);
           setCardsToBeShowed([...cardsToBeShowed, cardInfo]);
@@ -231,10 +232,19 @@ function SRSPanel() {
           (item: any) => item.cardStats.state === 0
         );
 
-        const cardDataForTheDay = cardData.filter(
-          (item: any) =>
-            new Date(item.cardStats.dueDate).getDay() <= new Date().getDay()
-        );
+        const cardDataForTheDay = cardData.filter((item: any) => {
+          const dueDay = new Date(item.cardStats.dueDate).getDate();
+          const currentDay = new Date().getDate();
+
+          console.log(dueDay);
+          console.log(currentDay);
+
+          return dueDay <= currentDay;
+        });
+
+        console.log("CardDataForTheDay");
+
+        console.log(cardDataForTheDay);
 
         //for the other states, grab only the cards due for the day
 
@@ -273,6 +283,8 @@ function SRSPanel() {
           ].sort(() => Math.random() - 0.5) //shuffle the list a bit
         );
 
+        console.log(cardsToBeShowed);
+
         setNewCardsNumber(cardsToBeAdded.length);
 
         const totalReviewedCards =
@@ -282,8 +294,6 @@ function SRSPanel() {
         setRelearnedCardsNumber(cardsBeingRelearned.length);
 
         setIsPageLoaded(true);
-
-        console.log(cardsToBeAdded);
       });
   }, []);
 
