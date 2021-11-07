@@ -41,6 +41,18 @@ function SRSPanel() {
     });
   }
 
+  function addFail(id, failCount) {
+    api.patch(`card-stats/${id}`, {
+      failCount: failCount + 1,
+    });
+  }
+
+  function addPass(id, passCount) {
+    api.patch(`card-stats/${id}`, {
+      passCount: passCount + 1,
+    });
+  }
+
   function removeConsecutiveLapses(id) {
     api.patch(`card-stats/${id}`, {
       consecutiveLapses: 0,
@@ -93,22 +105,26 @@ function SRSPanel() {
       _id,
       totalLapses,
       consecutiveLapses,
+      failCount,
+      passCount,
     } = cardStats;
 
+    if (state == 0) {
+      //newState =
+      await changeState(_id, 1); //if the card is new, change state from new to learning
+      //if (newState) cardInfo.cardStats.state = newState; //change the state in the current session
+
+      await calculateInterval(repetitions, efactor, dueDate, pass, _id);
+      console.log("Console log after calculateInterval");
+
+      //setNewCardsNumber(newCardsNumber - 1);
+      //setReviewedCardsNumber(reviewedCardsNumber + 1);
+
+      //setCardsToBeShowed([...cardsToBeShowed, cardInfo]);
+    }
+
     if (pass) {
-      if (state == 0) {
-        //newState =
-        await changeState(_id, 1); //if the card is new, change state from new to learning
-        //if (newState) cardInfo.cardStats.state = newState; //change the state in the current session
-
-        await calculateInterval(repetitions, efactor, dueDate, pass, _id);
-        console.log("Console log after calculateInterval");
-
-        //setNewCardsNumber(newCardsNumber - 1);
-        //setReviewedCardsNumber(reviewedCardsNumber + 1);
-
-        //setCardsToBeShowed([...cardsToBeShowed, cardInfo]);
-      }
+      addPass(_id, passCount);
 
       switch (state) {
         case 1:
@@ -144,6 +160,8 @@ function SRSPanel() {
           break;
       }
     } else {
+      addFail(_id, failCount);
+
       switch (state) {
         case 1:
         case 2:
