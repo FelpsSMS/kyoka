@@ -6,6 +6,7 @@ import Image from "next/image";
 import ToggleBox from "./ToggleBox";
 import PlayAudioButton from "./PlayAudioButton";
 import ImagePopup from "./ImagePopup";
+import LoadingWheel from "./LoadingWheel";
 
 function SRSPanel() {
   let animationHeight = "";
@@ -21,15 +22,17 @@ function SRSPanel() {
   const [reviewedCardsNumber, setReviewedCardsNumber] = useState(0);
   const [relearnedCardsNumber, setRelearnedCardsNumber] = useState(0);
 
-  const [cardCounter, setCardCounter] = useState(0);
-
   const [cardsToBeShowed, setCardsToBeShowed] = useState([]);
+
+  const [reloadCards, setReloadCards] = useState(false);
 
   const [sessionStart, setSessionStart] = useState(false);
 
   const [isPageLoaded, setIsPageLoaded] = useState(false);
 
   const [isCardFlipped, setIsCardFlipped] = useState(false);
+
+  const [isDataLoaded, setIsDataLoaded] = useState(false);
 
   function addLapse(id, totalLapses, consecutiveLapses) {
     api.patch(`card-stats/${id}`, {
@@ -44,18 +47,26 @@ function SRSPanel() {
     });
   }
 
-  function calculateInterval(repetitions, efactor, dueDate, pass, _id) {
-    api.post("card-stats/srs", {
-      repetitions: repetitions,
-      efactor: efactor,
-      dueDate: dueDate,
-      pass: pass,
-      statId: _id,
-    });
+  async function calculateInterval(repetitions, efactor, dueDate, pass, _id) {
+    await api
+      .post("card-stats/srs", {
+        repetitions: repetitions,
+        efactor: efactor,
+        dueDate: dueDate,
+        pass: pass,
+        statId: _id,
+      })
+      .then(() => {
+        setReloadCards(!reloadCards);
+        setIsDataLoaded(false);
+        console.log("Dentro do calculateInterval");
+        //setIsPageLoaded(false);
+      });
   }
 
   async function changeState(id, state) {
-    const newState = await api
+    //const newState =
+    await api
       .patch(`card-stats/${id}`, {
         state: state,
       })
@@ -65,7 +76,7 @@ function SRSPanel() {
         return null;
       });
 
-    return newState.data.state;
+    //return newState.data.state;
   }
 
   function showImage(item) {
@@ -73,8 +84,7 @@ function SRSPanel() {
     setShow(true);
   }
 
-  async function parseSRSResponse(cardInfo, pass) {
-    const { cardStats } = cardInfo;
+  async function checkSRS(cardStats, pass) {
     const {
       state,
       repetitions,
@@ -85,48 +95,51 @@ function SRSPanel() {
       consecutiveLapses,
     } = cardStats;
 
-    let newState;
-
-    if (state == 0) {
-      newState = await changeState(_id, 1); //if the card is new, change state from new to learning
-      if (newState) cardInfo.cardStats.state = newState; //change the state in the current session
-
-      setNewCardsNumber(newCardsNumber - 1);
-      setReviewedCardsNumber(reviewedCardsNumber + 1);
-
-      setCardsToBeShowed([...cardsToBeShowed, cardInfo]);
-    }
-
     if (pass) {
+      if (state == 0) {
+        //newState =
+        await changeState(_id, 1); //if the card is new, change state from new to learning
+        //if (newState) cardInfo.cardStats.state = newState; //change the state in the current session
+
+        await calculateInterval(repetitions, efactor, dueDate, pass, _id);
+        console.log("Console log after calculateInterval");
+
+        //setNewCardsNumber(newCardsNumber - 1);
+        //setReviewedCardsNumber(reviewedCardsNumber + 1);
+
+        //setCardsToBeShowed([...cardsToBeShowed, cardInfo]);
+      }
+
       switch (state) {
         case 1:
-          newState = await changeState(_id, 3); //if the card is in the learning state, change state to reviewing
-          if (newState) cardInfo.cardStats.state = newState; //change the state in the current session
-
+          //newState =
+          await changeState(_id, 3); //if the card is in the learning state, change state to reviewing
           //if (newState) cardInfo.cardStats.state = newState; //change the state in the current session
 
-          setCardsToBeShowed([...cardsToBeShowed, cardInfo]);
+          //setCardsToBeShowed([...cardsToBeShowed, cardInfo]);
+          await calculateInterval(repetitions, efactor, dueDate, pass, _id);
+
           break;
 
         case 2:
-          newState = await changeState(_id, 3); //if the card is in the relearning state, change state to reviewing and remove consecutive lapses
-          if (newState) cardInfo.cardStats.state = newState; //change the state in the current session
-
+          //newState =
+          await changeState(_id, 3); //if the card is in the relearning state, change state to reviewing and remove consecutive lapses
           //if (newState) cardInfo.cardStats.state = newState; //change the state in the current session
 
           removeConsecutiveLapses(_id);
 
-          setRelearnedCardsNumber(relearnedCardsNumber - 1);
-          setReviewedCardsNumber(reviewedCardsNumber + 1);
+          // setRelearnedCardsNumber(relearnedCardsNumber - 1);
+          // setReviewedCardsNumber(reviewedCardsNumber + 1);
 
-          setCardsToBeShowed([...cardsToBeShowed, cardInfo]);
+          //setCardsToBeShowed([...cardsToBeShowed, cardInfo]);
+          await calculateInterval(repetitions, efactor, dueDate, pass, _id);
 
           break;
 
         case 3:
           //if the card is in the reviewing state, calculate the interval for the next review and proceed
-          calculateInterval(repetitions, efactor, dueDate, pass, _id);
-          setReviewedCardsNumber(reviewedCardsNumber - 1);
+          await calculateInterval(repetitions, efactor, dueDate, pass, _id);
+          //setReviewedCardsNumber(reviewedCardsNumber - 1);
 
           break;
       }
@@ -135,25 +148,33 @@ function SRSPanel() {
         case 1:
         case 2:
           //if the user fails the card in the learning or relearning state, just send it to the end of the list
-          setCardsToBeShowed([...cardsToBeShowed, cardInfo]);
+          //setCardsToBeShowed([...cardsToBeShowed, cardInfo]);
+          await calculateInterval(repetitions, efactor, dueDate, pass, _id);
+
           break;
 
         case 3:
           //if the user fails the card in the reviewing state, add a lapse and change it's state to relearning
-          newState = await changeState(_id, 3);
-          if (newState) cardInfo.cardStats.state = newState; //change the state in the current session
-
+          //newState =
+          await changeState(_id, 3);
           //if (newState) cardInfo.cardStats.state = newState; //change the state in the current session
 
           addLapse(_id, totalLapses, consecutiveLapses);
-          setCardsToBeShowed([...cardsToBeShowed, cardInfo]);
+          //setCardsToBeShowed([...cardsToBeShowed, cardInfo]);
+          await calculateInterval(repetitions, efactor, dueDate, pass, _id);
 
           break;
       }
     }
+  }
 
-    setCardCounter(cardCounter + 1);
-    setIsCardFlipped(false);
+  async function parseSRSResponse(cardInfo, pass) {
+    const { cardStats } = cardInfo;
+
+    await checkSRS(cardStats, pass).then(() => {
+      console.log("checkSRS");
+      if (isDataLoaded) setIsCardFlipped(false);
+    });
   }
 
   useEffect(() => {
@@ -236,15 +257,8 @@ function SRSPanel() {
           const dueDay = new Date(item.cardStats.dueDate).getDate();
           const currentDay = new Date().getDate();
 
-          console.log(dueDay);
-          console.log(currentDay);
-
           return dueDay <= currentDay;
         });
-
-        console.log("CardDataForTheDay");
-
-        console.log(cardDataForTheDay);
 
         //for the other states, grab only the cards due for the day
 
@@ -283,8 +297,6 @@ function SRSPanel() {
           ].sort(() => Math.random() - 0.5) //shuffle the list a bit
         );
 
-        console.log(cardsToBeShowed);
-
         setNewCardsNumber(cardsToBeAdded.length);
 
         const totalReviewedCards =
@@ -294,8 +306,11 @@ function SRSPanel() {
         setRelearnedCardsNumber(cardsBeingRelearned.length);
 
         setIsPageLoaded(true);
+
+        console.log("Console log before setting isDataLoaded inside useEffect");
+        setIsDataLoaded(true);
       });
-  }, []);
+  }, [reloadCards]);
 
   return (
     <motion.div
@@ -307,12 +322,12 @@ function SRSPanel() {
     >
       <ImagePopup show={show} setShow={() => setShow(false)} src={src} />
       {sessionStart && isPageLoaded ? (
-        isCardFlipped ? (
+        isCardFlipped && isDataLoaded ? (
           <div className="flex flex-col items-center justify-center space-y-4">
             <div className="flex">
-              {cardsToBeShowed[cardCounter].card.images[0] && (
+              {cardsToBeShowed[0].card.images[0] && (
                 <div className="grid grid-cols-2 gap-2 sm:flex sm:space-x-2 2xl:space-x-4">
-                  {cardsToBeShowed[cardCounter].card.images.map((item, i) => {
+                  {cardsToBeShowed[0].card.images.map((item, i) => {
                     return (
                       <div
                         className="w-16 h-16 sm:w-32 sm:h-32 2xl:w-48 2xl:h-48 scale-105 rounded-lg hover:cursor-pointer hover:scale-110"
@@ -334,78 +349,65 @@ function SRSPanel() {
             </div>
 
             <p className="text-4xl sm:text-5xl font-bol p-4">
-              {cardsToBeShowed[cardCounter]
-                ? cardsToBeShowed[cardCounter].card.sentence
+              {cardsToBeShowed[0]
+                ? cardsToBeShowed[0].card.sentence
                 : setSessionStart(false)}
             </p>
 
             <p className="text-2xl sm:text-3xl font-bold">
-              {cardsToBeShowed[cardCounter]
-                ? cardsToBeShowed[cardCounter].card.focus
+              {cardsToBeShowed[0]
+                ? cardsToBeShowed[0].card.focus
                 : setSessionStart(false)}
             </p>
 
             <div className="flex flex-col">
-              {cardsToBeShowed[cardCounter].card.bilingualDescription && (
+              {cardsToBeShowed[0].card.bilingualDescription && (
                 <ToggleBox
                   title={"Descrição bilíngue"}
-                  text={cardsToBeShowed[cardCounter].card.bilingualDescription}
+                  text={cardsToBeShowed[0].card.bilingualDescription}
                 />
               )}
-              {cardsToBeShowed[cardCounter].card.monolingualDescription && (
+              {cardsToBeShowed[0].card.monolingualDescription && (
                 <ToggleBox
                   title={"Descrição monolíngue"}
-                  text={
-                    cardsToBeShowed[cardCounter].card.monolingualDescription
-                  }
+                  text={cardsToBeShowed[0].card.monolingualDescription}
                 />
               )}
-              {cardsToBeShowed[cardCounter].card.translation && (
+              {cardsToBeShowed[0].card.translation && (
                 <ToggleBox
                   title={"Tradução"}
-                  text={cardsToBeShowed[cardCounter].card.translation}
+                  text={cardsToBeShowed[0].card.translation}
                 />
               )}
-              {cardsToBeShowed[cardCounter].card.notes && (
+              {cardsToBeShowed[0].card.notes && (
                 <ToggleBox
                   title={"Observações"}
-                  text={cardsToBeShowed[cardCounter].card.notes}
+                  text={cardsToBeShowed[0].card.notes}
                 />
               )}
             </div>
-            {cardsToBeShowed[cardCounter].card.sentenceAudio[0] && (
+            {cardsToBeShowed[0].card.sentenceAudio[0] && (
               <div className="flex space-x-2">
-                {cardsToBeShowed[cardCounter].card.sentenceAudio.map(
-                  (item, i) => {
+                {cardsToBeShowed[0].card.sentenceAudio.map((item, i) => {
+                  return <PlayAudioButton audio={item} key={i} />;
+                })}
+                {cardsToBeShowed[0].card.focusAudio[0] &&
+                  cardsToBeShowed[0].card.focusAudio.map((item, i) => {
                     return <PlayAudioButton audio={item} key={i} />;
-                  }
-                )}
-                {cardsToBeShowed[cardCounter].card.focusAudio[0] &&
-                  cardsToBeShowed[cardCounter].card.focusAudio.map(
-                    (item, i) => {
-                      return <PlayAudioButton audio={item} key={i} />;
-                    }
-                  )}
+                  })}
               </div>
             )}
 
             <div className="flex space-x-2 p-4">
               <button
                 className="confirmation-button"
-                onClick={() =>
-                  parseSRSResponse(cardsToBeShowed[cardCounter], true)
-                }
+                onClick={() => parseSRSResponse(cardsToBeShowed[0], true)}
               >
                 Acertei
               </button>
               <button
                 className="confirmation-button"
-                onClick={() =>
-                  parseSRSResponse(
-                    cardsToBeShowed[cardCounter].cardStats,
-                    false
-                  )
-                }
+                onClick={() => parseSRSResponse(cardsToBeShowed[0], false)}
               >
                 Errei
               </button>
@@ -414,11 +416,19 @@ function SRSPanel() {
         ) : (
           <div className="flex flex-col items-center justify-center space-y-48">
             <p className="text-5xl font-bol">
-              {cardsToBeShowed[cardCounter]
-                ? cardsToBeShowed[cardCounter].card.sentence //try to show the sentence, if theres no sentence, show the focus
-                  ? cardsToBeShowed[cardCounter].card.sentence
-                  : cardsToBeShowed[cardCounter].card.focus
-                : setSessionStart(false)}
+              {isDataLoaded ? (
+                cardsToBeShowed[0] ? (
+                  cardsToBeShowed[0].card.sentence ? ( //try to show the sentence, if theres no sentence, show the focus
+                    cardsToBeShowed[0].card.sentence
+                  ) : (
+                    cardsToBeShowed[0].card.focus
+                  )
+                ) : (
+                  setSessionStart(false)
+                )
+              ) : (
+                <LoadingWheel />
+              )}
             </p>
 
             <div className="flex space-x-2">
