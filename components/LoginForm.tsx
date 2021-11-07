@@ -15,6 +15,9 @@ export const LoginForm = () => {
   const [forgotPasswordForm, setForgotPasswordForm] = useState(false);
   const [loginSuccessful, setLoginSuccessful] = useState(false);
   const [passwordResetSuccessful, setPasswordResetSuccessful] = useState(false);
+  const [verificationSuccessful, setVerificationSuccessful] = useState(false);
+  const [emailVerificationSent, setEmailVerificationSent] = useState(false);
+  const [informedEmail, setInformedEmail] = useState("");
 
   const validateLogin = Yup.object({
     email: Yup.string()
@@ -40,6 +43,8 @@ export const LoginForm = () => {
   });
 
   async function handleLogin({ email, password }) {
+    setInformedEmail(email);
+
     await api
       .post("/users/login", {
         email,
@@ -55,6 +60,8 @@ export const LoginForm = () => {
           });
 
           router.push("/home");
+        } else if (!response.data.isVerified) {
+          setVerificationSuccessful(true);
         } else {
           setLoginSuccessful(!response.data.success);
         }
@@ -62,10 +69,18 @@ export const LoginForm = () => {
   }
 
   async function handleRegistration({ email, password }) {
-    await api.post("/users/", {
-      email,
-      password,
-    });
+    await api
+      .post("/users/", {
+        email,
+        password,
+      })
+      .then(async () => {
+        await api.post("/users/email-verification", {
+          email,
+        });
+
+        setEmailVerificationSent(true);
+      });
   }
 
   async function handleForgot({ email }) {
@@ -76,6 +91,12 @@ export const LoginForm = () => {
       .then((response) => {
         setPasswordResetSuccessful(response.data.success);
       });
+  }
+
+  async function sendVerificationEmail(email) {
+    await api.post(`users/email-verification`, {
+      email,
+    });
   }
 
   return (
@@ -98,6 +119,21 @@ export const LoginForm = () => {
             {loginSuccessful && (
               <div className="bg-red-200 p-4 rounded-lg w-full">
                 <label className="text-red-900">Credenciais inválidas</label>
+              </div>
+            )}
+
+            {verificationSuccessful && (
+              <div className="bg-red-200 p-4 rounded-lg w-full flex flex-col">
+                <label className="text-red-900 whitespace-normal">
+                  Por favor, verifique sua conta. Caso você não tenha recebido
+                  um e-mail de verificação, clique no link abaixo
+                </label>
+                <a
+                  className="text-blue-500 hover:cursor-pointer hover:text-blue-700"
+                  onClick={() => sendVerificationEmail(informedEmail)}
+                >
+                  Clique aqui
+                </a>
               </div>
             )}
             <h1 className="font-black text-3xl sm:text-5xl">Login</h1>
@@ -148,6 +184,13 @@ export const LoginForm = () => {
             sm:shadow-lg lg:w-2/5 md:w-3/5 sm:rounded-lg sm:w-4/5 sm:items-start sm:justify-start p-4
             whitespace-nowrap"
             >
+              {emailVerificationSent && (
+                <div className="bg-green-200 p-4 rounded-lg w-full">
+                  <label className="text-green-900">
+                    Um e-mail de verificação foi enviada para o e-mail informado
+                  </label>
+                </div>
+              )}
               <h1 className="font-black text-3xl sm:text-5xl">Criar conta</h1>
               <div className="flex flex-col w-full space-y-4">
                 <TextField label="E-mail" name="email" type="text" />
@@ -187,6 +230,7 @@ export const LoginForm = () => {
                   </label>
                 </div>
               )}
+
               <h1 className="font-black text-3xl sm:text-5xl">
                 Insira seu e-mail
               </h1>
