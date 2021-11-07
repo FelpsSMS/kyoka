@@ -3,6 +3,7 @@ const navbarElements = [
   //{ title: "Adicionar carta", link: "/test" },
   { title: "Biblioteca", link: "/library" },
   { title: "Clipboard", link: "/test" },
+  { title: "Configurações", link: "/preferences" },
   { title: "Logout", link: "/logout" },
 ];
 

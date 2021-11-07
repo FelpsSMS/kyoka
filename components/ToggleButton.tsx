@@ -1,12 +1,17 @@
 import { useState } from "react";
 import { Switch } from "@headlessui/react";
 
-export default function ToggleButton({ enabled, setEnabled }) {
+export default function ToggleButton({
+  enabled,
+  setEnabled,
+  textColor,
+  label,
+}) {
   return (
     <Switch.Group>
       <div className="flex flex-col items-center justify-center md:flex-row my-2">
-        <Switch.Label className="m-4 font-bold text-white">
-          Ativar deck
+        <Switch.Label className={`m-4 font-bold text-${textColor}`}>
+          {label}
         </Switch.Label>
         <Switch
           checked={enabled}

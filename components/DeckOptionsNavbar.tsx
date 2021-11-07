@@ -59,7 +59,14 @@ function DeckOptionsNavbar({ deckId }) {
         title="Você realmente deseja excluir este deck?"
       />
 
-      <ToggleButton enabled={enabled} setEnabled={setEnabled} />
+      {toggleLoaded && (
+        <ToggleButton
+          enabled={enabled}
+          setEnabled={setEnabled}
+          textColor={"white"}
+          label={"Ativar deck"}
+        />
+      )}
 
       <div className="flex flex-col sm:flex-row">
         <button
