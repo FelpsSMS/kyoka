@@ -39,6 +39,9 @@ function NewDeckPrompt({
   async function sendToServer(values) {
     const deckName = values.deckName;
 
+    //Get user ID from jwt token
+    const userId = verifyToken();
+
     //if deck id is passed, then update
     if (deckId) {
       api
@@ -54,12 +57,10 @@ function NewDeckPrompt({
       api
         .post(`/decks`, {
           name: deckName,
+          creator: userId,
         })
         .then((res) => {
           const recentlyCreatedId = res.data._id;
-
-          //Get user ID from jwt token
-          const userId = verifyToken();
 
           //Create SRS stats for the deck
 

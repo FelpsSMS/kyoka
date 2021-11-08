@@ -10,7 +10,7 @@ import DeletePrompt from "./DeletePrompt";
 import { api } from "../utils/api";
 import { useRouter } from "next/router";
 
-export const CardInfoUpdateForm = ({ cardDetails: card }) => {
+export const CardInfoUpdateForm = ({ cardDetails: card, readOnly }) => {
   const [showDeletePrompt, setShowDeletePrompt] = useState(false);
   const router = useRouter();
 
@@ -114,17 +114,29 @@ export const CardInfoUpdateForm = ({ cardDetails: card }) => {
           />
           <Form className="flex flex-col flex-wrap m-4">
             <div className="flex flex-col w-full space-y-4">
-              <TextField label="Frase" name="sentence" type="text" />
-              <TextField label="Foco" name="focus" type="text" />
+              <TextField
+                label="Frase"
+                name="sentence"
+                type="text"
+                readOnly={readOnly}
+              />
+              <TextField
+                label="Foco"
+                name="focus"
+                type="text"
+                readOnly={readOnly}
+              />
               <TextArea
                 label="Descrição bilíngue"
                 name="bilingualDescription"
                 type="text"
+                readOnly={readOnly}
               />
               <TextArea
                 label="Descrição monolíngue"
                 name="monolingualDescription"
                 type="text"
+                readOnly={readOnly}
               />
               <AudioDropzone
                 label="Áudio da frase"
@@ -166,6 +178,7 @@ export const CardInfoUpdateForm = ({ cardDetails: card }) => {
                     fileExchange={(image) => {
                       formik.setFieldValue("image2Holder", image);
                     }}
+                    readOnly={readOnly}
                   />
                 </div>
                 <div className="flex space-x-4 xs:space-x-4">
@@ -189,8 +202,14 @@ export const CardInfoUpdateForm = ({ cardDetails: card }) => {
                 label="Tradução da frase"
                 name="translation"
                 type="text"
+                readOnly={readOnly}
               />
-              <TextArea label="Observações" name="notes" type="text" />
+              <TextArea
+                label="Observações"
+                name="notes"
+                type="text"
+                readOnly={readOnly}
+              />
             </div>
             <div className="flex items-center justify-center space-x-2 sm:space-x-4">
               <button

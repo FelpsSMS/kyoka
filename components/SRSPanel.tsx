@@ -243,9 +243,10 @@ function SRSPanel() {
             const cardStats = await api
               .post(`card-stats/card`, {
                 cardId: item._id,
+                userId: userId,
               })
               .then((res) => {
-                return res.data[0];
+                return res.data;
               });
 
             return { cardStats: cardStats, card: item };

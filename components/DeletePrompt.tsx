@@ -3,34 +3,115 @@ import axios from "axios";
 import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/router";
 import React, { useRef, useState } from "react";
-import { api } from "../utils/api";
+import { api, verifyToken } from "../utils/api";
 
 function DeletePrompt({ show, setShow, id, routeName, title }) {
   const completeButtonRef = useRef(null);
   const router = useRouter();
 
-  function confirmFunction() {
-    api
-      .delete(`${routeName}/${id}`)
-      .then(() => {
-        if (routeName == "cards") {
-          api.post("card-stats/delete-by-card-id", {
-            cardId: id,
-          });
-        }
+  const userId = verifyToken();
 
-        if (routeName == "decks") {
-          api.post("deck-stats/delete-by-deck-id", {
-            deckId: id,
+  async function confirmFunction() {
+    if (routeName == "cards") {
+      const card = await api.get(`cards/${id}`);
+
+      const deckId = card.data.deck;
+
+      const deckInfo = await api
+        .post("deck-stats/stats", {
+          deckId: deckId,
+          userId: userId,
+        })
+        .then((res) => {
+          return res.data;
+        });
+
+      await api
+        .post("card-stats/delete-by-card-and-user-id", {
+          cardId: id,
+          userId: userId,
+          readOnly: deckInfo.readOnly,
+        })
+        .then(async (res) => {
+          const deleteAuth = res.data;
+
+          if (deleteAuth) {
+            await api
+              .post("cards/authenticate-deletion-and-delete", {
+                creator: userId,
+                id: id,
+              })
+              .then(() => {
+                setTimeout(() => router.back(), 500); //small delay before going back just in case
+              })
+              .catch((err) => {
+                console.log(err);
+              });
+          } else {
+            setTimeout(() => router.back(), 500); //small delay before going back just in case
+          }
+        });
+    }
+
+    if (routeName == "decks") {
+      await api
+        .post("deck-stats/delete-by-deck-and-user-id", {
+          deckId: id,
+          userId: userId,
+        })
+        .then(async (res) => {
+          const deleteAuth = res.data;
+
+          //delete all cardStats associated
+          api.get(`cards/get_cards/${id}`).then(async (res) => {
+            await Promise.all(
+              res.data.map(async (item) => {
+                await api
+                  .post(`card-stats/delete-by-card-and-user-id`, {
+                    cardId: item._id,
+                    userId: userId,
+                    readOnly: false,
+                  })
+                  .then((res) => {
+                    return res.data;
+                  });
+              })
+            );
           });
-        }
-      })
-      .then(() => {
-        setTimeout(() => router.back(), 500); //small delay before going back just in case
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+
+          if (deleteAuth) {
+            await api.post("decks/authenticate-deletion-and-delete", {
+              creator: userId,
+              id: id,
+            });
+            //delete all cards associated
+            api
+              .get(`cards/get_cards/${id}`)
+              .then(async (res) => {
+                await Promise.all(
+                  res.data.map(async (item) => {
+                    await api
+                      .post(`cards/authenticate-deletion-and-delete`, {
+                        id: item._id,
+                        creator: userId,
+                      })
+                      .then((res) => {
+                        return res.data;
+                      });
+                  })
+                );
+              })
+              .then(() => {
+                setTimeout(() => router.back(), 500); //small delay before going back just in case
+              })
+              .catch((err) => {
+                console.log(err);
+              });
+          } else {
+            setTimeout(() => router.back(), 500); //small delay before going back just in case
+          }
+        });
+    }
   }
 
   return (

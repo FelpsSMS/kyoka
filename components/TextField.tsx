@@ -14,7 +14,9 @@ export const TextField = (props) => {
         className={`${
           props.type === "file"
             ? ""
-            : `rounded-lg bg-gray-200 text-xl p-2 outline-none  ${
+            : `rounded-lg  text-xl p-2 outline-none ${
+                props.readOnly ? "bg-gray-400" : "bg-gray-200"
+              } ${
                 meta.error
                   ? "border-2 border-red-700"
                   : "focus:border-2 border-black"

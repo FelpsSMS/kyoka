@@ -1,7 +1,7 @@
 import { SearchIcon } from "@heroicons/react/outline";
 import router from "next/router";
 import React, { useEffect, useState } from "react";
-import { api } from "../utils/api";
+import { api, verifyToken } from "../utils/api";
 import DeletePrompt from "./DeletePrompt";
 import NewDeckPrompt from "./NewDeckPrompt";
 import ToggleButton from "./ToggleButton";
@@ -22,7 +22,7 @@ function DeckOptionsNavbar({ deckId }) {
           deckId: deckId,
         })
         .then((res) => {
-          setEnabled(res.data[0].active);
+          setEnabled(res.data.active);
 
           setToggleLoaded(true);
         });
@@ -30,10 +30,13 @@ function DeckOptionsNavbar({ deckId }) {
   }, [deckId]);
 
   useEffect(() => {
+    const userId = verifyToken();
+
     if (deckId && toggleLoaded) {
       api
         .post(`/deck-stats/update`, {
           deckId: deckId,
+          userId: userId,
           updateBody: { active: enabled },
         })
         .catch((err) => {

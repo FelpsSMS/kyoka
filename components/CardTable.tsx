@@ -1,7 +1,7 @@
 import axios from "axios";
 import { AnimatePresence, motion, AnimateSharedLayout } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
-import { api } from "../utils/api";
+import { api, verifyToken } from "../utils/api";
 import CardInfo from "./CardInfo";
 import CardTableItem from "./CardTableItem";
 
@@ -9,7 +9,11 @@ function CardTable({ deckId, search, sorting }) {
   const [cards, setCards] = useState([]);
   const [hasCards, setHasCards] = useState(true);
 
+  const [readOnly, setReadOnly] = useState(false);
+
   useEffect(() => {
+    const userId = verifyToken();
+
     api
       .get(`cards/get_cards/${deckId}`)
       .then(async (res) => {
@@ -18,9 +22,10 @@ function CardTable({ deckId, search, sorting }) {
             const cardStats = await api
               .post(`card-stats/card`, {
                 cardId: item._id,
+                userId: userId,
               })
               .then((res) => {
-                return res.data[0];
+                return res.data;
               });
 
             return {
@@ -76,7 +81,16 @@ function CardTable({ deckId, search, sorting }) {
 
         setCards(cardsInfo);
       })
-
+      .then(async () => {
+        await api
+          .post("deck-stats/stats", {
+            userId: userId,
+            deckId: deckId,
+          })
+          .then((res) => {
+            setReadOnly(res.data.readOnly);
+          });
+      })
       .catch((err) => {
         console.log(err);
       });
@@ -95,6 +109,7 @@ function CardTable({ deckId, search, sorting }) {
                     tableKey: i + 1,
                     card,
                   }}
+                  readOnly={readOnly}
                 />
               );
             })

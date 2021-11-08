@@ -60,7 +60,9 @@ export default function ImageDropzone(props) {
   return (
     <div className="relative flex flex-col whitespace-nowrap">
       <div
-        className="w-16 h-16 scale-105 bg-gray-200 rounded-lg hover:cursor-pointer hover:scale-110"
+        className={`${
+          props.readOnly ? "bg-gray-400" : "bg-gray-200"
+        } w-16 h-16 scale-105 rounded-lg hover:cursor-pointer hover:scale-110`}
         {...getRootProps()}
       >
         {imageContentURL && (
@@ -74,6 +76,7 @@ export default function ImageDropzone(props) {
         )}
         <input
           {...getInputProps()}
+          readOnly={props.readOnly}
           onChange={(event) => {
             const file = event.target.files[0];
             checkFile(file);

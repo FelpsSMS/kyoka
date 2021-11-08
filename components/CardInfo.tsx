@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { CardInfoUpdateForm } from "./CardInfoUpdateForm";
 
-function CardInfo({ cardDetails: card }) {
+function CardInfo({ cardDetails: card, readOnly }) {
   return (
     <motion.div
       className="bg-white border-t-2"
@@ -11,7 +11,7 @@ function CardInfo({ cardDetails: card }) {
       transition={{ duration: 0.4 }}
       exit={{ opacity: 0, y: -50 }}
     >
-      <CardInfoUpdateForm cardDetails={card} />
+      <CardInfoUpdateForm cardDetails={card} readOnly={readOnly} />
     </motion.div>
   );
 }

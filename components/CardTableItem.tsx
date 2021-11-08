@@ -2,7 +2,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import React, { useEffect, useState } from "react";
 import CardInfo from "./CardInfo";
 
-function CardTableItem({ cardDetails: { card, tableKey } }) {
+function CardTableItem({ cardDetails: { card, tableKey }, readOnly }) {
   const [showCardInfo, setShowCardInfo] = useState(false);
 
   const formattedDateAdded = new Date(card.dateAdded).toLocaleDateString(
@@ -62,7 +62,7 @@ function CardTableItem({ cardDetails: { card, tableKey } }) {
       </motion.div>
       <AnimatePresence>
         {/* You need to place the AnimatePresence before the conditional to make exit activate  */}
-        {showCardInfo && <CardInfo cardDetails={card} />}
+        {showCardInfo && <CardInfo cardDetails={card} readOnly={readOnly} />}
       </AnimatePresence>
     </motion.li>
   );

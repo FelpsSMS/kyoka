@@ -17,6 +17,9 @@ export const NewCardForm = ({ deckId }) => {
   });
 
   function sendToServer(values) {
+    //Get user ID from jwt token
+    const userId = verifyToken();
+
     const files = { sentenceAudio: "", focusAudio: "" };
 
     if (values.sentenceAudioHolder.name !== "") {
@@ -56,14 +59,13 @@ export const NewCardForm = ({ deckId }) => {
     fd.append("translation", values.translation);
     fd.append("notes", values.notes);
 
+    fd.append("creator", userId);
+
     api
       .post(`cards/`, fd, config)
       .then((res) => {
         //Get card ID
         const cardId = res.data._id;
-
-        //Get user ID from jwt token
-        const userId = verifyToken();
 
         //Create SRS stats for the card
         api
