@@ -74,14 +74,15 @@ export default function ImageDropzone(props) {
             objectFit="contain"
           />
         )}
-        <input
-          {...getInputProps()}
-          readOnly={props.readOnly}
-          onChange={(event) => {
-            const file = event.target.files[0];
-            checkFile(file);
-          }}
-        />
+        {!props.readOnly && (
+          <input
+            {...getInputProps()}
+            onChange={(event) => {
+              const file = event.target.files[0];
+              checkFile(file);
+            }}
+          />
+        )}
       </div>
       {rejectFile && (
         <p className="absolute mt-16 text-red-700">

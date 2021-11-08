@@ -9,9 +9,9 @@ function DeletePrompt({ show, setShow, id, routeName, title }) {
   const completeButtonRef = useRef(null);
   const router = useRouter();
 
-  const userId = verifyToken();
-
   async function confirmFunction() {
+    const userId = verifyToken();
+
     if (routeName == "cards") {
       const card = await api.get(`cards/${id}`);
 

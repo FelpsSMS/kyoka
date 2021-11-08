@@ -62,13 +62,15 @@ export default function AudioDropzone(props) {
         {...getRootProps()}
       >
         <UploadIcon className="w-full h-full text-black" />
-        <input
-          {...getInputProps()}
-          onChange={(event) => {
-            const file = event.target.files[0];
-            checkFile(file);
-          }}
-        />
+        {!props.readOnly && (
+          <input
+            {...getInputProps()}
+            onChange={(event) => {
+              const file = event.target.files[0];
+              checkFile(file);
+            }}
+          />
+        )}
       </div>
       {audioContentURL && (
         <audio controls ref={audioRef}>

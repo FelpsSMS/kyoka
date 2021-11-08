@@ -145,6 +145,7 @@ export const CardInfoUpdateForm = ({ cardDetails: card, readOnly }) => {
                 fileExchange={(audio) => {
                   formik.setFieldValue("sentenceAudioHolder", audio);
                 }}
+                readOnly={readOnly}
               />
               <label>{formik.values.sentenceAudioHolder.name}</label>
               <input name="sentenceAudioHolder" hidden />
@@ -156,6 +157,7 @@ export const CardInfoUpdateForm = ({ cardDetails: card, readOnly }) => {
                 fileExchange={(audio) => {
                   formik.setFieldValue("focusAudioHolder", audio);
                 }}
+                readOnly={readOnly}
               />
               <label>{formik.values.focusAudioHolder.name}</label>
               <label className="text-xl font-normal">Imagens</label>
@@ -171,6 +173,7 @@ export const CardInfoUpdateForm = ({ cardDetails: card, readOnly }) => {
                     fileExchange={(image) => {
                       formik.setFieldValue("image1Holder", image);
                     }}
+                    readOnly={readOnly}
                   />
                   <ImageDropzone
                     name="image2"
@@ -188,6 +191,7 @@ export const CardInfoUpdateForm = ({ cardDetails: card, readOnly }) => {
                     fileExchange={(image) => {
                       formik.setFieldValue("image3Holder", image);
                     }}
+                    readOnly={readOnly}
                   />
                   <ImageDropzone
                     name="image4"
@@ -195,6 +199,7 @@ export const CardInfoUpdateForm = ({ cardDetails: card, readOnly }) => {
                     fileExchange={(image) => {
                       formik.setFieldValue("image4Holder", image);
                     }}
+                    readOnly={readOnly}
                   />
                 </div>
               </div>
@@ -211,21 +216,23 @@ export const CardInfoUpdateForm = ({ cardDetails: card, readOnly }) => {
                 readOnly={readOnly}
               />
             </div>
-            <div className="flex items-center justify-center space-x-2 sm:space-x-4">
-              <button
-                className="px-8 mt-4 confirmation-button sm:px-16"
-                type="submit"
-              >
-                Atualizar
-              </button>
-              <button
-                className="px-8 mt-4 confirmation-button sm:px-16"
-                onClick={() => setShowDeletePrompt(true)}
-                type="button"
-              >
-                Excluir
-              </button>
-            </div>
+            {!readOnly && (
+              <div className="flex items-center justify-center space-x-2 sm:space-x-4">
+                <button
+                  className="px-8 mt-4 confirmation-button sm:px-16"
+                  type="submit"
+                >
+                  Atualizar
+                </button>
+                <button
+                  className="px-8 mt-4 confirmation-button sm:px-16"
+                  onClick={() => setShowDeletePrompt(true)}
+                  type="button"
+                >
+                  Excluir
+                </button>
+              </div>
+            )}
           </Form>
         </div>
       )}

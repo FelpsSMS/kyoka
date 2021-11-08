@@ -10,6 +10,8 @@ import ToggleButton from "../components/ToggleButton";
 import * as Yup from "yup";
 import { api, verifyToken } from "../utils/api";
 import LoadingWheel from "../components/LoadingWheel";
+import { GetServerSideProps } from "next";
+import { parseCookies } from "nookies";
 
 export default function preferences() {
   // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -125,3 +127,21 @@ export default function preferences() {
     </div>
   );
 }
+
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const { ["kyoka-token"]: token } = parseCookies(ctx);
+  //const apiClient = getAPIClient(ctx);
+
+  if (!token) {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    };
+  }
+
+  //await apiClient.get("/users");
+
+  return { props: {} };
+};

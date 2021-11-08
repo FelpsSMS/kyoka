@@ -1,4 +1,6 @@
+import { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
+import { parseCookies } from "nookies";
 import Container from "../../../components/Container";
 import Footer from "../../../components/Footer";
 import Navbar from "../../../components/Navbar";
@@ -21,3 +23,21 @@ function create_card() {
 }
 
 export default create_card;
+
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const { ["kyoka-token"]: token } = parseCookies(ctx);
+  //const apiClient = getAPIClient(ctx);
+
+  if (!token) {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    };
+  }
+
+  //await apiClient.get("/users");
+
+  return { props: {} };
+};

@@ -1,3 +1,5 @@
+import { GetServerSideProps } from "next";
+import { parseCookies } from "nookies";
 import React, { useState } from "react";
 import Container from "../components/Container";
 import Footer from "../components/Footer";
@@ -37,3 +39,21 @@ export default function library() {
     </div>
   );
 }
+
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const { ["kyoka-token"]: token } = parseCookies(ctx);
+  //const apiClient = getAPIClient(ctx);
+
+  if (!token) {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    };
+  }
+
+  //await apiClient.get("/users");
+
+  return { props: {} };
+};
