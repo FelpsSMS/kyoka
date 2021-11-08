@@ -12,7 +12,6 @@ export default function ImagePopup({ show, setShow, src }) {
   const centralDiv = useRef(null);
 
   const imageLoader = ({ src }) => {
-    console.log(src);
     return src;
   };
 

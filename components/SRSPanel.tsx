@@ -71,7 +71,6 @@ function SRSPanel() {
       .then(() => {
         setReloadCards(!reloadCards);
         setIsDataLoaded(false);
-        console.log("Dentro do calculateInterval");
         //setIsPageLoaded(false);
       });
   }
@@ -115,7 +114,6 @@ function SRSPanel() {
       //if (newState) cardInfo.cardStats.state = newState; //change the state in the current session
 
       await calculateInterval(repetitions, efactor, dueDate, pass, _id);
-      console.log("Console log after calculateInterval");
 
       //setNewCardsNumber(newCardsNumber - 1);
       //setReviewedCardsNumber(reviewedCardsNumber + 1);
@@ -190,7 +188,6 @@ function SRSPanel() {
     const { cardStats } = cardInfo;
 
     await checkSRS(cardStats, pass).then(() => {
-      console.log("checkSRS");
       if (isDataLoaded) setIsCardFlipped(false);
     });
   }
@@ -325,7 +322,6 @@ function SRSPanel() {
 
         setIsPageLoaded(true);
 
-        console.log("Console log before setting isDataLoaded inside useEffect");
         setIsDataLoaded(true);
       });
   }, [reloadCards]);

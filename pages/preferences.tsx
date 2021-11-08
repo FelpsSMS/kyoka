@@ -35,8 +35,6 @@ export default function preferences() {
         id: userId,
       })
       .then((res) => {
-        console.log(res.data);
-
         setLapseThreshold(res.data.lapseThreshold);
         setEnabled(res.data.removeLeeches);
         setNumberOfNewCards(res.data.numberOfNewCards);
@@ -55,10 +53,6 @@ export default function preferences() {
     if (numberOfNewCards > 99) {
       setNumberOfNewCards(99);
     }
-
-    console.log(lapseThreshold);
-    console.log(enabled);
-    console.log(numberOfNewCards);
 
     api.post("users/update-user-info", {
       lapseThreshold: lapseThreshold,
