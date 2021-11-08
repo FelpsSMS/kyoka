@@ -35,7 +35,6 @@ export default function HamburgerMenu() {
                           } text-white p-4 outline-none`}
                           onClick={() => {
                             router.push(item.link);
-                            console.log(item.link);
                           }}
                         >
                           {item.title}

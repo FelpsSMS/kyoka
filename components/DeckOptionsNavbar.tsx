@@ -22,7 +22,6 @@ function DeckOptionsNavbar({ deckId }) {
           deckId: deckId,
         })
         .then((res) => {
-          console.log(res.data[0].active);
           setEnabled(res.data[0].active);
 
           setToggleLoaded(true);

@@ -1,5 +1,5 @@
 import { ErrorMessage, useField } from "formik";
-import React from "react";
+import React, { useEffect } from "react";
 
 export const TextField = (props) => {
   const [field, meta] = useField(props);
@@ -10,6 +10,7 @@ export const TextField = (props) => {
         {props.label}
       </label>
       <input
+        //ref={props.ref}
         className={`${
           props.type === "file"
             ? ""
@@ -21,7 +22,6 @@ export const TextField = (props) => {
         }`}
         {...field}
         {...props}
-        ref={props.innerRef}
       />
       <ErrorMessage
         component="p"

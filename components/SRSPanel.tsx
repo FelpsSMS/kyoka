@@ -324,6 +324,8 @@ function SRSPanel() {
 
         setIsDataLoaded(true);
       });
+
+    return () => {};
   }, [reloadCards]);
 
   return (
