@@ -34,6 +34,8 @@ function SRSPanel() {
 
   const [isDataLoaded, setIsDataLoaded] = useState(false);
 
+  const [sessionId, setSessionId] = useState("");
+
   function addLapse(id, totalLapses, consecutiveLapses) {
     api.patch(`card-stats/${id}`, {
       totalLapses: totalLapses + 1,
@@ -68,7 +70,19 @@ function SRSPanel() {
         pass: pass,
         statId: _id,
       })
-      .then(() => {
+      .then(async (res) => {
+        console.log(res.data);
+
+        const DayInMilliseconds = 86400000;
+
+        const interval = res.data.dueDate - Date.now();
+
+        if (interval > DayInMilliseconds * 21) {
+          await api.patch(`card-stats/${res.data._id}`, {
+            mature: true,
+          });
+        }
+
         setReloadCards(!reloadCards);
         setIsDataLoaded(false);
         //setIsPageLoaded(false);
@@ -186,6 +200,29 @@ function SRSPanel() {
 
   async function parseSRSResponse(cardInfo, pass) {
     const { cardStats } = cardInfo;
+
+    //get session
+    const session = await api.get(`session/${sessionId}`);
+
+    const sessionInfo = session.data;
+
+    //set session data
+    let failedOnMatureCard = 0;
+    let isMature = 0;
+
+    if (cardStats.mature) {
+      failedOnMatureCard = 1;
+      isMature = 1;
+    }
+
+    api.patch(`session/${sessionId}`, {
+      endTime: Date.now(),
+      numberOfCardsReviewed: sessionInfo.numberOfCardsReviewed + 1,
+      numberOfFailsOnMatureCards:
+        sessionInfo.numberOfFailsOnMatureCards + failedOnMatureCard,
+      numberOfMatureCardsReviewed:
+        sessionInfo.numberOfMatureCardsReviewed + isMature,
+    });
 
     await checkSRS(cardStats, pass).then(() => {
       if (isDataLoaded) setIsCardFlipped(false);
@@ -328,6 +365,24 @@ function SRSPanel() {
 
     return () => {};
   }, [reloadCards]);
+
+  useEffect(() => {
+    const userId = verifyToken();
+
+    if (sessionStart && !sessionId) {
+      //start new session
+
+      api
+        .post("session", {
+          user: userId,
+          numberOfCardsToReview:
+            newCardsNumber + reviewedCardsNumber + relearnedCardsNumber,
+        })
+        .then((res) => {
+          setSessionId(res.data._id);
+        });
+    }
+  }, [sessionStart, sessionId]);
 
   return (
     <motion.div
