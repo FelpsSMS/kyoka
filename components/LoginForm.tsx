@@ -52,17 +52,20 @@ export const LoginForm = () => {
         password,
       })
       .then((response) => {
+        console.log(response.data);
         if (response.data.success) {
           //Set jwt token as a cookie
 
-          setCookie(undefined, "kyoka-token", response.data.token, {
-            maxAge: 60 * 60 * 24, //1 day
-            path: "/",
-          });
+          if (response.data.isVerified) {
+            setCookie(undefined, "kyoka-token", response.data.token, {
+              maxAge: 60 * 60 * 24, //1 day
+              path: "/",
+            });
 
-          router.push("/home");
-        } else if (!response.data.isVerified) {
-          setVerificationSuccessful(true);
+            router.push("/home");
+          } else {
+            setVerificationSuccessful(true);
+          }
         } else {
           setLoginSuccessful(!response.data.success);
         }
