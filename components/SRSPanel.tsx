@@ -7,6 +7,8 @@ import ToggleBox from "./ToggleBox";
 import PlayAudioButton from "./PlayAudioButton";
 import ImagePopup from "./ImagePopup";
 import LoadingWheel from "./LoadingWheel";
+import Heatmap from "./Heatmap";
+import { dayInMilliseconds } from "../utils/constants";
 
 function SRSPanel() {
   let animationHeight = "";
@@ -73,11 +75,9 @@ function SRSPanel() {
       .then(async (res) => {
         console.log(res.data);
 
-        const DayInMilliseconds = 86400000;
-
         const interval = res.data.dueDate - Date.now();
 
-        if (interval > DayInMilliseconds * 21) {
+        if (interval > dayInMilliseconds * 21) {
           await api.patch(`card-stats/${res.data._id}`, {
             mature: true,
           });
@@ -123,16 +123,9 @@ function SRSPanel() {
     } = cardStats;
 
     if (state == 0) {
-      //newState =
       await changeState(_id, 1); //if the card is new, change state from new to learning
-      //if (newState) cardInfo.cardStats.state = newState; //change the state in the current session
 
       await calculateInterval(repetitions, efactor, dueDate, pass, _id);
-
-      //setNewCardsNumber(newCardsNumber - 1);
-      //setReviewedCardsNumber(reviewedCardsNumber + 1);
-
-      //setCardsToBeShowed([...cardsToBeShowed, cardInfo]);
     }
 
     if (pass) {
@@ -140,26 +133,17 @@ function SRSPanel() {
 
       switch (state) {
         case 1:
-          //newState =
           await changeState(_id, 3); //if the card is in the learning state, change state to reviewing
-          //if (newState) cardInfo.cardStats.state = newState; //change the state in the current session
 
-          //setCardsToBeShowed([...cardsToBeShowed, cardInfo]);
           await calculateInterval(repetitions, efactor, dueDate, pass, _id);
 
           break;
 
         case 2:
-          //newState =
           await changeState(_id, 3); //if the card is in the relearning state, change state to reviewing and remove consecutive lapses
-          //if (newState) cardInfo.cardStats.state = newState; //change the state in the current session
 
           removeConsecutiveLapses(_id);
 
-          // setRelearnedCardsNumber(relearnedCardsNumber - 1);
-          // setReviewedCardsNumber(reviewedCardsNumber + 1);
-
-          //setCardsToBeShowed([...cardsToBeShowed, cardInfo]);
           await calculateInterval(repetitions, efactor, dueDate, pass, _id);
 
           break;
@@ -167,7 +151,6 @@ function SRSPanel() {
         case 3:
           //if the card is in the reviewing state, calculate the interval for the next review and proceed
           await calculateInterval(repetitions, efactor, dueDate, pass, _id);
-          //setReviewedCardsNumber(reviewedCardsNumber - 1);
 
           break;
       }
@@ -178,19 +161,16 @@ function SRSPanel() {
         case 1:
         case 2:
           //if the user fails the card in the learning or relearning state, just send it to the end of the list
-          //setCardsToBeShowed([...cardsToBeShowed, cardInfo]);
           await calculateInterval(repetitions, efactor, dueDate, pass, _id);
 
           break;
 
         case 3:
           //if the user fails the card in the reviewing state, add a lapse and change it's state to relearning
-          //newState =
           await changeState(_id, 3);
-          //if (newState) cardInfo.cardStats.state = newState; //change the state in the current session
 
           addLapse(_id, totalLapses, consecutiveLapses);
-          //setCardsToBeShowed([...cardsToBeShowed, cardInfo]);
+
           await calculateInterval(repetitions, efactor, dueDate, pass, _id);
 
           break;
@@ -202,7 +182,7 @@ function SRSPanel() {
     const { cardStats } = cardInfo;
 
     //get session
-    const session = await api.get(`session/${sessionId}`);
+    const session = await api.get(`sessions/${sessionId}`);
 
     const sessionInfo = session.data;
 
@@ -215,7 +195,7 @@ function SRSPanel() {
       isMature = 1;
     }
 
-    api.patch(`session/${sessionId}`, {
+    api.patch(`sessions/${sessionId}`, {
       endTime: Date.now(),
       numberOfCardsReviewed: sessionInfo.numberOfCardsReviewed + 1,
       numberOfFailsOnMatureCards:
@@ -373,7 +353,7 @@ function SRSPanel() {
       //start new session
 
       api
-        .post("session", {
+        .post("sessions", {
           user: userId,
           numberOfCardsToReview:
             newCardsNumber + reviewedCardsNumber + relearnedCardsNumber,
@@ -386,7 +366,7 @@ function SRSPanel() {
 
   return (
     <motion.div
-      className="bg-white flex min-h-screen w-screen items-center justify-center sm:rounded-lg 
+      className="bg-white flex flex-col min-h-screen w-screen items-center justify-center sm:rounded-lg 
       sm:shadow-lg sm:my-8 sm:mx-8 md:mx-16 lg:my-16 lg:mx-32"
       initial={{ height: 0, opacity: 0 }}
       animate={{ height: animationHeight, opacity: 1 }}
@@ -514,7 +494,7 @@ function SRSPanel() {
           </div>
         )
       ) : (
-        <div className="flex flex-col space-y-2">
+        <div className="flex flex-col justify-center items-center space-y-2 mx-4">
           <p className="text-3xl font-bol">Bem-vindo de volta!</p>
 
           <div className="flex flex-col">
@@ -543,6 +523,8 @@ function SRSPanel() {
           </button>
         </div>
       )}
+
+      <Heatmap />
     </motion.div>
   );
 }
