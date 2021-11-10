@@ -31,10 +31,24 @@ function AddSharedDeckPrompt({
     if (decksInUsersLibrary.includes(id)) {
       setShowErrorMessage(true);
     } else {
+      //create deck stats
       await api
         .post("deck-stats", {
           deck: id,
           user: userId,
+          readOnly: true,
+        })
+        .then(async () => {
+          const cardInfo = await api.get(`cards/get_cards/${id}`);
+          const cards = cardInfo.data;
+
+          //create stats for each card in the deck
+          cards.map(async (item) => {
+            await api.post("card-stats", {
+              card: item._id,
+              user: userId,
+            });
+          });
         })
         .then(() => {
           setTimeout(() => router.back(), 500); //small delay before going back just in case

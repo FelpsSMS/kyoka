@@ -3,7 +3,7 @@ import router from "next/router";
 import React, { useEffect, useState } from "react";
 import Select from "./Select";
 
-function DeckNavbar({ deckId, setSorting, setSearch }) {
+function DeckNavbar({ deckId, setSorting, setSearch, readOnly }) {
   function handleCardCreation(id: any) {
     router.push({
       pathname: `[deckId]/create_card`,
@@ -34,14 +34,18 @@ function DeckNavbar({ deckId, setSorting, setSearch }) {
         />
       </div>
       <div className="flex">
-        <button
-          className="confirmation-button mx-2 mb-2 md:mt-4 md:mb-4 md:mx-4 whitespace-nowrap w-1/2"
-          onClick={() => handleCardCreation(deckId)}
-        >
-          Criar carta
-        </button>
+        {!readOnly && (
+          <button
+            className="confirmation-button mx-2 mb-2 md:mt-4 md:mb-4 md:mx-4 whitespace-nowrap w-1/2"
+            onClick={() => handleCardCreation(deckId)}
+          >
+            Criar carta
+          </button>
+        )}
         <Select
-          className="mx-2 mb-2 md:mt-4 md:mb-4 md:mx-4 w-1/2"
+          className={`mx-2 mb-2 md:mt-4 md:mb-4 md:mx-4 ${
+            readOnly ? "" : "w-1/2"
+          }`}
           className2="sm:px-20 font-bold bg-white py-2 text-xl w-full focus:outline-none 
           focus:shadow-outline-blue focus:border-blue-300 relative border shadow-sm 
           border-gray-300 rounded text-gray-800"

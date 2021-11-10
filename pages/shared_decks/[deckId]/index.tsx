@@ -1,7 +1,7 @@
 import { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
 import { parseCookies } from "nookies";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import CardTable from "../../../components/CardTable";
 import Container from "../../../components/Container";
 import DeckNavbar from "../../../components/DeckNavbar";
@@ -10,6 +10,7 @@ import Footer from "../../../components/Footer";
 import Navbar from "../../../components/Navbar";
 import { NewCardForm } from "../../../components/NewCardForm";
 import SharedDeckOptionsNavbar from "../../../components/SharedDeckOptionsNavbar";
+import { api, verifyToken } from "../../../utils/api";
 
 export default function index() {
   // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -31,7 +32,7 @@ export default function index() {
           search={search}
           sorting={sorting}
           deckId={deckId}
-          sharedDeck={true}
+          readOnly={true}
         />
       </div>
       <SharedDeckOptionsNavbar deckId={deckId} />

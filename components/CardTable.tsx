@@ -5,11 +5,9 @@ import { api, verifyToken } from "../utils/api";
 import CardInfo from "./CardInfo";
 import CardTableItem from "./CardTableItem";
 
-function CardTable({ deckId, search, sorting, sharedDeck }) {
+function CardTable({ deckId, search, sorting, readOnly }) {
   const [cards, setCards] = useState([]);
   const [hasCards, setHasCards] = useState(true);
-
-  const [readOnly, setReadOnly] = useState(false);
 
   useEffect(() => {
     const userId = verifyToken();
@@ -25,7 +23,11 @@ function CardTable({ deckId, search, sorting, sharedDeck }) {
                 userId: userId,
               })
               .then((res) => {
-                return res.data;
+                if (res.data) {
+                  return res.data;
+                } else {
+                  return { dueDate: Date.now(), totalLapses: 0 };
+                }
               });
 
             return {
@@ -81,20 +83,18 @@ function CardTable({ deckId, search, sorting, sharedDeck }) {
 
         setCards(cardsInfo);
       })
-      .then(async () => {
+      /*       .then(async () => {
         await api
           .post("deck-stats/stats", {
             userId: userId,
             deckId: deckId,
           })
-          .then((res) => {
+          .then(() => {
             if (sharedDeck) {
               setReadOnly(true);
-            } else {
-              setReadOnly(res.data.readOnly);
             }
           });
-      })
+      }) */
       .catch((err) => {
         console.log(err);
       });

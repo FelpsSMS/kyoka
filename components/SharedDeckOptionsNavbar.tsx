@@ -9,48 +9,12 @@ import NewDeckPrompt from "./NewDeckPrompt";
 import ToggleButton from "./ToggleButton";
 
 function SharedDeckOptionsNavbar({ deckId }) {
-  const [showDeckNameChangePrompt, setShowDeckNameChangePrompt] =
-    useState(false);
-
-  const [enabled, setEnabled] = useState(true);
-  const [toggleLoaded, setToggleLoaded] = useState(false);
-
   const [showAddSharedDeckPrompt, setShowAddSharedDeckPrompt] = useState(false);
 
   const [showErrorMessage, setShowErrorMessage] = useState(false);
 
-  useEffect(() => {
-    if (deckId) {
-      api
-        .post("/deck-stats/stats", {
-          deckId: deckId,
-        })
-        .then((res) => {
-          setEnabled(res.data.active);
-
-          setToggleLoaded(true);
-        });
-    }
-  }, [deckId]);
-
-  useEffect(() => {
-    const userId = verifyToken();
-
-    if (deckId && toggleLoaded) {
-      api
-        .post(`/deck-stats/update`, {
-          deckId: deckId,
-          userId: userId,
-          updateBody: { active: enabled },
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }
-  }, [enabled, deckId, toggleLoaded]);
-
   return (
-    <nav className="bg-gray-500 flex items-center flex-row justify-end">
+    <nav className="bg-gray-500 flex items-center flex-row justify-center sm:justify-end">
       {/*@ts-ignore: Unreachable code error*/}
       <AddSharedDeckPrompt
         show={showAddSharedDeckPrompt}

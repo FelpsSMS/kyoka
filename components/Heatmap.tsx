@@ -33,52 +33,55 @@ function Heatmap() {
       })
       .then((res) => {
         let hashMap = {};
+        let formattedSessions = [];
+        let newestDate = Date.now();
 
         const numberOfDaysShown = 30;
 
-        const dateNewestToOldest = res.data.sort((a, b) => {
-          return b.endTime - a.endTime;
-        });
+        if (res.data[0]) {
+          const dateNewestToOldest = res.data.sort((a, b) => {
+            return b.endTime - a.endTime;
+          });
 
-        setLastSessionDuration(
-          dateNewestToOldest[0].endTime - dateNewestToOldest[0].startTime
-        );
-
-        setLastSessionReviews(dateNewestToOldest[0].numberOfCardsReviewed);
-
-        console.log(dateNewestToOldest[0]);
-
-        if (dateNewestToOldest[0].numberOfMatureCardsReviewed > 0) {
-          setLastRetentionRate(
-            `${
-              (1 -
-                dateNewestToOldest[0].numberOfFailsOnMatureCards /
-                  dateNewestToOldest[0].numberOfMatureCardsReviewed) *
-              100
-            }%`
+          setLastSessionDuration(
+            dateNewestToOldest[0].endTime - dateNewestToOldest[0].startTime
           );
-        } else {
-          setLastRetentionRate("N/A");
+
+          setLastSessionReviews(dateNewestToOldest[0].numberOfCardsReviewed);
+
+          if (dateNewestToOldest[0].numberOfMatureCardsReviewed > 0) {
+            setLastRetentionRate(
+              `${
+                (1 -
+                  dateNewestToOldest[0].numberOfFailsOnMatureCards /
+                    dateNewestToOldest[0].numberOfMatureCardsReviewed) *
+                100
+              }%`
+            );
+          } else {
+            setLastRetentionRate("N/D");
+          }
+
+          dateNewestToOldest.reverse().map((item) => {
+            const date = new Date(item.endTime).toLocaleDateString("pt-br");
+
+            if (hashMap.hasOwnProperty(date)) {
+              hashMap[date].numberOfCardsReviewed += item.numberOfCardsReviewed;
+            } else {
+              hashMap[date] = {
+                numberOfCardsReviewed: item.numberOfCardsReviewed,
+                date: item.endTime,
+              };
+            }
+          });
+
+          formattedSessions = Object.values(hashMap).map((item) => {
+            return item;
+          });
+
+          newestDate = dateNewestToOldest.reverse()[0].endTime;
         }
 
-        dateNewestToOldest.reverse().map((item) => {
-          const date = new Date(item.endTime).toLocaleDateString("pt-br");
-
-          if (hashMap.hasOwnProperty(date)) {
-            hashMap[date].numberOfCardsReviewed += item.numberOfCardsReviewed;
-          } else {
-            hashMap[date] = {
-              numberOfCardsReviewed: item.numberOfCardsReviewed,
-              date: item.endTime,
-            };
-          }
-        });
-
-        const formattedSessions: any = Object.values(hashMap).map((item) => {
-          return item;
-        });
-
-        let newestDate = dateNewestToOldest.reverse()[0].endTime;
         let emptyElementDate;
 
         while (formattedSessions.length < numberOfDaysShown) {
