@@ -1,12 +1,12 @@
 import { motion } from "framer-motion";
 import { useRouter } from "next/router";
 
-export default function LibraryItem({ title, numberOfCards, id }) {
+export default function LibraryItem({ title, numberOfCards, id, pathName }) {
   const router = useRouter();
 
   function handleClick(id: string) {
     router.push({
-      pathname: `decks/[deckId]`,
+      pathname: pathName,
       query: { deckId: id },
     });
   }

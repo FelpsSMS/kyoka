@@ -5,7 +5,7 @@ import { api, verifyToken } from "../utils/api";
 import CardInfo from "./CardInfo";
 import CardTableItem from "./CardTableItem";
 
-function CardTable({ deckId, search, sorting }) {
+function CardTable({ deckId, search, sorting, sharedDeck }) {
   const [cards, setCards] = useState([]);
   const [hasCards, setHasCards] = useState(true);
 
@@ -88,7 +88,11 @@ function CardTable({ deckId, search, sorting }) {
             deckId: deckId,
           })
           .then((res) => {
-            setReadOnly(res.data.readOnly);
+            if (sharedDeck) {
+              setReadOnly(true);
+            } else {
+              setReadOnly(res.data.readOnly);
+            }
           });
       })
       .catch((err) => {

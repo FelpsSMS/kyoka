@@ -65,62 +65,65 @@ export default function preferences() {
   }
 
   return (
-    <div className="flex flex-col space-y-8">
-      <div>
-        <Navbar />
-      </div>
+    <div className="">
+      <Navbar />
 
-      <div className="flex flex-col min-h-screen mx-8 bg-white shadow-lg rounded-lg items-center">
-        {isDataLoaded ? (
-          <div>
-            <ToggleButton
-              enabled={enabled}
-              setEnabled={setEnabled}
-              textColor={"black"}
-              label={"Remover leeches"}
-            />
-            <div className="flex flex-col justify-center items-center">
-              <div className="flex flex-col sm:flex-row justify-center items-center">
-                <label className="m-4 font-bold text-black">
-                  Limite para leeches
-                </label>
-                <input
-                  name="limit"
-                  type="number"
-                  className="bg-gray-200 rounded-lg h-4 w-12 py-3 pl-4"
-                  min="1"
-                  max="99"
-                  value={lapseThreshold}
-                  onChange={(e: any) => setLapseThreshold(e.target.value)}
-                />
+      <div className="flex justify-center items-center min-h-screen">
+        <div
+          className="bg-white flex flex-col min-h-screen w-screen items-center justify-center sm:rounded-lg 
+      sm:shadow-lg sm:my-8 sm:mx-8 md:mx-16 lg:my-16 lg:mx-32"
+        >
+          {isDataLoaded ? (
+            <div>
+              <ToggleButton
+                enabled={enabled}
+                setEnabled={setEnabled}
+                textColor={"black"}
+                label={"Remover leeches"}
+              />
+              <div className="flex flex-col justify-center items-center">
+                <div className="flex flex-col sm:flex-row justify-center items-center">
+                  <label className="m-4 font-bold text-black">
+                    Limite para leeches
+                  </label>
+                  <input
+                    name="limit"
+                    type="number"
+                    className="bg-gray-200 rounded-lg h-4 w-12 py-3 pl-4"
+                    min="1"
+                    max="99"
+                    value={lapseThreshold}
+                    onChange={(e: any) => setLapseThreshold(e.target.value)}
+                  />
+                </div>
+
+                <div className="flex flex-col sm:flex-row justify-center items-center">
+                  <label className="m-4 font-bold text-black">
+                    Número de novas cartas diárias
+                  </label>
+                  <input
+                    name="newCards"
+                    type="number"
+                    className="bg-gray-200 rounded-lg h-4 w-12 py-3 pl-4"
+                    min="0"
+                    max="99"
+                    value={numberOfNewCards}
+                    onChange={(e: any) => setNumberOfNewCards(e.target.value)}
+                  />
+                </div>
+
+                <button
+                  className="px-8 mt-4 confirmation-button sm:px-16"
+                  onClick={() => sendToServer()}
+                >
+                  Enviar
+                </button>
               </div>
-
-              <div className="flex flex-col sm:flex-row justify-center items-center">
-                <label className="m-4 font-bold text-black">
-                  Número de novas cartas diárias
-                </label>
-                <input
-                  name="newCards"
-                  type="number"
-                  className="bg-gray-200 rounded-lg h-4 w-12 py-3 pl-4"
-                  min="0"
-                  max="99"
-                  value={numberOfNewCards}
-                  onChange={(e: any) => setNumberOfNewCards(e.target.value)}
-                />
-              </div>
-
-              <button
-                className="px-8 mt-4 confirmation-button sm:px-16"
-                onClick={() => sendToServer()}
-              >
-                Enviar
-              </button>
             </div>
-          </div>
-        ) : (
-          <LoadingWheel />
-        )}
+          ) : (
+            <LoadingWheel />
+          )}
+        </div>
       </div>
 
       <Footer />

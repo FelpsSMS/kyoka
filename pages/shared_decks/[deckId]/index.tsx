@@ -9,6 +9,7 @@ import DeckOptionsNavbar from "../../../components/DeckOptionsNavbar";
 import Footer from "../../../components/Footer";
 import Navbar from "../../../components/Navbar";
 import { NewCardForm } from "../../../components/NewCardForm";
+import SharedDeckOptionsNavbar from "../../../components/SharedDeckOptionsNavbar";
 
 export default function index() {
   // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -24,20 +25,16 @@ export default function index() {
   return (
     <div className="">
       <Navbar />
-      <DeckNavbar
-        deckId={deckId}
-        setSorting={setSorting}
-        setSearch={setSearch}
-      />
+
       <div className="flex flex-col justify-start items-center min-h-screen min-w-screen h-full overflow-x-hidden">
         <CardTable
           search={search}
           sorting={sorting}
           deckId={deckId}
-          sharedDeck={false}
+          sharedDeck={true}
         />
       </div>
-      <DeckOptionsNavbar deckId={deckId} />
+      <SharedDeckOptionsNavbar deckId={deckId} />
       <Footer />
     </div>
   );

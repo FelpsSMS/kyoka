@@ -1,4 +1,3 @@
-import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { api, verifyToken } from "../utils/api";
 import LibraryItem from "./LibraryItem";
@@ -121,6 +120,7 @@ export default function Library({ sorting, libraryChanged, search }) {
             title={item.title}
             numberOfCards={item.numberOfCards}
             id={item.id}
+            pathName={"decks/[deckId]"}
           />
         );
       })}
