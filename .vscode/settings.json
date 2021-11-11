@@ -1,3 +1,10 @@
 {
-  "cSpell.words": ["efactor", "nextjs", "semibold"]
+  "cSpell.words": [
+    "efactor",
+    "INDEXEDDB",
+    "Localbase",
+    "localforage",
+    "nextjs",
+    "semibold"
+  ]
 }
