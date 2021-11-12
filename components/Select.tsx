@@ -22,7 +22,7 @@ function Select({
   setSorting,
 }: SelectInterface) {
   useEffect(() => {
-    setSelectedItem(Object.keys(items[0])[0]); //weird workaround to make it so headless UI's listbox detects the selection for the first element
+    if (items.length > 0) setSelectedItem(Object.keys(items[0])[0]); //weird workaround to make it so headless UI's listbox detects the selection for the first element
   }, []);
 
   return (

@@ -15,6 +15,7 @@ import { parseCookies } from "nookies";
 import JsonDropzone from "../components/JsonDropzone";
 import * as localForage from "localforage";
 import DisplayLoading from "../components/DisplayLoading";
+import Select from "../components/Select";
 
 export default function preferences() {
   // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -43,6 +44,63 @@ export default function preferences() {
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const [showLoadingPrompt, setShowLoadingPrompt] = useState(false);
 
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const [dictsState, setDictsState] = useState([]);
+
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const [selectedDict, setSelectedDict] = useState(0);
+
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  useEffect(() => {
+    const userId = verifyToken();
+
+    api
+      .post("dictionaries/by-user", {
+        user: userId,
+      })
+      .then((res) => {
+        res.data.map((item) => {
+          const aux = item.name.split(".");
+
+          if (aux[0] == dictsState[selectedDict]) {
+            api.post("users/update-active-dictionary", {
+              userId: userId,
+              activeDictionary: item._id,
+            });
+          }
+        });
+      });
+
+    /*     api.post("users/update-active-dictionary", {
+      userId: userId,
+      activeDictionary: dictsState[selectedDict],
+    }); */
+  }, [selectedDict]);
+
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  useEffect(() => {
+    const userId = verifyToken();
+
+    api
+      .post("dictionaries/by-user", {
+        user: userId,
+      })
+      .then(async (res) => {
+        const dicts = await Promise.all(
+          res.data.map((item) => {
+            return item.name;
+          })
+        );
+
+        const formattedDicts = dicts.map((item: string) => {
+          const aux = item.split(".");
+
+          return aux[0];
+        });
+
+        setDictsState(formattedDicts);
+      });
+  }, []);
   // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
     const userId = verifyToken();
@@ -98,7 +156,7 @@ export default function preferences() {
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
-    console.log(fileName);
+    const userId = verifyToken();
 
     let altReading = false;
 
@@ -133,30 +191,37 @@ export default function preferences() {
 
       let counter = 0;
 
-      chunkedArray.map(async (chunk) => {
-        await Promise.all(
-          chunk.map(async (item) => {
-            let dictEntry;
+      Promise.all(
+        chunkedArray.map(async (chunk) => {
+          await Promise.all(
+            chunk.map(async (item) => {
+              let dictEntry;
 
-            if (altReading) {
-              dictEntry = {
-                definition: item["definition"],
-                altReading: item["altReading"],
-              };
-            } else {
-              dictEntry = {
-                definition: item["definition"],
-              };
-            }
+              if (altReading) {
+                dictEntry = {
+                  definition: item["definition"],
+                  altReading: item["altReading"],
+                };
+              } else {
+                dictEntry = {
+                  definition: item["definition"],
+                };
+              }
 
-            await localForage.setItem(item["term"], dictEntry);
-            /*          .then((res) => {
+              await localForage.setItem(item["term"], dictEntry);
+              /*          .then((res) => {
               return res;
             }); */
-          })
-        ).then(() => {
-          counter += numberOfChunks;
-          setLoadingBarProgress(Math.round((counter / jsonSize) * 100));
+            })
+          ).then(() => {
+            counter += numberOfChunks;
+            setLoadingBarProgress(Math.round((counter / jsonSize) * 100));
+          });
+        })
+      ).then(() => {
+        api.post("dictionaries", {
+          user: userId,
+          name: fileName,
         });
       });
     }
@@ -179,7 +244,7 @@ export default function preferences() {
             />
           )}
           {isDataLoaded ? (
-            <div>
+            <div className="">
               <ToggleButton
                 enabled={enabled}
                 setEnabled={setEnabled}
@@ -223,13 +288,6 @@ export default function preferences() {
                 >
                   Salvar
                 </button>
-
-                {/*            <div className="w-64 h-12 m-4 bg-gray-500 p-4 items-center justify-center">
-                  <div
-                    className={`bg-purple-700 h-4 rounded`}
-                    style={{ width: `${loadingBarProgress}%` }}
-                  ></div>
-                </div> */}
               </div>
 
               <Formik
@@ -252,6 +310,21 @@ export default function preferences() {
                   </Form>
                 )}
               </Formik>
+
+              <div className="flex flex-col items-center justify-center mt-4">
+                <label className="text-xl font-normal">
+                  Dicionário selecionado
+                </label>
+                <Select
+                  selectedItem={selectedDict}
+                  setSelectedItem={setSelectedDict}
+                  items={dictsState}
+                  className="flex w-full justify-center my-6 sm:px-6"
+                  className2="px-8 sm:px-20 font-bold bg-white py-2 text-xl w-full focus:outline-none
+                  focus:shadow-outline-blue focus:border-blue-300 relative border shadow-sm
+                  border-gray-300 rounded text-gray-800"
+                />
+              </div>
             </div>
           ) : (
             <LoadingWheel />

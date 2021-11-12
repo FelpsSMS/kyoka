@@ -12,10 +12,6 @@ export default function ClipboardNavbar({}) {
     return () => clearTimeout(timeOutId);
   }, [query, setSearch]); */
 
-  const sortingOptions = ["A-Z", "Revisão"];
-
-  const [selectSorting, setSelectSorting] = useState();
-
   return (
     <nav className="bg-gray-500 flex justify-center flex-col md:flex-row">
       <div className="flex">
