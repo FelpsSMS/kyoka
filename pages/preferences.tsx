@@ -48,34 +48,13 @@ export default function preferences() {
   const [dictsState, setDictsState] = useState([]);
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
+  const [targetDecksState, setTargetDecksState] = useState([]);
+
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [selectedDict, setSelectedDict] = useState(0);
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
-  useEffect(() => {
-    const userId = verifyToken();
-
-    api
-      .post("dictionaries/by-user", {
-        user: userId,
-      })
-      .then((res) => {
-        res.data.map((item) => {
-          const aux = item.name.split(".");
-
-          if (aux[0] == dictsState[selectedDict]) {
-            api.post("users/update-active-dictionary", {
-              userId: userId,
-              activeDictionary: item._id,
-            });
-          }
-        });
-      });
-
-    /*     api.post("users/update-active-dictionary", {
-      userId: userId,
-      activeDictionary: dictsState[selectedDict],
-    }); */
-  }, [selectedDict]);
+  const [selectedTargetDeck, setSelectedTargetDeck] = useState(0);
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
@@ -99,6 +78,18 @@ export default function preferences() {
         });
 
         setDictsState(formattedDicts);
+      });
+
+    api
+      .post("decks/by-creator", {
+        userId: userId,
+      })
+      .then((res) => {
+        const formattedDecks = res.data.map((item) => {
+          return { id: item._id, name: item.name };
+        });
+
+        setTargetDecksState(formattedDecks);
       });
   }, []);
   // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -138,7 +129,28 @@ export default function preferences() {
         lapseThreshold: lapseThreshold,
         removeLeeches: enabled,
         numberOfNewCards: numberOfNewCards,
+        defaultDeckForGeneratedCards: targetDecksState[selectedTargetDeck]
+          ? targetDecksState[selectedTargetDeck].id
+          : undefined,
         userId: userId,
+      })
+      .then(() => {
+        api
+          .post("dictionaries/by-user", {
+            user: userId,
+          })
+          .then((res) => {
+            res.data.map((item) => {
+              const aux = item.name.split(".");
+
+              if (aux[0] == dictsState[selectedDict]) {
+                api.post("users/update-active-dictionary", {
+                  userId: userId,
+                  activeDictionary: item._id,
+                });
+              }
+            });
+          });
       })
       .then(() => {
         //add an indicator that the save as successful
@@ -282,6 +294,38 @@ export default function preferences() {
                   />
                 </div>
 
+                <div className="flex flex-col items-center justify-center mt-4">
+                  <label className="text-xl font-normal">
+                    Dicionário selecionado
+                  </label>
+                  <Select
+                    selectedItem={selectedDict}
+                    setSelectedItem={setSelectedDict}
+                    items={dictsState}
+                    className="flex w-full justify-center my-6 sm:px-6"
+                    className2="px-8 sm:px-20 font-bold bg-white py-2 text-xl w-full focus:outline-none
+                  focus:shadow-outline-blue focus:border-blue-300 relative border shadow-sm
+                  border-gray-300 rounded text-gray-800"
+                  />
+                </div>
+
+                <div className="flex flex-col items-center justify-center mt-4">
+                  <label className="text-xl font-normal">
+                    Deck onde serão salvas as cartas geradas automaticamente
+                  </label>
+                  <Select
+                    selectedItem={selectedTargetDeck}
+                    setSelectedItem={setSelectedTargetDeck}
+                    items={targetDecksState.map((item) => {
+                      return item.name;
+                    })}
+                    className="flex w-full justify-center my-6 sm:px-6"
+                    className2="px-8 sm:px-20 font-bold bg-white py-2 text-xl w-full focus:outline-none
+                  focus:shadow-outline-blue focus:border-blue-300 relative border shadow-sm
+                  border-gray-300 rounded text-gray-800"
+                  />
+                </div>
+
                 <button
                   className="px-8 mt-4 confirmation-button sm:px-16"
                   onClick={() => sendToServer()}
@@ -310,21 +354,6 @@ export default function preferences() {
                   </Form>
                 )}
               </Formik>
-
-              <div className="flex flex-col items-center justify-center mt-4">
-                <label className="text-xl font-normal">
-                  Dicionário selecionado
-                </label>
-                <Select
-                  selectedItem={selectedDict}
-                  setSelectedItem={setSelectedDict}
-                  items={dictsState}
-                  className="flex w-full justify-center my-6 sm:px-6"
-                  className2="px-8 sm:px-20 font-bold bg-white py-2 text-xl w-full focus:outline-none
-                  focus:shadow-outline-blue focus:border-blue-300 relative border shadow-sm
-                  border-gray-300 rounded text-gray-800"
-                />
-              </div>
             </div>
           ) : (
             <LoadingWheel />

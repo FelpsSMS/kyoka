@@ -9,6 +9,7 @@ import * as localForage from "localforage";
 import DictionaryEntry from "../components/DictionaryEntry";
 import { api, verifyToken } from "../utils/api";
 import parse from "html-react-parser";
+import GenerateCardPrompt from "../components/GenerateCardPrompt";
 
 export default function clipboard() {
   // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -39,7 +40,7 @@ export default function clipboard() {
   const divRef = useRef(null);
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
-  const [itemColor, setItemColor] = useState("");
+  const [showSentencePrompt, setShowSentencePrompt] = useState(false);
 
   function handleClick(e) {
     setClipboardWord(e.target.innerText);
@@ -257,7 +258,6 @@ export default function clipboard() {
   return (
     <div className="">
       <Navbar />
-      {/* <ClipboardNavbar /> */}
 
       <div className="flex justify-center items-center min-h-screen">
         <div
