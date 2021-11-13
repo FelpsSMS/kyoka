@@ -28,21 +28,31 @@ export default function GenerateCardPrompt({ show, setShow, term, text }) {
               return res.data.defaultDeckForGeneratedCards;
             });
 
+          console.log(res.data.images);
+
           api
             .post("cards/create-without-files", {
               focus: term,
-              bilingualDescription: text,
+              bilingualDescription: text.join("\n"),
               monolingualDescription: res.data.definition,
               sentence: res.data.sentence,
               focusAudio: res.data.audio,
               translation: res.data.translation,
               sentenceAudio: res.data.t2sAudio,
+              images: res.data.images,
               deck: defaultDeckForGeneratedCards,
               user: userId,
             })
-            .then(() => {
-              //show a success message
-              setShow(false);
+            .then((res) => {
+              api
+                .post("/card-stats", {
+                  card: res.data._id,
+                  user: userId,
+                })
+                .then(() => {
+                  //show a success message
+                  setShow(false);
+                });
             });
         }
       });
@@ -81,7 +91,7 @@ export default function GenerateCardPrompt({ show, setShow, term, text }) {
                     transition={{ duration: 0.4 }}
                   >
                     <Dialog.Title className="text-xl font-bold sm:text-2xl">
-                      Deseja adicionar uma frase? Para gerar uma frase
+                      Deseja adicionar uma frase? Para tentar gerar uma frase
                       automaticamente, deixe o campo em branco
                     </Dialog.Title>
                     <Formik

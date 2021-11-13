@@ -16,12 +16,17 @@ function DeckOptionsNavbar({ deckId, readOnly }) {
   const [showDeletePrompt, setShowDeletePrompt] = useState(false);
 
   useEffect(() => {
+    const userId = verifyToken();
+
     if (deckId) {
       api
         .post("/deck-stats/stats", {
           deckId: deckId,
+          userId: userId,
         })
         .then((res) => {
+          console.log(res.data);
+
           setEnabled(res.data.active);
 
           setToggleLoaded(true);

@@ -10,10 +10,6 @@ export default function DictionaryEntry({ term, text }) {
 
   const [showSentencePrompt, setShowSentencePrompt] = useState(false);
 
-  /*   function handleAudioPlay() {
-    console.log("audio");
-  } */
-
   useEffect(() => {
     api
       .post("automatic-card-creation/get-audio", {
@@ -21,37 +17,13 @@ export default function DictionaryEntry({ term, text }) {
       })
       .then((res) => {
         if (res) {
-          console.log(res.data);
-          if (res.data.audio) setAudio(res.data.audio);
+          if (res.data) setAudio(res.data);
         }
       });
   }, [term]);
 
   async function handleClick() {
     setShowSentencePrompt(true);
-  }
-
-  async function handleClick2() {
-    const userId = verifyToken();
-
-    const defaultDeckForGeneratedCards = await api
-      .post("users/user-info", {
-        id: userId,
-      })
-      .then((res) => {
-        return res.data.defaultDeckForGeneratedCards;
-      });
-
-    api
-      .post("automatic-card-creation/generate-card", {
-        focus: term,
-      })
-      .then((res) => {
-        if (res) {
-          console.log(res.data);
-          console.log(defaultDeckForGeneratedCards);
-        }
-      });
   }
 
   return (
@@ -61,7 +33,7 @@ export default function DictionaryEntry({ term, text }) {
           show={showSentencePrompt}
           setShow={setShowSentencePrompt}
           term={term}
-          text={text}
+          text={splitText}
         />
       )}
       <div className="border border-b-black">
