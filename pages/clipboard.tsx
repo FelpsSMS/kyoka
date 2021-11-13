@@ -264,7 +264,7 @@ export default function clipboard() {
           className="bg-white flex flex-col min-h-screen w-screen items-center justify-center sm:rounded-lg 
           sm:shadow-lg sm:my-8 p-8 sm:mx-8 md:mx-16 lg:my-16 lg:mx-32 max-h-sc"
         >
-          <div className="flex w-full h-full flex-col space-y-4 justify-center items-center sm:flex-row sm:space-y-0 sm:space-x-4">
+          <div className="flex w-full h-full flex-col space-y-4 justify-center sm:flex-row sm:space-y-0 sm:space-x-4">
             <div className="grid grid-rows-2 min-h-screen w-full sm:w-3/5 md:w-4/5 lg:w-2/3">
               <textarea
                 className="rounded-lg text-2xl overflow-scroll outline-none focus:border-2 border-black 
@@ -272,7 +272,7 @@ export default function clipboard() {
                 onChange={(e) => setTextContent(e.currentTarget.value)}
               />
               <div className="w-full h-full rounded-lg">
-                <div className="p-4" ref={divRef}>
+                <div className="p-4 leading-10" ref={divRef}>
                   {parse(htmlContent)}
                 </div>
               </div>
