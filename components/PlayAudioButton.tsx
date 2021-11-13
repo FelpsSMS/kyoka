@@ -1,11 +1,13 @@
 import { PlayIcon } from "@heroicons/react/solid";
 
-function PlayAudioButton({ audio }) {
+function PlayAudioButton({ audio, width, height }) {
   function playSound(audio) {
     const sound = new Audio(audio);
     sound.volume = 0.5; //maybe add a setting later for changing the volume
 
-    sound.play();
+    sound.play().catch((err) => {
+      console.log(err);
+    });
   }
 
   return (
@@ -15,7 +17,7 @@ function PlayAudioButton({ audio }) {
       onClick={() => {
         playSound(audio);
       }}
-      style={{ width: "3em", height: "3em", cursor: "pointer" }}
+      style={{ width: width, height: height, cursor: "pointer" }}
     />
   );
 }

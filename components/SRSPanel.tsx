@@ -441,11 +441,25 @@ function SRSPanel() {
             {cardsToBeShowed[0].card.sentenceAudio[0] && (
               <div className="flex space-x-2">
                 {cardsToBeShowed[0].card.sentenceAudio.map((item, i) => {
-                  return <PlayAudioButton audio={item} key={i} />;
+                  return (
+                    <PlayAudioButton
+                      audio={item}
+                      key={i}
+                      width={"3em"}
+                      height={"3em"}
+                    />
+                  );
                 })}
                 {cardsToBeShowed[0].card.focusAudio[0] &&
                   cardsToBeShowed[0].card.focusAudio.map((item, i) => {
-                    return <PlayAudioButton audio={item} key={i} />;
+                    return (
+                      <PlayAudioButton
+                        audio={item}
+                        key={i}
+                        width={"3em"}
+                        height={"3em"}
+                      />
+                    );
                   })}
               </div>
             )}

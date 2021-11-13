@@ -39,6 +39,15 @@ export default function clipboard() {
   const divRef = useRef(null);
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
+  const [itemColor, setItemColor] = useState("");
+
+  function handleClick(e) {
+    setClipboardWord(e.target.innerText);
+
+    setClipboardState(!clipboardState);
+  }
+
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
     const userId = verifyToken();
 
@@ -146,34 +155,33 @@ export default function clipboard() {
           });
 
         splitString.map((item) => {
-          let wasAdded = false;
+          let color = "bg-gray-300";
 
-          cardData.map((card) => {
-            if (item == card.focus) {
-              let color = card.mature
-                ? "bg-green-500"
-                : card.state != 0
+          const inCards = cardData.filter((card) => item == card.focus);
+
+          if (inCards.length > 0) {
+            color = inCards[0].mature
+              ? "bg-green-500"
+              : inCards[0].state != 0
+              ? "bg-yellow-500"
+              : "bg-gray-300";
+          }
+
+          const inWordStates = userWordStates.filter(
+            (word) => item == word.word
+          );
+
+          if (inWordStates.length > 0) {
+            color =
+              inWordStates[0].state == 1
                 ? "bg-yellow-500"
+                : inWordStates[0].state == 2
+                ? "bg-green-500"
                 : "bg-gray-300";
+          }
 
-              userWordStates.map((word) => {
-                if (item == word.word) {
-                  color =
-                    word.state == 0
-                      ? "bg-gray-300"
-                      : word.state == 1
-                      ? "bg-yellow-500"
-                      : "bg-green-500";
-                }
-              });
-
-              newText += `<a className="${color} font-bold rounded hover:cursor-pointer p-1">${item}</a> `;
-
-              wasAdded = true;
-            }
-          });
-
-          if (!wasAdded) newText += `${item} `;
+          if (item.length > 0)
+            newText += `<a className="${color} font-bold rounded hover:cursor-pointer p-1">${item}</a> `;
         });
 
         setHtmlContent(newText);
@@ -181,26 +189,10 @@ export default function clipboard() {
         if (divRef.current.children.length > 1) {
           for (let i = 0; i < divRef.current.children.length; i++) {
             //map doesn't work
-            divRef.current.children[i].addEventListener(
-              "click",
-              (e) => {
-                setClipboardWord(e.target.innerText);
-
-                setClipboardState(!clipboardState);
-              },
-              { once: true }
-            );
+            divRef.current.children[i].onclick = (e) => handleClick(e);
           }
         } else if (divRef.current.children.length > 0) {
-          divRef.current.children[0].addEventListener(
-            "click",
-            (e) => {
-              setClipboardWord(e.target.innerText);
-
-              setClipboardState(!clipboardState);
-            },
-            { once: true }
-          );
+          divRef.current.children[0].onclick = (e) => handleClick(e);
         }
       });
   }, [textContent, clipboardState]);
