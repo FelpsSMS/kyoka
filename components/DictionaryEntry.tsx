@@ -1,6 +1,8 @@
+import { SaveIcon } from "@heroicons/react/outline";
 import React, { useEffect, useState } from "react";
 import { api, verifyToken } from "../utils/api";
 import GenerateCardPrompt from "./GenerateCardPrompt";
+import HeadsUpMessage from "./HeadsUpMessage";
 import PlayAudioButton from "./PlayAudioButton";
 
 export default function DictionaryEntry({ term, text }) {
@@ -9,6 +11,8 @@ export default function DictionaryEntry({ term, text }) {
   const [audio, setAudio] = useState("");
 
   const [showSentencePrompt, setShowSentencePrompt] = useState(false);
+
+  const [showMessage, setShowMessage] = useState(false);
 
   useEffect(() => {
     api
@@ -34,6 +38,15 @@ export default function DictionaryEntry({ term, text }) {
           setShow={setShowSentencePrompt}
           term={term}
           text={splitText}
+          setShowMessage={setShowMessage}
+        />
+      )}
+      {showMessage && (
+        <HeadsUpMessage
+          show={showMessage}
+          setShow={() => setShowMessage(false)}
+          title="Carta adicionada com sucesso!"
+          color={"green"}
         />
       )}
       <div className="border border-b-black">
@@ -43,11 +56,11 @@ export default function DictionaryEntry({ term, text }) {
           className="absolute 
           top-2 right-2 space-x-2 flex"
         >
-          <button
-            className=" bg-purple-800  hover:cursor-pointer rounded-full"
+          <SaveIcon
+            className="hover:cursor-pointer"
             style={{ width: "2em", height: "2em" }}
             onClick={() => handleClick()}
-          ></button>
+          ></SaveIcon>
           <PlayAudioButton
             audio={audio}
             width={"2em"}

@@ -89,10 +89,10 @@ export const CardInfoUpdateForm = ({ cardDetails: card, readOnly }) => {
         focusAudio: card.focusAudio.name,
         focusAudioHolder: { name: "" },
         //card.focusAudio === [] ? { name: "" } : card.focusAudio,
-        image1: card.images[0].url,
-        image2: card.images[1].url,
-        image3: card.images[2].url,
-        image4: card.images[3].url,
+        image1: card.images[0],
+        image2: card.images[1],
+        image3: card.images[2],
+        image4: card.images[3],
         translation: card.translation ?? "",
         notes: card.notes ?? "",
         image1Holder: "",
@@ -169,7 +169,7 @@ export const CardInfoUpdateForm = ({ cardDetails: card, readOnly }) => {
                 <div className="flex space-x-4 xs:space-x-4">
                   <ImageDropzone
                     name="image1"
-                    webSource={card.images[0].url}
+                    webSource={card.images[0] ? card.images[0].url : ""}
                     fileExchange={(image) => {
                       formik.setFieldValue("image1Holder", image);
                     }}
@@ -177,7 +177,7 @@ export const CardInfoUpdateForm = ({ cardDetails: card, readOnly }) => {
                   />
                   <ImageDropzone
                     name="image2"
-                    webSource={card.images[1].url}
+                    webSource={card.images[1] ? card.images[1].url : ""}
                     fileExchange={(image) => {
                       formik.setFieldValue("image2Holder", image);
                     }}
@@ -187,7 +187,7 @@ export const CardInfoUpdateForm = ({ cardDetails: card, readOnly }) => {
                 <div className="flex space-x-4 xs:space-x-4">
                   <ImageDropzone
                     name="image3"
-                    webSource={card.images[2].url}
+                    webSource={card.images[2] ? card.images[2].url : ""}
                     fileExchange={(image) => {
                       formik.setFieldValue("image3Holder", image);
                     }}
@@ -195,7 +195,7 @@ export const CardInfoUpdateForm = ({ cardDetails: card, readOnly }) => {
                   />
                   <ImageDropzone
                     name="image4"
-                    webSource={card.images[3].url}
+                    webSource={card.images[3] ? card.images[3].url : ""}
                     fileExchange={(image) => {
                       formik.setFieldValue("image4Holder", image);
                     }}

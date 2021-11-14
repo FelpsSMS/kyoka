@@ -3,11 +3,11 @@ import axios from "axios";
 import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/router";
 import React, { useRef, useState } from "react";
+import { ref } from "yup";
 import { api, verifyToken } from "../utils/api";
 
-function ErrorMessage({ show, setShow, title }) {
+export default function HeadsUpMessage({ show, setShow, title, color }) {
   const completeButtonRef = useRef(null);
-  const router = useRouter();
 
   return (
     <AnimatePresence>
@@ -47,8 +47,9 @@ function ErrorMessage({ show, setShow, title }) {
 
                     <div className="flex space-x-2 sm:space-x-8">
                       <button
-                        className="bg-red-800 text-white p-2 sm:px-16 rounded-sm text-xl font-bold focus:text-gray-200 
-                 focus:bg-red-900 hover:text-gray-200 hover:bg-red-900 outline-none px-2"
+                        ref={completeButtonRef}
+                        className={`bg-${color}-800 text-white p-2 sm:px-16 rounded-sm text-xl font-bold focus:text-gray-200 
+                 focus:bg-${color}-900 hover:text-gray-200 hover:bg-${color}-900 outline-none px-2`}
                       >
                         Confirmar
                       </button>
@@ -63,5 +64,3 @@ function ErrorMessage({ show, setShow, title }) {
     </AnimatePresence>
   );
 }
-
-export default ErrorMessage;

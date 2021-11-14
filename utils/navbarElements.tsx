@@ -1,6 +1,5 @@
 const navbarElements = [
   { title: "Home", link: "/home" },
-  //{ title: "Adicionar carta", link: "/test" },
   { title: "Biblioteca", link: "/library" },
   { title: "Clipboard", link: "/clipboard" },
   { title: "Repositório de decks", link: "/deck_repo" },

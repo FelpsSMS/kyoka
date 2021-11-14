@@ -4,7 +4,8 @@ import React, { useEffect, useState } from "react";
 import { api, verifyToken } from "../utils/api";
 import AddSharedDeckPrompt from "./AddSharedDeckPrompt";
 import DeletePrompt from "./DeletePrompt";
-import ErrorMessage from "./ErrorMessage";
+import HeadsUpMessage from "./HeadsUpMessage";
+import ErrorMessage from "./HeadsUpMessage";
 import NewDeckPrompt from "./NewDeckPrompt";
 import ToggleButton from "./ToggleButton";
 
@@ -23,10 +24,11 @@ function SharedDeckOptionsNavbar({ deckId }) {
         title="Você realmente deseja adicionar este deck à sua biblioteca?"
         setShowErrorMessage={setShowErrorMessage}
       />
-      <ErrorMessage
+      <HeadsUpMessage
         show={showErrorMessage}
         setShow={() => setShowErrorMessage(false)}
         title="Você já possui este deck"
+        color={"red"}
       />
 
       <div className="flex flex-col sm:flex-row">

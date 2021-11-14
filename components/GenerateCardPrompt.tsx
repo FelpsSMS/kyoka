@@ -7,7 +7,13 @@ import { TextField } from "./TextField";
 
 import { api, verifyToken } from "../utils/api";
 
-export default function GenerateCardPrompt({ show, setShow, term, text }) {
+export default function GenerateCardPrompt({
+  show,
+  setShow,
+  term,
+  text,
+  setShowMessage,
+}) {
   const sentenceField = useRef(null);
 
   async function sendToServer(values) {
@@ -51,6 +57,7 @@ export default function GenerateCardPrompt({ show, setShow, term, text }) {
                 })
                 .then(() => {
                   //show a success message
+                  setShowMessage(true);
                   setShow(false);
                 });
             });
@@ -120,6 +127,13 @@ export default function GenerateCardPrompt({ show, setShow, term, text }) {
                               }}
                             >
                               Confirmar
+                            </button>
+
+                            <button
+                              className="confirmation-button px-2 sm:px-16"
+                              onClick={() => setShow()}
+                            >
+                              Cancelar
                             </button>
                           </div>
                         </Form>
