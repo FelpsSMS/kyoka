@@ -1,5 +1,6 @@
 import { Listbox, Transition } from "@headlessui/react";
 import { CheckIcon, SelectorIcon } from "@heroicons/react/outline";
+import router from "next/router";
 import { Fragment, useState } from "react";
 import Select from "./Select";
 
@@ -18,7 +19,17 @@ export default function Footer() {
           focus:shadow-outline-blue focus:border-blue-300 relative border shadow-sm 
           border-gray-300 rounded text-gray-800"
       />
-      <p className="text-white font-black my-3">Kyoka - 2021</p>
+      <div className="flex flex-col items-center justify-center">
+        <p
+          className="text-white font-black my-3 hover:text-gray-100 hover:cursor-pointer"
+          onClick={() => {
+            router.push("credits");
+          }}
+        >
+          Credits
+        </p>
+        <p className="text-white font-black my-3">Kyoka - 2021</p>
+      </div>
     </div>
   );
 }

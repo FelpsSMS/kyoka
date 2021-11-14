@@ -387,11 +387,13 @@ function SRSPanel() {
                       >
                         <Image
                           loader={imageLoader}
-                          src={item}
+                          src={item.url}
                           alt="Uploaded image"
                           layout="fill"
                           objectFit="contain"
-                          onClick={() => showImage(item)}
+                          onClick={() => {
+                            showImage(item);
+                          }}
                         />
                       </div>
                     );
