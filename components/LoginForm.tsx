@@ -226,7 +226,7 @@ export const LoginForm = () => {
                     animate={{ opacity: 1 }}
                     transition={{ duration: 0.3 }}
                   >
-                    <label className="text-green-900">
+                    <label className="text-green-900 whitespace-normal">
                       Um e-mail de verificação foi enviado para o e-mail
                       informado. Caso você não tenha recebido um e-mail de
                       verificação, clique no link abaixo
