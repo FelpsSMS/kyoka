@@ -221,7 +221,7 @@ export const LoginForm = () => {
               >
                 {emailVerificationSent && (
                   <motion.div
-                    className="bg-green-200 p-4 rounded-lg w-full"
+                    className="bg-green-200 p-4 rounded-lg w-full flex flex-col"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ duration: 0.3 }}
