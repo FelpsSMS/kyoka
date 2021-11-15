@@ -26,6 +26,7 @@ function NewDeckPrompt({
   const deckNameFieldRef = useRef(null);
 
   const maxNameSize = 10;
+  const maxSubjectSize = 10;
 
   const validate = Yup.object({
     deckName: Yup.string()
@@ -34,10 +35,18 @@ function NewDeckPrompt({
         maxNameSize,
         `O nome não pode ultrapassar ${maxNameSize} caracteres`
       ),
+
+    deckSubject: Yup.string()
+      .required("Por favor, adicione um assunto")
+      .max(
+        maxSubjectSize,
+        `O assunto não pode ultrapassar ${maxSubjectSize} caracteres`
+      ),
   });
 
   async function sendToServer(values) {
     const deckName = values.deckName;
+    const deckSubject = values.deckSubject;
 
     //Get user ID from jwt token
     const userId = verifyToken();
@@ -47,6 +56,7 @@ function NewDeckPrompt({
       api
         .patch(`/decks/${deckId}`, {
           name: deckName,
+          subject: deckSubject,
         })
         .then()
         .catch((err) => {
@@ -58,6 +68,7 @@ function NewDeckPrompt({
         .post(`/decks`, {
           name: deckName,
           creator: userId,
+          subject: deckSubject,
         })
         .then((res) => {
           const recentlyCreatedId = res.data._id;
@@ -118,11 +129,12 @@ function NewDeckPrompt({
                     transition={{ duration: 0.4 }}
                   >
                     <Dialog.Title className="text-xl font-bold sm:text-2xl">
-                      Insira o nome do deck
+                      Insira as informações do deck
                     </Dialog.Title>
                     <Formik
                       initialValues={{
                         deckName: "",
+                        deckSubject: "",
                       }}
                       validationSchema={validate}
                       onSubmit={(values) => sendToServer(values)}
@@ -130,10 +142,17 @@ function NewDeckPrompt({
                       {(formik) => (
                         <Form className="w-full space-y-8">
                           <TextField
-                            label=""
+                            label="Nome"
                             type="text"
                             innerref={deckNameFieldRef}
                             name="deckName"
+                            className="bg-gray-100 border-2 border-gray-200 rounded-lg w-full outline-none focus:border-black p-2"
+                          />
+
+                          <TextField
+                            label="Assunto"
+                            type="text"
+                            name="deckSubject"
                             className="bg-gray-100 border-2 border-gray-200 rounded-lg w-full outline-none focus:border-black p-2"
                           />
 

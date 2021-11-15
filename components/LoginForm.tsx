@@ -27,12 +27,24 @@ export const LoginForm = () => {
     password: Yup.string().required("Por favor, insira sua senha"),
   });
 
+  const regex: RegExp = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])");
+
+  const regex2: RegExp = new RegExp("^(?!.*\\s)");
+
   const validateRegister = Yup.object({
     email: Yup.string()
       .required("Por favor, insira um e-mail")
       .email("Por favor, insira um e-mail válido"),
-    password: Yup.string().required("Por favor, insira uma senha"),
+    password: Yup.string()
+      .required("Por favor, insira uma senha")
+      .min(6, "Sua senha deve conter um mínimo de 6 caracteres")
+      .matches(
+        regex,
+        "Sua senha deve conter pelo menos 1 número, 1 letra maiúscula e 1 letra minúscula"
+      )
+      .matches(regex2, "Sua senha não pode conter espaços vazios"),
     passwordConfirmation: Yup.string()
+
       .required("As senhas devem corresponder")
       .oneOf([Yup.ref("password"), null], "As senhas devem corresponder"),
   });
@@ -78,12 +90,14 @@ export const LoginForm = () => {
         email,
         password,
       })
-      .then(async () => {
-        await api.post("/users/email-verification", {
-          email,
-        });
-
-        setEmailVerificationSent(true);
+      .then(() => {
+        api
+          .post("/users/email-verification", {
+            email,
+          })
+          .then(() => {
+            setEmailVerificationSent(true);
+          });
       });
   }
 
@@ -194,6 +208,7 @@ export const LoginForm = () => {
             initialValues={{
               email: "",
               password: "",
+              passwordConfirmation: "",
             }}
             validationSchema={validateRegister}
             onSubmit={(values) => handleRegistration(values)}
@@ -212,7 +227,7 @@ export const LoginForm = () => {
                     transition={{ duration: 0.3 }}
                   >
                     <label className="text-green-900">
-                      Um e-mail de verificação foi enviada para o e-mail
+                      Um e-mail de verificação foi enviado para o e-mail
                       informado
                     </label>
                   </motion.div>

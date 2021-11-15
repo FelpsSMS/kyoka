@@ -1,7 +1,13 @@
 import { motion } from "framer-motion";
 import { useRouter } from "next/router";
 
-export default function LibraryItem({ title, numberOfCards, id, pathName }) {
+export default function LibraryItem({
+  title,
+  numberOfCards,
+  subject,
+  id,
+  pathName,
+}) {
   const router = useRouter();
 
   function handleClick(id: string) {
@@ -23,7 +29,10 @@ export default function LibraryItem({ title, numberOfCards, id, pathName }) {
         handleClick(id);
       }}
     >
-      <div className="flex flex-col items-center">
+      <div className="flex flex-col items-center relative">
+        <p className="font-bold break-all whitespace-normal absolute bottom-24">
+          {subject}
+        </p>
         <p className="font-bold text-4xl break-all whitespace-normal">
           {title}
         </p>

@@ -28,7 +28,8 @@ function SharedDeckOptionsNavbar({ deckId }) {
         show={showErrorMessage}
         setShow={() => setShowErrorMessage(false)}
         title="Você já possui este deck"
-        color={"red"}
+        color="bg-red-800"
+        colorFocusOrHover="bg-red-900"
       />
 
       <div className="flex flex-col sm:flex-row">

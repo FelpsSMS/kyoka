@@ -85,7 +85,7 @@ function DeckOptionsNavbar({ deckId, readOnly }) {
             className="confirmation-button sm:px-8 md:px-16 mx-2 mb-2 mt-2 md:mt-4 md:mb-4 md:mx-4 whitespace-nowrap"
             onClick={() => setShowDeckNameChangePrompt(true)}
           >
-            Alterar nome do deck
+            Editar deck
           </button>
         )}
 

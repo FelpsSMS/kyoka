@@ -36,6 +36,7 @@ export default function DeckRepo() {
               title: item.name,
               id: item._id,
               numberOfCards: numberOfCards,
+              subject: item.subject,
             };
           })
         );
@@ -60,6 +61,7 @@ export default function DeckRepo() {
             title={item.title}
             numberOfCards={item.numberOfCards}
             id={item.id}
+            subject={item.subject}
             pathName={"shared_decks/[deckId]"}
           />
         );

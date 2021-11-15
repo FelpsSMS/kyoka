@@ -46,7 +46,8 @@ export default function DictionaryEntry({ term, text }) {
           show={showMessage}
           setShow={() => setShowMessage(false)}
           title="Carta adicionada com sucesso!"
-          color={"green"}
+          color="bg-green-800"
+          colorFocusOrHover="bg-green-900"
         />
       )}
       <div className="border border-b-black">

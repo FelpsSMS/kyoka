@@ -46,6 +46,7 @@ export default function Library({ sorting, libraryChanged, search }) {
               title: item.name,
               id: item._id,
               numberOfCards: numberOfCards,
+              subject: item.subject,
             };
           })
         );
@@ -77,36 +78,6 @@ export default function Library({ sorting, libraryChanged, search }) {
       });
   }, [sorting, libraryChanged, search]);
 
-  /*axios
-      .get(`${process.env.NEXT_PUBLIC_API_ENDPOINT}/decks/`)
-      .then(async (res) => {
-        const data = res.data;
-
-        const formattedData = await Promise.all(
-          data.map(async (item) => {
-            const numberOfCards = await axios
-              .get(
-                `${process.env.NEXT_PUBLIC_API_ENDPOINT}/cards/get_cards/${item._id}`
-              )
-              .then((res) => {
-                return res.data.length;
-              });
-
-            return {
-              title: item.name,
-              id: item._id,
-              numberOfCards: numberOfCards,
-            };
-          })
-        );
-
-        setLibrary(formattedData);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, []); */
-
   return (
     <div
       className="grid grid-cols-1 grid-wrap
@@ -119,6 +90,7 @@ export default function Library({ sorting, libraryChanged, search }) {
             key={i}
             title={item.title}
             numberOfCards={item.numberOfCards}
+            subject={item.subject}
             id={item.id}
             pathName={"decks/[deckId]"}
           />
