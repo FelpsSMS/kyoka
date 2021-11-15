@@ -228,8 +228,15 @@ export const LoginForm = () => {
                   >
                     <label className="text-green-900">
                       Um e-mail de verificação foi enviado para o e-mail
-                      informado
+                      informado. Caso você não tenha recebido um e-mail de
+                      verificação, clique no link abaixo
                     </label>
+                    <a
+                      className="text-blue-500 hover:cursor-pointer hover:text-blue-700"
+                      onClick={() => sendVerificationEmail(informedEmail)}
+                    >
+                      Clique aqui
+                    </a>
                   </motion.div>
                 )}
                 <h1 className="font-black text-3xl sm:text-5xl">Criar conta</h1>
