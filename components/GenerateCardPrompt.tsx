@@ -35,6 +35,7 @@ export default function GenerateCardPrompt({
             });
 
           console.log(res.data.images);
+          console.log(defaultDeckForGeneratedCards);
 
           api
             .post("cards/create-without-files", {
@@ -60,6 +61,9 @@ export default function GenerateCardPrompt({
                   setShowMessage(true);
                   setShow(false);
                 });
+            })
+            .catch((err) => {
+              console.log(err.response);
             });
         }
       });

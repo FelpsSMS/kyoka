@@ -16,6 +16,7 @@ import JsonDropzone from "../components/JsonDropzone";
 import * as localForage from "localforage";
 import DisplayLoading from "../components/DisplayLoading";
 import Select from "../components/Select";
+import HeadsUpMessage from "../components/HeadsUpMessage";
 
 export default function preferences() {
   // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -55,6 +56,9 @@ export default function preferences() {
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const [selectedTargetDeck, setSelectedTargetDeck] = useState(0);
+
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const [showMessage, setShowMessage] = useState(false);
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
@@ -153,8 +157,8 @@ export default function preferences() {
           });
       })
       .then(() => {
-        //add an indicator that the save as successful
-        console.log("salvo");
+        //show a success message
+        setShowMessage(true);
       });
   }
 
@@ -248,6 +252,15 @@ export default function preferences() {
           className="bg-white flex flex-col min-h-screen w-screen items-center justify-center sm:rounded-lg 
       sm:shadow-lg sm:my-8 sm:mx-8 md:mx-16 lg:my-16 lg:mx-32"
         >
+          {showMessage && (
+            <HeadsUpMessage
+              show={showMessage}
+              setShow={() => setShowMessage(false)}
+              title="Configurações alteradas com sucesso!"
+              color="bg-green-800"
+              colorFocusOrHover="bg-green-900"
+            />
+          )}
           {showLoadingPrompt && (
             <DisplayLoading
               show={showLoadingPrompt}
