@@ -13,7 +13,9 @@ function CardTableItem({ cardDetails: { card, tableKey }, readOnly }) {
   return (
     <motion.li
       layout
-      className="flex flex-col mx-4 sm:mx-16 my-8 border-2 bg-white"
+      className={`flex flex-col mx-4 sm:mx-16 my-8 border-2 ${
+        card.leech ? "bg-yellow-100" : "bg-white"
+      }`}
     >
       {/* Row */}
       <motion.div layout>

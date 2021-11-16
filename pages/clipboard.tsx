@@ -285,7 +285,8 @@ export default function clipboard() {
                   className="w-full rounded-r-lg bg-gray-200 text-xl p-2 outline-none focus:border-2 border-black my-2 mr-2
               focus:my-1.5" //In tailwind, 2px = 0.5
                   onChange={(e: any) => {
-                    if (activeDictionary) setQuery(e.target.value);
+                    if (activeDictionary)
+                      setQuery(e.target.value.toLowerCase());
                   }}
                 />
               </div>

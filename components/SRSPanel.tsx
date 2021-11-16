@@ -38,11 +38,22 @@ function SRSPanel() {
 
   const [sessionId, setSessionId] = useState("");
 
+  const [removeLeeches, setRemoveLeeches] = useState(false);
+  const [lapseThreshold, setLapseThreshold] = useState(8);
+
   function addLapse(id, totalLapses, consecutiveLapses) {
-    api.patch(`card-stats/${id}`, {
-      totalLapses: totalLapses + 1,
-      consecutiveLapses: consecutiveLapses + 1,
-    });
+    api
+      .patch(`card-stats/${id}`, {
+        totalLapses: totalLapses + 1,
+        consecutiveLapses: consecutiveLapses + 1,
+      })
+      .then((res) => {
+        if (res.data.consecutiveLapses >= lapseThreshold) {
+          api.patch(`card-stats/${id}`, {
+            leech: true,
+          });
+        }
+      });
   }
 
   function addFail(id, failCount) {
@@ -279,6 +290,9 @@ function SRSPanel() {
             return res.data;
           });
 
+        //check if the user wishes to remove removeLeeches and lapse threshold
+        setLapseThreshold(userInfo.lapseThreshold);
+
         //get all cards with each state
 
         //state 0 (not yet added to the SRS)
@@ -286,12 +300,19 @@ function SRSPanel() {
           (item: any) => item.cardStats.state === 0
         );
 
-        const cardDataForTheDay = cardData.filter((item: any) => {
+        let cardDataForTheDay = cardData.filter((item: any) => {
           const dueDay = new Date(item.cardStats.dueDate).getDate();
           const currentDay = new Date().getDate();
 
           return dueDay <= currentDay;
         });
+
+        //if the user wishes to, remove leeches
+        if (userInfo.removeLeeches) {
+          cardDataForTheDay = cardDataForTheDay.filter(
+            (item) => item.cardStats.leech === false
+          );
+        }
 
         //for the other states, grab only the cards due for the day
 

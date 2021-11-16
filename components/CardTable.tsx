@@ -36,6 +36,7 @@ function CardTable({ deckId, search, sorting, readOnly }) {
               dateAdded: item.dateAdded,
               dueDate: cardStats.dueDate,
               lapses: cardStats.totalLapses,
+              leech: cardStats.leech,
               deckId: item.deck,
               bilingualDescription: item.bilingualDescription ?? "",
               focusAudio: item.focusAudio ?? [],
