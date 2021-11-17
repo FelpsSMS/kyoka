@@ -34,7 +34,7 @@ function CardTableItem({ cardDetails: { card, tableKey }, readOnly }) {
               Foco
             </div>
             <div className="text-right text-black p-2 truncate">
-              {card.focus}
+              {card.layoutInfo.focus}
             </div>
           </div>
           {/* Col */}

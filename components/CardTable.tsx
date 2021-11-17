@@ -34,22 +34,12 @@ function CardTable({ deckId, search, sorting, readOnly }) {
 
             return {
               id: item._id,
-              focus: item.layoutInfo[0].focus,
+              layoutInfo: item.layoutInfo[0],
               dateAdded: item.dateAdded,
               dueDate: cardStats.dueDate,
               lapses: cardStats.totalLapses,
               leech: cardStats.leech,
               deckId: item.deck,
-              bilingualDescription:
-                item.layoutInfo[0].bilingualDescription ?? "",
-              focusAudio: item.layoutInfo[0].focusAudio ?? [],
-              images: item.layoutInfo[0].images ?? [],
-              monolingualDescription:
-                item.layoutInfo[0].monolingualDescription ?? "",
-              sentence: item.layoutInfo[0].sentence ?? "",
-              sentenceAudio: item.layoutInfo[0].sentenceAudio ?? "",
-              translation: item.layoutInfo[0].translation ?? "",
-              notes: item.layoutInfo[0].notes ?? "",
             };
           })
         );

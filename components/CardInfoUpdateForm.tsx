@@ -46,25 +46,27 @@ export const CardInfoUpdateForm = ({ cardDetails: card, readOnly }) => {
             switch (item.fieldType) {
               case 0:
               case 1:
-                init[currentField] = card[currentField] ?? "";
+                init[currentField] = card.layoutInfo[currentField] ?? "";
                 break;
 
               case 2:
-                init[currentField] = card[currentField] ?? "";
+                init[currentField] = card.layoutInfo[currentField] ?? "";
 
-                init[holder] = card[currentField] ?? "";
+                init[holder] = card.layoutInfo[currentField] ?? "";
                 break;
 
               case 3:
                 numberOfImages.map((item2) => {
                   init[currentField + item2.toString()] = init[
                     holder + item2.toString()
-                  ] = card[currentField][item2]
-                    ? card[currentField][item2].url
+                  ] = card.layoutInfo[currentField][item2]
+                    ? card.layoutInfo[currentField][item2].url
                     : "";
 
-                  init[holder + item2.toString()] = card[currentField][item2]
-                    ? card[currentField][item2].url
+                  init[holder + item2.toString()] = card.layoutInfo[
+                    currentField
+                  ][item2]
+                    ? card.layoutInfo[currentField][item2].url
                     : "";
                 });
                 break;
@@ -142,7 +144,7 @@ export const CardInfoUpdateForm = ({ cardDetails: card, readOnly }) => {
     api
       .patch(`cards/${card.id}`, fd, config)
 
-      //.then(() => router.back()) //redirect user to the deck page
+      .then(() => router.back()) //redirect user to the deck page
 
       .catch((err) => {
         console.log(err);
@@ -206,8 +208,8 @@ export const CardInfoUpdateForm = ({ cardDetails: card, readOnly }) => {
                                 formik.setFieldValue(currentFieldName, audio);
                               }}
                               webSource={
-                                card[currentFieldName]
-                                  ? card[currentFieldName]
+                                card.layoutInfo[currentFieldName]
+                                  ? card.layoutInfo[currentFieldName]
                                   : ""
                               }
                               readOnly={readOnly}
@@ -244,8 +246,12 @@ export const CardInfoUpdateForm = ({ cardDetails: card, readOnly }) => {
                                           );
                                         }}
                                         webSource={
-                                          card[currentFieldName][item]
-                                            ? card[currentFieldName][item].url
+                                          card.layoutInfo[currentFieldName][
+                                            item
+                                          ]
+                                            ? card.layoutInfo[currentFieldName][
+                                                item
+                                              ].url
                                             : ""
                                         }
                                         readOnly={readOnly}
