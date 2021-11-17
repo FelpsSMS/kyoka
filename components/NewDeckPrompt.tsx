@@ -1,11 +1,12 @@
 import { Dialog } from "@headlessui/react";
 import { Form, Formik } from "formik";
 import { AnimatePresence, motion } from "framer-motion";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import * as Yup from "yup";
 import { TextField } from "./TextField";
 
 import { api, verifyToken } from "../utils/api";
+import Select from "./Select";
 
 interface newDeckPromptProps {
   show: boolean;
@@ -25,6 +26,10 @@ function NewDeckPrompt({
   const completeButtonRef = useRef(null);
   const deckNameFieldRef = useRef(null);
 
+  const [selectedLayout, setSelectedLayout] = useState(0);
+  const [layoutsState, setLayoutsState] = useState([]);
+  const [layoutsId, setLayoutsId] = useState([]);
+
   const maxNameSize = 10;
   const maxSubjectSize = 10;
 
@@ -43,6 +48,29 @@ function NewDeckPrompt({
         `O assunto não pode ultrapassar ${maxSubjectSize} caracteres`
       ),
   });
+
+  useEffect(() => {
+    api.get("layouts").then(async (res) => {
+      const layouts = await Promise.all(
+        res.data.map((item) => {
+          return { name: item.name, id: item._id };
+        })
+      );
+
+      const names = layouts.map((item: any) => {
+        return item.name;
+      });
+
+      const ids = layouts.map((item: any) => {
+        return item.id;
+      });
+
+      console.log(names);
+
+      setLayoutsState(names);
+      setLayoutsId(ids);
+    });
+  }, []);
 
   async function sendToServer(values) {
     const deckName = values.deckName;
@@ -69,6 +97,7 @@ function NewDeckPrompt({
           name: deckName,
           creator: userId,
           subject: deckSubject,
+          layout: layoutsId[selectedLayout],
         })
         .then((res) => {
           const recentlyCreatedId = res.data._id;
@@ -141,6 +170,20 @@ function NewDeckPrompt({
                     >
                       {(formik) => (
                         <Form className="w-full space-y-8">
+                          <div className="flex flex-col items-center justify-center">
+                            <label className="font-normal text-xl">
+                              Layout
+                            </label>
+                            <Select
+                              selectedItem={selectedLayout}
+                              setSelectedItem={setSelectedLayout}
+                              items={layoutsState}
+                              className="flex w-full justify-center my-6 sm:px-6"
+                              className2="px-8 sm:px-20 font-bold bg-white py-2 text-xl w-full focus:outline-none
+                                                    focus:shadow-outline-blue focus:border-blue-300 relative border shadow-sm
+                                                    border-gray-300 rounded text-gray-800"
+                            />
+                          </div>
                           <TextField
                             label="Nome"
                             type="text"
