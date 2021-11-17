@@ -13,6 +13,8 @@ export const NewCardForm = ({ deckId }) => {
   const [fields, setFields] = useState([]);
   const [initialVal, setInitialVal] = useState({});
 
+  const [needValidation, setNeedValidation] = useState([]);
+
   const [initValues, setInitValues] = useState(false);
   const numberOfImages = Array.from(Array(4).keys()); //4 images
 
@@ -32,6 +34,10 @@ export const NewCardForm = ({ deckId }) => {
           res.data.map((item) => {
             const currentField = item.fieldName;
             const holder = currentField + "Holder";
+
+            if (item.required) {
+              setNeedValidation([...needValidation, item]);
+            }
 
             switch (item.fieldType) {
               case 0:
@@ -61,11 +67,21 @@ export const NewCardForm = ({ deckId }) => {
     });
   }, []);
 
-  const validate = Yup.object({
-    focus: Yup.string().required(
-      "Por favor, adicione um foco. Isso pode ser uma palavra ou expressão"
-    ),
-  });
+  function createValidator() {
+    const validationObject: { [key: string]: Yup.StringSchema } = {};
+
+    needValidation.forEach((item) => {
+      console.log("ue");
+      console.log(item.fieldName);
+
+      validationObject[item.fieldName] = Yup.string().required(
+        "Este campo é obrigatório"
+      );
+    });
+    console.log(validationObject);
+
+    return Yup.object(validationObject);
+  }
 
   function renameFile(originalFile, newName) {
     return new File([originalFile], newName, {
@@ -73,6 +89,8 @@ export const NewCardForm = ({ deckId }) => {
       lastModified: originalFile.lastModified,
     });
   }
+
+  const validate = createValidator();
 
   function sendToServer(values) {
     //Get user ID from jwt token
