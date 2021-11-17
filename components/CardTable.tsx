@@ -17,6 +17,8 @@ function CardTable({ deckId, search, sorting, readOnly }) {
       .then(async (res) => {
         let cardsInfo: any = await Promise.all(
           res.data.map(async (item) => {
+            console.log(item);
+
             const cardStats = await api
               .post(`card-stats/card`, {
                 cardId: item._id,
@@ -32,20 +34,22 @@ function CardTable({ deckId, search, sorting, readOnly }) {
 
             return {
               id: item._id,
-              focus: item.focus,
+              focus: item.layoutInfo[0].focus,
               dateAdded: item.dateAdded,
               dueDate: cardStats.dueDate,
               lapses: cardStats.totalLapses,
               leech: cardStats.leech,
               deckId: item.deck,
-              bilingualDescription: item.bilingualDescription ?? "",
-              focusAudio: item.focusAudio ?? [],
-              images: item.images ?? [],
-              monolingualDescription: item.monolingualDescription ?? "",
-              sentence: item.sentence ?? "",
-              sentenceAudio: item.sentenceAudio ?? "",
-              translation: item.translation ?? "",
-              notes: item.notes ?? "",
+              bilingualDescription:
+                item.layoutInfo[0].bilingualDescription ?? "",
+              focusAudio: item.layoutInfo[0].focusAudio ?? [],
+              images: item.layoutInfo[0].images ?? [],
+              monolingualDescription:
+                item.layoutInfo[0].monolingualDescription ?? "",
+              sentence: item.layoutInfo[0].sentence ?? "",
+              sentenceAudio: item.layoutInfo[0].sentenceAudio ?? "",
+              translation: item.layoutInfo[0].translation ?? "",
+              notes: item.layoutInfo[0].notes ?? "",
             };
           })
         );
@@ -107,6 +111,7 @@ function CardTable({ deckId, search, sorting, readOnly }) {
         <motion.ul layout>
           {hasCards ? (
             cards.map((card, i) => {
+              console.log(card);
               return (
                 <CardTableItem
                   key={i}

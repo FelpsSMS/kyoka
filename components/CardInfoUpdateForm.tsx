@@ -2,16 +2,297 @@ import { Formik, Form } from "formik";
 import { TextField } from "./TextField";
 import * as Yup from "yup";
 import { TextArea } from "./TextArea";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import ImageDropzone from "./ImageDropzone";
 import AudioDropzone from "./AudioDropzone";
 import axios from "axios";
 import DeletePrompt from "./DeletePrompt";
 import { api } from "../utils/api";
-import { useRouter } from "next/router";
+
+import router from "next/router";
 
 export const CardInfoUpdateForm = ({ cardDetails: card, readOnly }) => {
+  const [fields, setFields] = useState([]);
+  const [initialVal, setInitialVal] = useState({});
+
+  const [needValidation, setNeedValidation] = useState([]);
+
+  const [initValues, setInitValues] = useState(false);
+  const numberOfImages = Array.from(Array(4).keys()); //4 images
+
   const [showDeletePrompt, setShowDeletePrompt] = useState(false);
+
+  let init = {};
+
+  useEffect(() => {
+    api.get(`decks/${card.deckId}`).then((res) => {
+      const layout = res.data.layout;
+
+      api
+        .post("layout-configs/by-layout", {
+          id: layout,
+        })
+        .then((res) => {
+          setFields(res.data);
+
+          res.data.map((item) => {
+            const currentField = item.fieldName;
+            const holder = currentField + "Holder";
+
+            if (item.required) {
+              setNeedValidation([...needValidation, item]);
+            }
+
+            switch (item.fieldType) {
+              case 0:
+              case 1:
+                init[currentField] = card[currentField] ?? "";
+                break;
+
+              case 2:
+                init[currentField] = card[currentField] ?? "";
+
+                init[holder] = card[currentField] ?? "";
+                break;
+
+              case 3:
+                numberOfImages.map((item2) => {
+                  init[currentField + item2.toString()] = init[
+                    holder + item2.toString()
+                  ] = card[currentField][item2]
+                    ? card[currentField][item2].url
+                    : "";
+
+                  init[holder + item2.toString()] = card[currentField][item2]
+                    ? card[currentField][item2].url
+                    : "";
+                });
+                break;
+            }
+
+            setInitialVal(init);
+          });
+        })
+        .then(() => {
+          setInitValues(true);
+        });
+    });
+  }, []);
+
+  function createValidator() {
+    const validationObject: { [key: string]: Yup.StringSchema } = {};
+
+    needValidation.forEach((item) => {
+      validationObject[item.fieldName] = Yup.string().required(
+        "Este campo é obrigatório"
+      );
+    });
+
+    return Yup.object(validationObject);
+  }
+
+  function renameFile(originalFile, newName) {
+    return new File([originalFile], newName, {
+      type: originalFile.type,
+      lastModified: originalFile.lastModified,
+    });
+  }
+
+  const validate = createValidator();
+
+  function sendToServer(values) {
+    let imageData = [];
+    let audioData = [];
+
+    const config = { headers: { "Content-Type": "multipart/form-data" } };
+    let fd = new FormData();
+
+    console.log(values);
+    Object.entries(values).map((item: any) => {
+      if (typeof item[1] === "object") {
+        //if (!item[1].hasOwnProperty("url")) {
+        console.log(item[0]);
+        console.log(item[1]);
+        const newFile = renameFile(item[1], item[0]);
+
+        if (item[1].type.split("/")[0] == "image") {
+          imageData.push(newFile);
+        } else if (item[1].type.split("/")[0] == "audio") {
+          audioData.push(newFile);
+        }
+        /*   } else if (!item[0].includes("Holder")) {
+            fd.append(item[0], item[1]);
+          } */
+      } else if (item[1].length > 0 && !item[0].includes("Holder")) {
+        fd.append(item[0], item[1]);
+      }
+    });
+
+    imageData.map((item) => {
+      console.log(item);
+      fd.append("images", item);
+    });
+
+    audioData.map((item) => {
+      console.log(item);
+
+      fd.append("audios", item);
+    });
+
+    api
+      .patch(`cards/${card.id}`, fd, config)
+
+      //.then(() => router.back()) //redirect user to the deck page
+
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
+  return (
+    <>
+      {initValues && (
+        <div>
+          <DeletePrompt
+            show={showDeletePrompt}
+            setShow={() => setShowDeletePrompt(false)}
+            id={card.id}
+            routeName={"cards"}
+            title="Você realmente deseja excluir esta carta?"
+          />
+          <Formik
+            initialValues={initialVal}
+            validationSchema={validate}
+            enableReinitialize
+            onSubmit={(values) => sendToServer(values)}
+          >
+            {(formik) => (
+              <Form className="flex flex-col flex-wrap m-4">
+                <div className="flex flex-col w-full space-y-4">
+                  {fields.map((item, i) => {
+                    const currentFieldName = item.fieldName;
+                    const labelNumber = 0;
+
+                    switch (item.fieldType) {
+                      case 0:
+                        return (
+                          <TextField
+                            key={i}
+                            label={item.fieldLabel[labelNumber]}
+                            name={currentFieldName}
+                            type="text"
+                            readOnly={readOnly}
+                          />
+                        );
+
+                      case 1:
+                        return (
+                          <TextArea
+                            key={i}
+                            label={item.fieldLabel[labelNumber]}
+                            name={currentFieldName}
+                            type="text"
+                            readOnly={readOnly}
+                          />
+                        );
+
+                      case 2:
+                        return (
+                          <div key={i}>
+                            <AudioDropzone
+                              label={item.fieldLabel[labelNumber]}
+                              name={currentFieldName + "Holder"}
+                              fileExchange={(audio) => {
+                                formik.setFieldValue(currentFieldName, audio);
+                              }}
+                              webSource={
+                                card[currentFieldName]
+                                  ? card[currentFieldName]
+                                  : ""
+                              }
+                              readOnly={readOnly}
+                            />
+
+                            <input name={currentFieldName} hidden />
+                          </div>
+                        );
+
+                      case 3:
+                        return (
+                          <>
+                            <label className="text-xl font-normal">
+                              {item.fieldLabel[labelNumber]}
+                            </label>
+                            <div
+                              className="flex flex-wrap flex-col space-y-4 xs:space-x-4 xs:space-y-0 xs:flex-row"
+                              key={i}
+                            >
+                              <div className="flex space-x-4 xs:space-x-4">
+                                {numberOfImages.map((item) => {
+                                  return (
+                                    <div key={item}>
+                                      <ImageDropzone
+                                        name={
+                                          currentFieldName +
+                                          "Holder" +
+                                          item.toString()
+                                        }
+                                        fileExchange={(image) => {
+                                          formik.setFieldValue(
+                                            currentFieldName + item.toString(),
+                                            image
+                                          );
+                                        }}
+                                        webSource={
+                                          card[currentFieldName][item]
+                                            ? card[currentFieldName][item].url
+                                            : ""
+                                        }
+                                        readOnly={readOnly}
+                                      />
+
+                                      <input
+                                        name={
+                                          currentFieldName + item.toString()
+                                        }
+                                        hidden
+                                      />
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          </>
+                        );
+                    }
+                  })}
+                </div>
+
+                {!readOnly && (
+                  <div className="flex items-center justify-center space-x-2 sm:space-x-4">
+                    <button
+                      className="px-8 mt-4 confirmation-button sm:px-16"
+                      type="submit"
+                    >
+                      Atualizar
+                    </button>
+                    <button
+                      className="px-8 mt-4 confirmation-button sm:px-16"
+                      onClick={() => setShowDeletePrompt(true)}
+                      type="button"
+                    >
+                      Excluir
+                    </button>
+                  </div>
+                )}
+              </Form>
+            )}
+          </Formik>
+        </div>
+      )}
+    </>
+  );
+  /*  const [showDeletePrompt, setShowDeletePrompt] = useState(false);
   const router = useRouter();
 
   const validate = Yup.object({
@@ -187,7 +468,7 @@ export const CardInfoUpdateForm = ({ cardDetails: card, readOnly }) => {
                 <div className="flex space-x-4 xs:space-x-4">
                   <ImageDropzone
                     name="image3"
-                    webSource={card.images[2] ? card.images[2].url : ""}
+                    webSource={card.images[2].url ? card.images[2].url : ""}
                     fileExchange={(image) => {
                       formik.setFieldValue("image3Holder", image);
                     }}
@@ -195,7 +476,7 @@ export const CardInfoUpdateForm = ({ cardDetails: card, readOnly }) => {
                   />
                   <ImageDropzone
                     name="image4"
-                    webSource={card.images[3] ? card.images[3].url : ""}
+                    webSource={card.images[3].url ? card.images[3].url : ""}
                     fileExchange={(image) => {
                       formik.setFieldValue("image4Holder", image);
                     }}
@@ -237,5 +518,5 @@ export const CardInfoUpdateForm = ({ cardDetails: card, readOnly }) => {
         </div>
       )}
     </Formik>
-  );
+  ); */
 };
