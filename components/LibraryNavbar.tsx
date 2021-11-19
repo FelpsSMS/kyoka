@@ -1,10 +1,9 @@
 import { SearchIcon } from "@heroicons/react/outline";
-import router from "next/router";
 import React, { useEffect, useState } from "react";
 import NewDeckPrompt from "./NewDeckPrompt";
 import Select from "./Select";
 
-function LibraryNavbar({
+export default function LibraryNavbar({
   setSorting,
   libraryChanged,
   setLibraryChanged,
@@ -16,13 +15,6 @@ function LibraryNavbar({
     const timeOutId = setTimeout(() => setSearch(query), 300); //debounce
     return () => clearTimeout(timeOutId);
   }, [query, setSearch]);
-
-  /*   function handleClick(id: any) {
-    router.push({
-      pathname: `[deckId]/create_card`,
-      query: { deckId: id },
-    });
-  } */
 
   const [showNewDeckPrompt, setShowNewDeckPrompt] = useState(false);
 
@@ -69,5 +61,3 @@ function LibraryNavbar({
     </nav>
   );
 }
-
-export default LibraryNavbar;

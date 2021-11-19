@@ -1,4 +1,4 @@
-function LoadingWheel() {
+export default function LoadingWheel() {
   return (
     <button
       type="button"
@@ -31,5 +31,3 @@ function LoadingWheel() {
     </button>
   );
 }
-
-export default LoadingWheel;

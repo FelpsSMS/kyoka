@@ -1,6 +1,6 @@
 import { SaveIcon } from "@heroicons/react/outline";
 import React, { useEffect, useState } from "react";
-import { api, verifyToken } from "../utils/api";
+import { api } from "../utils/api";
 import GenerateCardPrompt from "./GenerateCardPrompt";
 import HeadsUpMessage from "./HeadsUpMessage";
 import PlayAudioButton from "./PlayAudioButton";
@@ -20,15 +20,11 @@ export default function DictionaryEntry({ term, text }) {
         focus: term,
       })
       .then((res) => {
-        if (res) {
-          if (res.data) setAudio(res.data);
-        }
+        const hasAudio = res ? res.data ?? null : null;
+
+        if (hasAudio) setAudio(res.data);
       });
   }, [term]);
-
-  async function handleClick() {
-    setShowSentencePrompt(true);
-  }
 
   return (
     <div className="bg-gray-200 rounded flex flex-col items-center justify-center mx-4 relative">
@@ -60,7 +56,7 @@ export default function DictionaryEntry({ term, text }) {
           <SaveIcon
             className="hover:cursor-pointer"
             style={{ width: "2em", height: "2em" }}
-            onClick={() => handleClick()}
+            onClick={() => setShowSentencePrompt(true)}
           ></SaveIcon>
           <PlayAudioButton
             audio={audio}

@@ -1,5 +1,5 @@
 import { useField } from "formik";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { UploadIcon } from "@heroicons/react/outline";
 
@@ -9,58 +9,42 @@ export default function JsonDropzone(props) {
   const [rejectFile, setRejectFile] = useState(false);
   const [rejectFileSize, setRejectFileSize] = useState(false);
 
-  const audioRef = useRef(null);
+  const checkFile = useCallback(
+    (file) => {
+      const reader = new FileReader();
 
-  function checkFile(file) {
-    const reader = new FileReader();
+      props.fileExchange(file);
+      setRejectFile(false);
+      setRejectFileSize(false);
 
-    /*     if (!file.type.match("audio.*")) {
-      setRejectFile(true);
-      return;
-    } */
+      props.setFileName(file.name);
 
-    /*     if (file.size > 5242880) {
-      //5MB
-      setRejectFileSize(true);
-      return;
-    } */
+      reader.onabort = () => console.log("file reading was aborted");
+      reader.onerror = () => console.log("file reading has failed");
+      reader.onload = () => {
+        const data: any = reader.result;
 
-    props.fileExchange(file);
-    setRejectFile(false);
-    setRejectFileSize(false);
+        const dataView = new DataView(data);
+        const decoder = new TextDecoder("utf8");
 
-    props.setFileName(file.name);
+        const json = JSON.parse(decoder.decode(dataView));
 
-    reader.onabort = () => console.log("file reading was aborted");
-    reader.onerror = () => console.log("file reading has failed");
-    reader.onload = () => {
-      const data: any = reader.result;
+        props.setResponse(json);
+      };
+      reader.readAsArrayBuffer(file);
+    },
+    [props]
+  );
 
-      const dataView = new DataView(data);
-      const decoder = new TextDecoder("utf8");
+  const onDrop = useCallback(
+    (acceptedFiles) => {
+      acceptedFiles.forEach((file) => {
+        checkFile(file);
+      });
+    },
+    [checkFile]
+  );
 
-      const json = JSON.parse(decoder.decode(dataView));
-
-      props.setResponse(json);
-
-      /*      json.map((item) => {
-        console.log(item);
-      }); */
-
-      /*   const binaryStr = reader.result;
-      const blob = new Blob([binaryStr]);
-
-      audioRef.current.pause();
-      audioRef.current.load(); */
-    };
-    reader.readAsArrayBuffer(file);
-  }
-
-  const onDrop = useCallback((acceptedFiles) => {
-    acceptedFiles.forEach((file) => {
-      checkFile(file);
-    });
-  }, []);
   const { getRootProps, getInputProps } = useDropzone({
     accept: "json/*",
     //maxSize: 5242880, //5MB

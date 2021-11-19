@@ -2,13 +2,10 @@ import { SearchIcon } from "@heroicons/react/outline";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
-import PageWrapper from "../components/PageWrapper";
-import { TextArea } from "../components/TextArea";
 import * as localForage from "localforage";
 import DictionaryEntry from "../components/DictionaryEntry";
 import { api, verifyToken } from "../utils/api";
 import parse from "html-react-parser";
-import GenerateCardPrompt from "../components/GenerateCardPrompt";
 
 export default function clipboard() {
   // eslint-disable-next-line react-hooks/rules-of-hooks

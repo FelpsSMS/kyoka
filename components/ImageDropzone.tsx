@@ -13,44 +13,51 @@ export default function ImageDropzone(props) {
     return src;
   };
 
-  function checkFile(file) {
-    const reader = new FileReader();
+  const checkFile = useCallback(
+    (file) => {
+      const reader = new FileReader();
 
-    if (!file.type.match("image.*")) {
-      setRejectFile(true);
-      return;
-    }
+      if (!file.type.match("image.*")) {
+        setRejectFile(true);
+        return;
+      }
 
-    if (file.size > 5242880) {
-      //5MB
-      setRejectFileSize(true);
-      return;
-    }
+      if (file.size > 5242880) {
+        //5MB
+        setRejectFileSize(true);
+        return;
+      }
 
-    props.fileExchange(file);
-    setRejectFile(false);
-    setRejectFileSize(false);
+      props.fileExchange(file);
+      setRejectFile(false);
+      setRejectFileSize(false);
 
-    reader.onabort = () => console.log("file reading was aborted");
-    reader.onerror = () => console.log("file reading has failed");
-    reader.onload = () => {
-      // Do whatever you want with the file contents
+      reader.onabort = () => console.log("file reading was aborted");
+      reader.onerror = () => console.log("file reading has failed");
+      reader.onload = () => {
+        // Do whatever you want with the file contents
 
-      const binaryStr = reader.result;
+        const binaryStr = reader.result;
 
-      const blob = new Blob([binaryStr]);
-      const url = URL.createObjectURL(blob);
+        const blob = new Blob([binaryStr]);
+        const url = URL.createObjectURL(blob);
 
-      setImageContentURL(url);
-    };
-    reader.readAsArrayBuffer(file);
-  }
+        setImageContentURL(url);
+      };
+      reader.readAsArrayBuffer(file);
+    },
+    [props]
+  );
 
-  const onDrop = useCallback((acceptedFiles) => {
-    acceptedFiles.forEach((file) => {
-      checkFile(file);
-    });
-  }, []);
+  const onDrop = useCallback(
+    (acceptedFiles) => {
+      acceptedFiles.forEach((file) => {
+        checkFile(file);
+      });
+    },
+    [checkFile]
+  );
+
   const { getRootProps, getInputProps } = useDropzone({
     accept: "image/*",
     maxSize: 5242880, //5MB

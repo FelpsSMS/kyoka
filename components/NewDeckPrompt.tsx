@@ -16,7 +16,7 @@ interface newDeckPromptProps {
   setLibraryChanged: any;
 }
 
-function NewDeckPrompt({
+export default function NewDeckPrompt({
   show,
   setShow,
   deckId,
@@ -64,8 +64,6 @@ function NewDeckPrompt({
       const ids = layouts.map((item: any) => {
         return item.id;
       });
-
-      console.log(names);
 
       setLayoutsState(names);
       setLayoutsId(ids);
@@ -152,7 +150,7 @@ function NewDeckPrompt({
                 >
                   <motion.div
                     className="bg-white fixed flex flex-col items-center justify-center space-y-8 opacity-100 
-      p-4 sm:p-8 rounded-lg shadow-lg mx-2"
+                    p-4 sm:p-8 rounded-lg shadow-lg mx-2"
                     initial={{ height: 0, opacity: 0 }}
                     animate={{ height: "auto", opacity: 1 }}
                     transition={{ duration: 0.4 }}
@@ -202,7 +200,7 @@ function NewDeckPrompt({
                           <div className="flex space-x-2 sm:space-x-8">
                             <button
                               className="bg-blue-800 text-white p-2 sm:px-16 rounded-sm text-xl font-bold focus:text-gray-200 
-                    focus:bg-blue-900 hover:text-gray-200 hover:bg-blue-900 outline-none px-2"
+                            focus:bg-blue-900 hover:text-gray-200 hover:bg-blue-900 outline-none px-2"
                               type="submit"
                               onClick={() => {
                                 formik.submitForm();
@@ -232,5 +230,3 @@ function NewDeckPrompt({
     </AnimatePresence>
   );
 }
-
-export default NewDeckPrompt;

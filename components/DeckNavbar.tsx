@@ -3,7 +3,12 @@ import router from "next/router";
 import React, { useEffect, useState } from "react";
 import Select from "./Select";
 
-function DeckNavbar({ deckId, setSorting, setSearch, readOnly }) {
+export default function DeckNavbar({
+  deckId,
+  setSorting,
+  setSearch,
+  readOnly,
+}) {
   function handleCardCreation(id: any) {
     router.push({
       pathname: `[deckId]/create_card`,
@@ -58,5 +63,3 @@ function DeckNavbar({ deckId, setSorting, setSearch, readOnly }) {
     </nav>
   );
 }
-
-export default DeckNavbar;

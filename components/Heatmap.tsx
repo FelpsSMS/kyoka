@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { api, verifyToken } from "../utils/api";
 import { dayInMilliseconds } from "../utils/constants";
 
-function Heatmap() {
+export default function Heatmap() {
   const [sessions, setSessions] = useState([]);
 
   const [tooltip, setTooltip] = useState(false);
@@ -109,6 +109,7 @@ function Heatmap() {
       <div className="inline-grid grid-cols-8 gap-2 bg-gray-100 my-4 p-2 rounded-lg mx-2 sm:w-1/2">
         {sessions.map((item, i) => {
           return (
+            //color changes with the number of cards reviewed
             <div
               className={`h-1 w-1 p-2 rounded ${
                 item.numberOfCardsReviewed == 0
@@ -144,5 +145,3 @@ function Heatmap() {
     </div>
   );
 }
-
-export default Heatmap;

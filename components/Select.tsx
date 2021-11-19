@@ -1,6 +1,5 @@
 import { Listbox, Transition } from "@headlessui/react";
-import { CheckIcon, SelectorIcon } from "@heroicons/react/outline";
-import { Fragment, useEffect, useState } from "react";
+import { useEffect } from "react";
 
 interface SelectInterface {
   selectedItem: any;
@@ -12,7 +11,7 @@ interface SelectInterface {
   setSorting?: any;
 }
 
-function Select({
+export default function Select({
   selectedItem,
   setSelectedItem,
   items,
@@ -22,7 +21,9 @@ function Select({
   setSorting,
 }: SelectInterface) {
   useEffect(() => {
-    if (items.length > 0) setSelectedItem(Object.keys(items[0])[0]); //weird workaround to make it so headless UI's listbox detects the selection for the first element
+    if (items.length > 0) setSelectedItem(Object.keys(items[0])[0]);
+    //weird workaround to make it so headless UI's listbox detects the selection for the first element
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -107,5 +108,3 @@ function Select({
     </Listbox>
   );
 }
-
-export default Select;

@@ -81,8 +81,8 @@ export default function Library({ sorting, libraryChanged, search }) {
   return (
     <div
       className="grid grid-cols-1 grid-wrap
-    sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 
-    gap-8"
+      sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 
+      gap-8"
     >
       {library.map((item, i) => {
         return (

@@ -1,6 +1,5 @@
 import { motion } from "framer-motion";
-import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { api, verifyToken } from "../utils/api";
 import Image from "next/image";
 import ToggleBox from "./ToggleBox";
@@ -11,8 +10,8 @@ import Heatmap from "./Heatmap";
 import { dayInMilliseconds } from "../utils/constants";
 import { nanoid } from "nanoid";
 
-function SRSPanel() {
-  let animationHeight = "";
+export default function SRSPanel() {
+  const animationHeight = useRef(null);
 
   const [show, setShow] = useState(false);
   const [src, setSRC] = useState("");
@@ -21,11 +20,14 @@ function SRSPanel() {
     return src;
   };
 
+  useEffect(() => {
+    //animationHeight.current = window.innerWidth > 640 ? "80%" : "100%"; //640px is the cutoff for sm in tailwind
+  }, []);
+
   const [newCardsNumber, setNewCardsNumber] = useState(0);
   const [reviewedCardsNumber, setReviewedCardsNumber] = useState(0);
   const [relearnedCardsNumber, setRelearnedCardsNumber] = useState(0);
 
-  const [cardFront, setCardFront] = useState([]);
   const [cardsToBeShowed, setCardsToBeShowed] = useState([]);
 
   const [reloadCards, setReloadCards] = useState(false);
@@ -40,10 +42,7 @@ function SRSPanel() {
 
   const [sessionId, setSessionId] = useState("");
 
-  const [removeLeeches, setRemoveLeeches] = useState(false);
   const [lapseThreshold, setLapseThreshold] = useState(8);
-
-  const [fields, setFields] = useState([]);
 
   function addLapse(id, totalLapses, consecutiveLapses) {
     api
@@ -88,8 +87,6 @@ function SRSPanel() {
         statId: _id,
       })
       .then(async (res) => {
-        console.log(res.data);
-
         const interval = res.data.dueDate - Date.now();
 
         if (interval > dayInMilliseconds * 21) {
@@ -100,23 +97,18 @@ function SRSPanel() {
 
         setReloadCards(!reloadCards);
         setIsDataLoaded(false);
-        //setIsPageLoaded(false);
       });
   }
 
   async function changeState(id, state) {
-    //const newState =
     await api
       .patch(`card-stats/${id}`, {
         state: state,
       })
-
       .catch((err) => {
         console.log(err);
         return null;
       });
-
-    //return newState.data.state;
   }
 
   function showImage(item) {
@@ -225,8 +217,6 @@ function SRSPanel() {
   }
 
   useEffect(() => {
-    animationHeight = window.innerWidth > 640 ? "80%" : "100%"; //640px is the cutoff for sm in tailwind
-
     //get active decks for the specific user
     const userId = verifyToken();
 
@@ -258,8 +248,6 @@ function SRSPanel() {
               .then(async (res) => {
                 const cardInfo = res.data;
 
-                console.log(res.data);
-
                 const fieldData = await api
                   .get(`decks/${item.deck._id}`)
                   .then(async (res) => {
@@ -277,14 +265,9 @@ function SRSPanel() {
 
                 //sort field data
                 cardInfo.map((card) => {
-                  console.log(card);
-
                   const auxFieldData = Object.keys(card.layoutInfo[0]);
 
                   const filteredFieldData = fieldData.filter((item) => {
-                    console.log(auxFieldData);
-                    console.log(item.fieldName);
-
                     return auxFieldData.includes(item.fieldName);
                   });
 
@@ -333,8 +316,6 @@ function SRSPanel() {
 
                 return cardInfo;
               });
-
-            console.log(cardData);
 
             return cardData;
           })
@@ -448,6 +429,10 @@ function SRSPanel() {
     return () => {};
   }, [reloadCards]);
 
+  const getTotalCardsNumber = useCallback(() => {
+    return newCardsNumber + reviewedCardsNumber + relearnedCardsNumber;
+  }, [newCardsNumber, relearnedCardsNumber, reviewedCardsNumber]);
+
   useEffect(() => {
     const userId = verifyToken();
 
@@ -457,22 +442,21 @@ function SRSPanel() {
       api
         .post("sessions", {
           user: userId,
-          numberOfCardsToReview:
-            newCardsNumber + reviewedCardsNumber + relearnedCardsNumber,
+          numberOfCardsToReview: getTotalCardsNumber(),
         })
         .then((res) => {
           setSessionId(res.data._id);
         });
     }
-  }, [sessionStart, sessionId]);
+  }, [sessionStart, sessionId, getTotalCardsNumber]);
 
   return (
     <motion.div
       className="bg-white flex flex-col min-h-screen w-screen items-center justify-center sm:rounded-lg 
       sm:shadow-lg sm:my-8 sm:mx-8 md:mx-16 lg:my-16 lg:mx-32"
-      initial={{ height: 0, opacity: 0 }}
-      animate={{ height: animationHeight, opacity: 1 }}
-      transition={{ duration: 0.2 }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.4 }}
     >
       <ImagePopup show={show} setShow={() => setShow(false)} src={src} />
       {sessionStart && isPageLoaded ? (
@@ -669,5 +653,3 @@ function SRSPanel() {
     </motion.div>
   );
 }
-
-export default SRSPanel;
