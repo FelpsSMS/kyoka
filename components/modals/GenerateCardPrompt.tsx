@@ -1,11 +1,10 @@
 import { Dialog } from "@headlessui/react";
 import { Form, Formik } from "formik";
 import { AnimatePresence, motion } from "framer-motion";
-import React, { useRef, useState } from "react";
-import * as Yup from "yup";
-import { TextField } from "./TextField";
+import React, { useRef } from "react";
+import { TextField } from "../TextField";
 
-import { api, verifyToken } from "../utils/api";
+import { api, verifyToken } from "../../utils/api";
 
 export default function GenerateCardPrompt({
   show,
@@ -85,7 +84,7 @@ export default function GenerateCardPrompt({
               {open && (
                 <Dialog.Overlay
                   className="fixed h-screen w-screen bg-black z-50 inset-0 mx-auto 
-                flex items-center justify-center"
+                  flex items-center justify-center"
                   as={motion.div}
                   initial={{ backgroundColor: "rgba(0, 0, 0, 0)" }} //Opacity is inherited, backgroundColor isn't
                   animate={{
@@ -96,7 +95,7 @@ export default function GenerateCardPrompt({
                 >
                   <motion.div
                     className="bg-white fixed flex flex-col items-center justify-center space-y-8 opacity-100 
-      p-4 sm:p-8 rounded-lg shadow-lg mx-2"
+                    p-4 sm:p-8 rounded-lg shadow-lg mx-2"
                     initial={{ height: 0, opacity: 0 }}
                     animate={{ height: "auto", opacity: 1 }}
                     transition={{ duration: 0.4 }}
@@ -124,7 +123,7 @@ export default function GenerateCardPrompt({
                           <div className="flex space-x-2 sm:space-x-8">
                             <button
                               className="bg-blue-800 text-white p-2 sm:px-16 rounded-sm text-xl font-bold focus:text-gray-200 
-                    focus:bg-blue-900 hover:text-gray-200 hover:bg-blue-900 outline-none px-2"
+                            focus:bg-blue-900 hover:text-gray-200 hover:bg-blue-900 outline-none px-2"
                               type="submit"
                               onClick={() => {
                                 formik.submitForm();

@@ -11,43 +11,49 @@ export default function AudioDropzone(props) {
 
   const audioRef = useRef(null);
 
-  function checkFile(file) {
-    const reader = new FileReader();
+  const checkFile = useCallback(
+    (file) => {
+      const reader = new FileReader();
 
-    if (!file.type.match("audio.*")) {
-      setRejectFile(true);
-      return;
-    }
+      if (!file.type.match("audio.*")) {
+        setRejectFile(true);
+        return;
+      }
 
-    if (file.size > 5242880) {
-      //5MB
-      setRejectFileSize(true);
-      return;
-    }
+      if (file.size > 5242880) {
+        //5MB
+        setRejectFileSize(true);
+        return;
+      }
 
-    props.fileExchange(file);
-    setRejectFile(false);
-    setRejectFileSize(false);
+      props.fileExchange(file);
+      setRejectFile(false);
+      setRejectFileSize(false);
 
-    reader.onabort = () => console.log("file reading was aborted");
-    reader.onerror = () => console.log("file reading has failed");
-    reader.onload = () => {
-      const binaryStr = reader.result;
-      const blob = new Blob([binaryStr]);
-      const url = URL.createObjectURL(blob);
+      reader.onabort = () => console.log("file reading was aborted");
+      reader.onerror = () => console.log("file reading has failed");
+      reader.onload = () => {
+        const binaryStr = reader.result;
+        const blob = new Blob([binaryStr]);
+        const url = URL.createObjectURL(blob);
 
-      setAudioContentURL(url);
-      audioRef.current.pause();
-      audioRef.current.load();
-    };
-    reader.readAsArrayBuffer(file);
-  }
+        setAudioContentURL(url);
+        audioRef.current.pause();
+        audioRef.current.load();
+      };
+      reader.readAsArrayBuffer(file);
+    },
+    [props]
+  );
 
-  const onDrop = useCallback((acceptedFiles) => {
-    acceptedFiles.forEach((file) => {
-      checkFile(file);
-    });
-  }, []);
+  const onDrop = useCallback(
+    (acceptedFiles) => {
+      acceptedFiles.forEach((file) => {
+        checkFile(file);
+      });
+    },
+    [checkFile]
+  );
   const { getRootProps, getInputProps } = useDropzone({
     accept: "audio/*",
     maxSize: 5242880, //5MB

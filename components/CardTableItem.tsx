@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import CardInfo from "./CardInfo";
 
 function CardTableItem({ cardDetails: { card, tableKey }, readOnly }) {
@@ -34,7 +34,7 @@ function CardTableItem({ cardDetails: { card, tableKey }, readOnly }) {
               Foco
             </div>
             <div className="text-right text-black p-2 truncate">
-              {card.focus}
+              {card.layoutInfo.focus}
             </div>
           </div>
           {/* Col */}

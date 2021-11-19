@@ -12,13 +12,9 @@ import { NewCardForm } from "../../../components/NewCardForm";
 import SharedDeckOptionsNavbar from "../../../components/SharedDeckOptionsNavbar";
 import { api, verifyToken } from "../../../utils/api";
 
-export default function index() {
-  // eslint-disable-next-line react-hooks/rules-of-hooks
+export default function SharedDecksIndex() {
   const router = useRouter();
-
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [sorting, setSorting] = useState();
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [search, setSearch] = useState("");
 
   const { deckId } = router.query;
@@ -43,7 +39,6 @@ export default function index() {
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { ["kyoka-token"]: token } = parseCookies(ctx);
-  //const apiClient = getAPIClient(ctx);
 
   if (!token) {
     return {
@@ -53,8 +48,6 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       },
     };
   }
-
-  //await apiClient.get("/users");
 
   return { props: {} };
 };

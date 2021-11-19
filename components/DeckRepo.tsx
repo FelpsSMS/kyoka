@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { api, verifyToken } from "../utils/api";
+import { api } from "../utils/api";
 import LibraryItem from "./LibraryItem";
 
 export default function DeckRepo() {

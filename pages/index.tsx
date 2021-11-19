@@ -5,7 +5,7 @@ import Footer from "../components/Footer";
 import { LoginForm } from "../components/LoginForm";
 import Head from "next/head";
 
-export default function Login() {
+export default function login() {
   return (
     <div>
       <Head>
@@ -21,8 +21,6 @@ export default function Login() {
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { ["kyoka-token"]: token } = parseCookies(ctx);
-  //const apiClient = getAPIClient(ctx);
-
   if (token) {
     return {
       redirect: {
@@ -31,8 +29,6 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       },
     };
   }
-
-  //await apiClient.get("/users");
 
   return { props: {} };
 };

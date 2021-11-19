@@ -3,27 +3,21 @@ import { useRouter } from "next/router";
 import { parseCookies } from "nookies";
 import React, { useEffect, useState } from "react";
 import CardTable from "../../../components/CardTable";
-import Container from "../../../components/Container";
 import DeckNavbar from "../../../components/DeckNavbar";
 import DeckOptionsNavbar from "../../../components/DeckOptionsNavbar";
 import Footer from "../../../components/Footer";
 import Navbar from "../../../components/Navbar";
-import { NewCardForm } from "../../../components/NewCardForm";
 import { api, verifyToken } from "../../../utils/api";
 
-export default function index() {
-  // eslint-disable-next-line react-hooks/rules-of-hooks
+export default function CreateCardIndex() {
   const router = useRouter();
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [sorting, setSorting] = useState();
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [search, setSearch] = useState("");
 
   const { deckId } = router.query;
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [readOnly, setReadOnly] = useState(false);
-  // eslint-disable-next-line react-hooks/rules-of-hooks
+
   useEffect(() => {
     const userId = verifyToken();
 
@@ -35,7 +29,7 @@ export default function index() {
       .then((res) => {
         setReadOnly(res.data.readOnly);
       });
-  }, []);
+  }, [deckId]);
 
   return (
     <div className="">
@@ -62,7 +56,6 @@ export default function index() {
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { ["kyoka-token"]: token } = parseCookies(ctx);
-  //const apiClient = getAPIClient(ctx);
 
   if (!token) {
     return {
@@ -72,8 +65,6 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       },
     };
   }
-
-  //await apiClient.get("/users");
 
   return { props: {} };
 };

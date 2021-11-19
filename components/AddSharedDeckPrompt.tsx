@@ -1,8 +1,7 @@
 import { Dialog } from "@headlessui/react";
-import axios from "axios";
 import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/router";
-import React, { useRef, useState } from "react";
+import React, { useRef } from "react";
 import { api, verifyToken } from "../utils/api";
 
 function AddSharedDeckPrompt({
@@ -72,7 +71,7 @@ function AddSharedDeckPrompt({
               {open && (
                 <Dialog.Overlay
                   className="fixed h-screen w-screen bg-black z-50 inset-0 mx-auto 
-    flex items-center justify-center"
+                  flex items-center justify-center"
                   as={motion.div}
                   initial={{ backgroundColor: "rgba(0, 0, 0, 0)" }} //Opacity is inherited, backgroundColor isn't
                   animate={{
@@ -83,7 +82,7 @@ function AddSharedDeckPrompt({
                 >
                   <motion.div
                     className="bg-white fixed flex flex-col items-center justify-center space-y-8 opacity-100 
-      p-4 sm:p-8 rounded-lg shadow-lg mx-2"
+                    p-4 sm:p-8 rounded-lg shadow-lg mx-2"
                     initial={{ height: 0, opacity: 0 }}
                     animate={{ height: "auto", opacity: 1 }}
                     transition={{ duration: 0.4 }}

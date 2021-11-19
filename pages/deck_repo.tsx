@@ -1,11 +1,9 @@
 import { GetServerSideProps } from "next";
 import { parseCookies } from "nookies";
-import React, { useState } from "react";
-import Container from "../components/Container";
+import React from "react";
 import DeckRepo from "../components/DeckRepo";
 import Footer from "../components/Footer";
-import Library from "../components/Library";
-import LibraryNavbar from "../components/LibraryNavbar";
+
 import Navbar from "../components/Navbar";
 
 export default function deck_repo() {

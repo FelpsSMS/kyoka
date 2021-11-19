@@ -5,10 +5,8 @@ import React from "react";
 import Footer from "../components/Footer";
 import { GetServerSideProps } from "next";
 import { parseCookies } from "nookies";
-import { api } from "../utils/api";
-import { getAPIClient } from "../utils/axios";
 
-export default function Home() {
+export default function home() {
   return (
     <div
       id="container"

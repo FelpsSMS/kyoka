@@ -1,9 +1,8 @@
-import { SearchIcon } from "@heroicons/react/outline";
-import router from "next/router";
 import React, { useEffect, useState } from "react";
 import { api, verifyToken } from "../utils/api";
-import DeletePrompt from "./DeletePrompt";
-import NewDeckPrompt from "./NewDeckPrompt";
+import DeletePrompt from "./modals/DeletePrompt";
+import NewDeckPrompt from "./modals/NewDeckPrompt";
+
 import ToggleButton from "./ToggleButton";
 
 function DeckOptionsNavbar({ deckId, readOnly }) {

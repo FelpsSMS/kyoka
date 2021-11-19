@@ -1,17 +1,17 @@
 import { motion } from "framer-motion";
-import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { api, verifyToken } from "../utils/api";
 import Image from "next/image";
 import ToggleBox from "./ToggleBox";
 import PlayAudioButton from "./PlayAudioButton";
-import ImagePopup from "./ImagePopup";
 import LoadingWheel from "./LoadingWheel";
 import Heatmap from "./Heatmap";
 import { dayInMilliseconds } from "../utils/constants";
+import { nanoid } from "nanoid";
+import ImagePopup from "./modals/ImagePopup";
 
-function SRSPanel() {
-  let animationHeight = "";
+export default function SRSPanel() {
+  const animationHeight = useRef(null);
 
   const [show, setShow] = useState(false);
   const [src, setSRC] = useState("");
@@ -19,6 +19,10 @@ function SRSPanel() {
   const imageLoader = ({ src }) => {
     return src;
   };
+
+  useEffect(() => {
+    //animationHeight.current = window.innerWidth > 640 ? "80%" : "100%"; //640px is the cutoff for sm in tailwind
+  }, []);
 
   const [newCardsNumber, setNewCardsNumber] = useState(0);
   const [reviewedCardsNumber, setReviewedCardsNumber] = useState(0);
@@ -38,7 +42,6 @@ function SRSPanel() {
 
   const [sessionId, setSessionId] = useState("");
 
-  const [removeLeeches, setRemoveLeeches] = useState(false);
   const [lapseThreshold, setLapseThreshold] = useState(8);
 
   function addLapse(id, totalLapses, consecutiveLapses) {
@@ -84,8 +87,6 @@ function SRSPanel() {
         statId: _id,
       })
       .then(async (res) => {
-        console.log(res.data);
-
         const interval = res.data.dueDate - Date.now();
 
         if (interval > dayInMilliseconds * 21) {
@@ -96,23 +97,18 @@ function SRSPanel() {
 
         setReloadCards(!reloadCards);
         setIsDataLoaded(false);
-        //setIsPageLoaded(false);
       });
   }
 
   async function changeState(id, state) {
-    //const newState =
     await api
       .patch(`card-stats/${id}`, {
         state: state,
       })
-
       .catch((err) => {
         console.log(err);
         return null;
       });
-
-    //return newState.data.state;
   }
 
   function showImage(item) {
@@ -221,8 +217,6 @@ function SRSPanel() {
   }
 
   useEffect(() => {
-    animationHeight = window.innerWidth > 640 ? "80%" : "100%"; //640px is the cutoff for sm in tailwind
-
     //get active decks for the specific user
     const userId = verifyToken();
 
@@ -251,8 +245,76 @@ function SRSPanel() {
           activeDecks.map(async (item: any) => {
             const cardData = await api
               .get(`cards/get_cards/${item.deck._id}`)
-              .then((res) => {
-                return res.data;
+              .then(async (res) => {
+                const cardInfo = res.data;
+
+                const fieldData = await api
+                  .get(`decks/${item.deck._id}`)
+                  .then(async (res) => {
+                    const layout = res.data.layout;
+                    const response = await api
+                      .post("layout-configs/by-layout", {
+                        id: layout,
+                      })
+                      .then((res) => {
+                        return res.data;
+                      });
+
+                    return response;
+                  });
+
+                //sort field data
+                cardInfo.map((card) => {
+                  const auxFieldData = Object.keys(card.layoutInfo[0]);
+
+                  const filteredFieldData = fieldData.filter((item) => {
+                    return auxFieldData.includes(item.fieldName);
+                  });
+
+                  const newFieldData = [];
+
+                  const fieldType0 = filteredFieldData.filter(
+                    (item) => item.fieldType === 0
+                  );
+
+                  const fieldType1 = filteredFieldData.filter(
+                    (item) => item.fieldType === 1
+                  );
+
+                  const fieldType2 = filteredFieldData.filter(
+                    (item) => item.fieldType === 2
+                  );
+
+                  const fieldType3 = filteredFieldData.filter(
+                    (item) => item.fieldType === 3
+                  );
+
+                  fieldType3.map((item) => {
+                    newFieldData.push(item);
+                  });
+
+                  fieldType0.map((item) => {
+                    newFieldData.push(item);
+                  });
+
+                  fieldType1.map((item) => {
+                    newFieldData.push(item);
+                  });
+
+                  fieldType2.map((item) => {
+                    newFieldData.push(item);
+                  });
+
+                  const frontData = newFieldData.filter(
+                    (item) => item.front && item.fieldName != "focus"
+                  );
+
+                  card["frontData"] = frontData;
+
+                  card["fieldData"] = newFieldData;
+                });
+
+                return cardInfo;
               });
 
             return cardData;
@@ -367,6 +429,10 @@ function SRSPanel() {
     return () => {};
   }, [reloadCards]);
 
+  const getTotalCardsNumber = useCallback(() => {
+    return newCardsNumber + reviewedCardsNumber + relearnedCardsNumber;
+  }, [newCardsNumber, relearnedCardsNumber, reviewedCardsNumber]);
+
   useEffect(() => {
     const userId = verifyToken();
 
@@ -376,116 +442,127 @@ function SRSPanel() {
       api
         .post("sessions", {
           user: userId,
-          numberOfCardsToReview:
-            newCardsNumber + reviewedCardsNumber + relearnedCardsNumber,
+          numberOfCardsToReview: getTotalCardsNumber(),
         })
         .then((res) => {
           setSessionId(res.data._id);
         });
     }
-  }, [sessionStart, sessionId]);
+  }, [sessionStart, sessionId, getTotalCardsNumber]);
 
   return (
     <motion.div
       className="bg-white flex flex-col min-h-screen w-screen items-center justify-center sm:rounded-lg 
       sm:shadow-lg sm:my-8 sm:mx-8 md:mx-16 lg:my-16 lg:mx-32"
-      initial={{ height: 0, opacity: 0 }}
-      animate={{ height: animationHeight, opacity: 1 }}
-      transition={{ duration: 0.2 }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.4 }}
     >
       <ImagePopup show={show} setShow={() => setShow(false)} src={src} />
       {sessionStart && isPageLoaded ? (
         isCardFlipped && isDataLoaded ? (
-          <div className="flex flex-col items-center justify-center space-y-4">
-            <div className="flex">
-              {cardsToBeShowed[0].card.images[0] && (
-                <div className="grid grid-cols-2 gap-2 sm:flex sm:space-x-2 2xl:space-x-4">
-                  {cardsToBeShowed[0].card.images.map((item, i) => {
+          <div className="flex flex-col items-center justify-center space-y-2">
+            {cardsToBeShowed[0].card.fieldData.map((field) => {
+              switch (field.fieldType) {
+                case 0:
+                case 1:
+                  if (field.front) {
+                    if (field.fieldName == "focus") {
+                      return (
+                        <p
+                          className="text-4xl sm:text-4xl font-bol p-4"
+                          key={nanoid()}
+                        >
+                          {cardsToBeShowed[0].card.layoutInfo[0]
+                            ? cardsToBeShowed[0].card.layoutInfo[0][
+                                field.fieldName
+                              ]
+                            : setSessionStart(false)}
+                        </p>
+                      );
+                    } else {
+                      return (
+                        <p
+                          className="text-6xl sm:text-7xl font-bol p-4"
+                          key={nanoid()}
+                        >
+                          {cardsToBeShowed[0].card.layoutInfo[0]
+                            ? cardsToBeShowed[0].card.layoutInfo[0][
+                                field.fieldName
+                              ]
+                            : setSessionStart(false)}
+                        </p>
+                      );
+                    }
+                  } else {
                     return (
-                      <div
-                        className="w-16 h-16 sm:w-32 sm:h-32 2xl:w-48 2xl:h-48 scale-105 rounded-lg hover:cursor-pointer hover:scale-110"
-                        key={i}
-                      >
-                        <Image
-                          loader={imageLoader}
-                          src={item.url}
-                          alt="Uploaded image"
-                          layout="fill"
-                          objectFit="contain"
-                          onClick={() => {
-                            showImage(item);
-                          }}
-                        />
+                      <div key={nanoid()}>
+                        {cardsToBeShowed[0].card.layoutInfo[0][
+                          field.fieldName
+                        ] && (
+                          <ToggleBox
+                            title={field.fieldLabel[0]}
+                            text={
+                              cardsToBeShowed[0].card.layoutInfo[0][
+                                field.fieldName
+                              ]
+                            }
+                            key={nanoid()}
+                          />
+                        )}
                       </div>
                     );
-                  })}
-                </div>
-              )}
-            </div>
+                  }
 
-            <p className="text-4xl sm:text-5xl font-bol p-4">
-              {cardsToBeShowed[0]
-                ? cardsToBeShowed[0].card.sentence
-                : setSessionStart(false)}
-            </p>
-
-            <p className="text-2xl sm:text-3xl font-bold">
-              {cardsToBeShowed[0]
-                ? cardsToBeShowed[0].card.focus
-                : setSessionStart(false)}
-            </p>
-
-            <div className="flex flex-col">
-              {cardsToBeShowed[0].card.bilingualDescription && (
-                <ToggleBox
-                  title={"Descrição bilíngue"}
-                  text={cardsToBeShowed[0].card.bilingualDescription}
-                />
-              )}
-              {cardsToBeShowed[0].card.monolingualDescription && (
-                <ToggleBox
-                  title={"Descrição monolíngue"}
-                  text={cardsToBeShowed[0].card.monolingualDescription}
-                />
-              )}
-              {cardsToBeShowed[0].card.translation && (
-                <ToggleBox
-                  title={"Tradução"}
-                  text={cardsToBeShowed[0].card.translation}
-                />
-              )}
-              {cardsToBeShowed[0].card.notes && (
-                <ToggleBox
-                  title={"Observações"}
-                  text={cardsToBeShowed[0].card.notes}
-                />
-              )}
-            </div>
-            {cardsToBeShowed[0].card.sentenceAudio[0] && (
-              <div className="flex space-x-2">
-                {cardsToBeShowed[0].card.sentenceAudio.map((item, i) => {
+                case 2:
                   return (
                     <PlayAudioButton
-                      audio={item}
-                      key={i}
+                      key={nanoid()}
+                      audio={
+                        cardsToBeShowed[0].card.layoutInfo[0][field.fieldName]
+                      }
                       width={"3em"}
                       height={"3em"}
                     />
                   );
-                })}
-                {cardsToBeShowed[0].card.focusAudio[0] &&
-                  cardsToBeShowed[0].card.focusAudio.map((item, i) => {
-                    return (
-                      <PlayAudioButton
-                        audio={item}
-                        key={i}
-                        width={"3em"}
-                        height={"3em"}
-                      />
-                    );
-                  })}
-              </div>
-            )}
+
+                case 3:
+                  return (
+                    <div className="flex" key={nanoid()}>
+                      {cardsToBeShowed[0].card.layoutInfo[0][
+                        field.fieldName
+                      ][0] && (
+                        <div
+                          className="grid grid-cols-2 gap-2 sm:flex sm:space-x-2 2xl:space-x-4"
+                          key={nanoid()}
+                        >
+                          {cardsToBeShowed[0].card.layoutInfo[0][
+                            field.fieldName
+                          ].map((item) => {
+                            return (
+                              <div
+                                className="w-16 h-16 sm:w-32 sm:h-32 2xl:w-48 2xl:h-48 scale-105 rounded-lg hover:cursor-pointer hover:scale-110"
+                                key={nanoid()}
+                              >
+                                <Image
+                                  loader={imageLoader}
+                                  src={item.url}
+                                  alt="Uploaded image"
+                                  layout="fill"
+                                  objectFit="contain"
+                                  onClick={() => {
+                                    showImage(item);
+                                  }}
+                                />
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  );
+              }
+            })}
 
             <div className="flex space-x-2 p-4">
               <button
@@ -504,13 +581,25 @@ function SRSPanel() {
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center space-y-48">
-            <p className="text-5xl font-bol">
+            <div>
               {isDataLoaded ? (
                 cardsToBeShowed[0] ? (
-                  cardsToBeShowed[0].card.sentence ? ( //try to show the sentence, if theres no sentence, show the focus
-                    cardsToBeShowed[0].card.sentence
+                  cardsToBeShowed[0].card.frontData.length > 0 ? (
+                    cardsToBeShowed[0].card.frontData.map((item) => {
+                      return (
+                        <p className="text-5xl font-bold" key={nanoid()}>
+                          {
+                            cardsToBeShowed[0].card.layoutInfo[0][
+                              item.fieldName
+                            ]
+                          }
+                        </p>
+                      );
+                    })
                   ) : (
-                    cardsToBeShowed[0].card.focus
+                    <p className="text-5xl font-bold" key={nanoid()}>
+                      {cardsToBeShowed[0].card.layoutInfo[0].focus}
+                    </p>
                   )
                 ) : (
                   setSessionStart(false)
@@ -518,8 +607,7 @@ function SRSPanel() {
               ) : (
                 <LoadingWheel />
               )}
-            </p>
-
+            </div>
             <div className="flex space-x-2">
               <button
                 className="confirmation-button"
@@ -565,5 +653,3 @@ function SRSPanel() {
     </motion.div>
   );
 }
-
-export default SRSPanel;

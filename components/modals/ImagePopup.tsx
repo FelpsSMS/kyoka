@@ -1,12 +1,7 @@
 import { Dialog } from "@headlessui/react";
-import { Form, Formik } from "formik";
 import { AnimatePresence, motion } from "framer-motion";
-import React, { useRef, useState } from "react";
-import * as Yup from "yup";
-import { TextField } from "./TextField";
+import React, { useRef } from "react";
 import Image from "next/image";
-
-import { api, verifyToken } from "../utils/api";
 
 export default function ImagePopup({ show, setShow, src }) {
   const centralDiv = useRef(null);
@@ -40,7 +35,7 @@ export default function ImagePopup({ show, setShow, src }) {
                 transition={{ duration: 0.4 }}
               >
                 <motion.div
-                  className="bg-transparent fixed flex flex-col items-center justify-center space-y-8 opacity-100 
+                  className="bg-transparent flex flex-col items-center justify-center space-y-8 opacity-100 
                   p-4 sm:p-8 rounded-lg mx-2 relative"
                   initial={{ height: 0, opacity: 0, width: 0 }}
                   animate={{ height: "60%", width: "60%", opacity: 1 }}

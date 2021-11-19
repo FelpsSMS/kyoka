@@ -1,64 +1,117 @@
 import { Formik, Form } from "formik";
 import { TextField } from "./TextField";
-import * as Yup from "yup";
 import { TextArea } from "./TextArea";
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import ImageDropzone from "./ImageDropzone";
 import AudioDropzone from "./AudioDropzone";
-import axios from "axios";
+
 import { api, verifyToken } from "../utils/api";
 import router from "next/router";
+import { useValidator } from "../utils/customHooks";
 
 export const NewCardForm = ({ deckId }) => {
-  const validate = Yup.object({
-    focus: Yup.string().required(
-      "Por favor, adicione um foco. Isso pode ser uma palavra ou expressão"
-    ),
-  });
+  const [fields, setFields] = useState([]);
+  const [initialVal, setInitialVal] = useState({});
+
+  const [needValidation, setNeedValidation] = useState([]);
+
+  const [initValues, setInitValues] = useState(false);
+
+  const numberOfImages = useMemo(() => {
+    return Array.from(Array(4).keys());
+  }, []); //4 images
+
+  useEffect(() => {
+    let init = {};
+    const waitingForValidation = [];
+
+    api.get(`decks/${deckId}`).then((res) => {
+      const layout = res.data.layout;
+
+      api
+        .post("layout-configs/by-layout", {
+          id: layout,
+        })
+        .then((res) => {
+          setFields(res.data);
+
+          res.data.map((item) => {
+            const currentField = item.fieldName;
+            const holder = currentField + "Holder";
+
+            if (item.required) {
+              waitingForValidation.push(item);
+            }
+
+            switch (item.fieldType) {
+              case 0:
+              case 1:
+                init[currentField] = "";
+                break;
+
+              case 2:
+                init[currentField] = "";
+                init[holder] = "";
+                break;
+
+              case 3:
+                numberOfImages.map((item2) => {
+                  init[currentField + item2.toString()] = "";
+                  init[holder + item2.toString()] = "";
+                });
+                break;
+            }
+          });
+
+          setNeedValidation(waitingForValidation);
+
+          setInitialVal(init);
+
+          setInitValues(true);
+        });
+    });
+  }, [deckId, numberOfImages]);
+
+  function renameFile(originalFile, newName) {
+    return new File([originalFile], newName, {
+      type: originalFile.type,
+      lastModified: originalFile.lastModified,
+    });
+  }
 
   function sendToServer(values) {
     //Get user ID from jwt token
     const userId = verifyToken();
 
-    const files = { sentenceAudio: "", focusAudio: "" };
-
-    if (values.sentenceAudioHolder.name !== "") {
-      files["sentenceAudio"] = values.sentenceAudioHolder;
-    }
-
-    if (values.focusAudioHolder.name !== "") {
-      files["focusAudio"] = values.focusAudioHolder;
-    }
-
-    const images = [
-      values.image1Holder,
-      values.image2Holder,
-      values.image3Holder,
-      values.image4Holder,
-    ];
-
-    files["images"] = images.filter((image) => {
-      return image !== "";
-    });
+    let imageData = [];
+    let audioData = [];
 
     const config = { headers: { "Content-Type": "multipart/form-data" } };
     let fd = new FormData();
 
-    files["images"].map((image) => {
-      fd.append("images", image);
+    Object.entries(values).map((item: any) => {
+      if (typeof item[1] === "object") {
+        const newFile = renameFile(item[1], item[0]);
+
+        if (item[1].type.split("/")[0] == "image") {
+          imageData.push(newFile);
+        } else if (item[1].type.split("/")[0] == "audio") {
+          audioData.push(newFile);
+        }
+      } else if (item[1].length > 0) {
+        fd.append(item[0], item[1]);
+      }
     });
 
-    fd.append("sentence_audio", files["sentenceAudio"]);
-    fd.append("focus_audio", files["focusAudio"]);
+    imageData.map((item) => {
+      fd.append("images", item);
+    });
+
+    audioData.map((item) => {
+      fd.append("audios", item);
+    });
 
     fd.append("deck", deckId);
-    fd.append("sentence", values.sentence);
-    fd.append("focus", values.focus);
-    fd.append("bilingualDescription", values.bilingualDescription);
-    fd.append("monolingualDescription", values.monolingualDescription);
-    fd.append("translation", values.translation);
-    fd.append("notes", values.notes);
-
     fd.append("creator", userId);
 
     api
@@ -79,129 +132,116 @@ export const NewCardForm = ({ deckId }) => {
         console.log(err);
       });
   }
+
+  const validate = useValidator(needValidation);
+
   return (
-    <Formik
-      initialValues={{
-        sentence: "",
-        focus: "",
-        bilingualDescription: "",
-        monolingualDescription: "",
-        sentenceAudio: "",
-        sentenceAudioHolder: { name: "" },
-        focusAudio: "",
-        focusAudioHolder: { name: "" },
-        image1: "",
-        image2: "",
-        image3: "",
-        image4: "",
-        translation: "",
-        notes: "",
-        image1Holder: "",
-        image2Holder: "",
-        image3Holder: "",
-        image4Holder: "",
-      }}
-      validationSchema={validate}
-      onSubmit={(values) => sendToServer(values)}
-    >
-      {(formik) => (
-        <Form
-          className="bg-white flex flex-col justify-center items-center sm:my-8 space-y-8 w-full
-        sm:shadow-lg sm:rounded-lg sm:w-4/5 sm:items-start sm:justify-start p-4
-        whitespace-nowrap"
+    <>
+      {initValues && (
+        <Formik
+          initialValues={initialVal}
+          validationSchema={validate}
+          enableReinitialize
+          onSubmit={(values) => sendToServer(values)}
         >
-          <h1 className="font-black text-3xl sm:text-5xl">Registrar carta</h1>
+          {(formik) => (
+            <Form
+              className="bg-white flex flex-col justify-center items-center sm:my-8 space-y-8 w-full
+              sm:shadow-lg sm:rounded-lg sm:w-4/5 sm:items-start sm:justify-start p-4
+              whitespace-nowrap"
+            >
+              <h1 className="font-black text-3xl sm:text-5xl">
+                Registrar carta
+              </h1>
 
-          <div className="flex flex-col w-full space-y-4">
-            <TextField label="Frase" name="sentence" type="text" />
-            <TextField label="Foco" name="focus" type="text" />
-            <TextArea
-              label="Descrição bilíngue"
-              name="bilingualDescription"
-              type="text"
-            />
-            <TextArea
-              label="Descrição monolíngue"
-              name="monolingualDescription"
-              type="text"
-            />
+              <div className="flex flex-col w-full space-y-4">
+                {fields.map((item, i) => {
+                  const currentFieldName = item.fieldName;
+                  const labelNumber = 0;
 
-            <AudioDropzone
-              label="Áudio da frase"
-              name="sentenceAudio"
-              fileExchange={(audio) => {
-                formik.setFieldValue("sentenceAudioHolder", audio);
-              }}
-            />
-            <label>{formik.values.sentenceAudioHolder.name}</label>
+                  switch (item.fieldType) {
+                    case 0:
+                      return (
+                        <TextField
+                          key={i}
+                          label={item.fieldLabel[labelNumber]}
+                          name={currentFieldName}
+                          type="text"
+                        />
+                      );
 
-            <input name="sentenceAudioHolder" hidden />
-            <input name="focusAudioHolder" hidden />
+                    case 1:
+                      return (
+                        <TextArea
+                          key={i}
+                          label={item.fieldLabel[labelNumber]}
+                          name={currentFieldName}
+                          type="text"
+                        />
+                      );
 
-            <AudioDropzone
-              label="Áudio do foco"
-              name="focusAudio"
-              fileExchange={(audio) => {
-                formik.setFieldValue("focusAudioHolder", audio);
-              }}
-            />
+                    case 2:
+                      return (
+                        <div key={i}>
+                          <AudioDropzone
+                            label={item.fieldLabel[labelNumber]}
+                            name={currentFieldName + "Holder"}
+                            fileExchange={(audio) => {
+                              formik.setFieldValue(currentFieldName, audio);
+                            }}
+                          />
 
-            <label>{formik.values.focusAudioHolder.name}</label>
+                          <input name={currentFieldName} hidden />
+                        </div>
+                      );
 
-            <label className="font-normal text-xl">Imagens</label>
+                    case 3:
+                      return (
+                        <div className="flex flex-col space-y-2" key={i}>
+                          <label className="text-xl font-normal">
+                            {item.fieldLabel[labelNumber]}
+                          </label>
+                          <div className="flex flex-wrap flex-col space-y-4 xs:space-x-4 xs:space-y-0 xs:flex-row">
+                            <div className="flex space-x-4 xs:space-x-4">
+                              {numberOfImages.map((item, j) => {
+                                return (
+                                  <div key={j * 10}>
+                                    <ImageDropzone
+                                      name={
+                                        currentFieldName +
+                                        "Holder" +
+                                        item.toString()
+                                      }
+                                      fileExchange={(image) => {
+                                        formik.setFieldValue(
+                                          currentFieldName + item.toString(),
+                                          image
+                                        );
+                                      }}
+                                    />
 
-            <input type="file" name="image1Holder" hidden />
-            <input type="file" name="image2Holder" hidden />
-            <input type="file" name="image3Holder" hidden />
-            <input type="file" name="image4Holder" hidden />
-
-            <div className="flex flex-wrap flex-col space-y-4 xs:space-x-4 xs:space-y-0 xs:flex-row">
-              <div className="flex space-x-4 xs:space-x-4">
-                <ImageDropzone
-                  name="image1"
-                  fileExchange={(image) => {
-                    formik.setFieldValue("image1Holder", image);
-                  }}
-                />
-
-                <ImageDropzone
-                  name="image2"
-                  fileExchange={(image) => {
-                    formik.setFieldValue("image2Holder", image);
-                  }}
-                />
+                                    <input
+                                      name={currentFieldName + item.toString()}
+                                      hidden
+                                    />
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                  }
+                })}
               </div>
 
-              <div className="flex space-x-4 xs:space-x-4">
-                <ImageDropzone
-                  name="image3"
-                  fileExchange={(image) => {
-                    formik.setFieldValue("image3Holder", image);
-                  }}
-                />
-                <ImageDropzone
-                  name="image4"
-                  fileExchange={(image) => {
-                    formik.setFieldValue("image4Holder", image);
-                  }}
-                />
-              </div>
-            </div>
-
-            <TextField
-              label="Tradução da frase"
-              name="translation"
-              type="text"
-            />
-
-            <TextArea label="Observações" name="notes" type="text" />
-          </div>
-
-          <button className="confirmation-button" type="submit">
-            Criar
-          </button>
-        </Form>
+              <button className="confirmation-button" type="submit">
+                Criar
+              </button>
+            </Form>
+          )}
+        </Formik>
       )}
-    </Formik>
+    </>
   );
 };

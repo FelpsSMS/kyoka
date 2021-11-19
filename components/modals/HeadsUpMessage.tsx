@@ -1,13 +1,16 @@
 import { Dialog } from "@headlessui/react";
-import axios from "axios";
 import { AnimatePresence, motion } from "framer-motion";
-import { useRouter } from "next/router";
-import React, { useRef, useState } from "react";
-import { api, verifyToken } from "../utils/api";
 
-function DisplayLoading({ show, setShow, loadingBarProgress }) {
+import React, { useRef } from "react";
+
+export default function HeadsUpMessage({
+  show,
+  setShow,
+  title,
+  color,
+  colorFocusOrHover,
+}) {
   const completeButtonRef = useRef(null);
-  const router = useRouter();
 
   return (
     <AnimatePresence>
@@ -16,7 +19,7 @@ function DisplayLoading({ show, setShow, loadingBarProgress }) {
           static
           initialFocus={completeButtonRef}
           open={show}
-          onClose={() => {}}
+          onClose={setShow}
           className=""
         >
           {({ open }) => (
@@ -25,7 +28,7 @@ function DisplayLoading({ show, setShow, loadingBarProgress }) {
               {open && (
                 <Dialog.Overlay
                   className="fixed h-screen w-screen bg-black z-50 inset-0 mx-auto 
-                    flex items-center justify-center"
+                  flex items-center justify-center"
                   as={motion.div}
                   initial={{ backgroundColor: "rgba(0, 0, 0, 0)" }} //Opacity is inherited, backgroundColor isn't
                   animate={{
@@ -36,31 +39,23 @@ function DisplayLoading({ show, setShow, loadingBarProgress }) {
                 >
                   <motion.div
                     className="bg-white fixed flex flex-col items-center justify-center space-y-8 opacity-100 
-      p-4 sm:p-8 rounded-lg shadow-lg mx-2"
+                    p-4 sm:p-8 rounded-lg shadow-lg mx-2"
                     initial={{ height: 0, opacity: 0 }}
                     animate={{ height: "auto", opacity: 1 }}
                     transition={{ duration: 0.4 }}
-                    ref={completeButtonRef}
                   >
-                    <div className="p-4 items-center justify-center space-y-4">
-                      <label className="font-bold text-2xl">
-                        Carregando...
-                      </label>
-                      <div
-                        className={`bg-black h-4 rounded`}
-                        style={{ width: `${loadingBarProgress}%` }}
-                      ></div>
-                    </div>
+                    <Dialog.Title className="text-xl font-bold sm:text-2xl">
+                      {title}
+                    </Dialog.Title>
+
                     <div className="flex space-x-2 sm:space-x-8">
-                      {loadingBarProgress > 99 && (
-                        <button
-                          className="bg-blue-800 text-white p-2 sm:px-16 rounded-sm text-xl font-bold focus:text-gray-200 
-                        focus:bg-blue-900 hover:text-gray-200 hover:bg-blue-900 outline-none px-2"
-                          onClick={() => setShow()}
-                        >
-                          Confirmar
-                        </button>
-                      )}
+                      <button
+                        ref={completeButtonRef}
+                        className={`${color} text-white p-2 sm:px-16 rounded-sm text-xl font-bold focus:text-gray-200 
+                        focus:bg-${colorFocusOrHover} hover:text-gray-200 hover:${colorFocusOrHover} outline-none px-2`}
+                      >
+                        Confirmar
+                      </button>
                     </div>
                   </motion.div>
                 </Dialog.Overlay>
@@ -72,5 +67,3 @@ function DisplayLoading({ show, setShow, loadingBarProgress }) {
     </AnimatePresence>
   );
 }
-
-export default DisplayLoading;

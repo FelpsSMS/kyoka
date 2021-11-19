@@ -1,7 +1,5 @@
-import { Listbox, Transition } from "@headlessui/react";
-import { CheckIcon, SelectorIcon } from "@heroicons/react/outline";
 import router from "next/router";
-import { Fragment, useState } from "react";
+import { useState } from "react";
 import Select from "./Select";
 
 export default function Footer() {
@@ -16,8 +14,8 @@ export default function Footer() {
         items={languages}
         className="flex w-full justify-center sm:justify-end my-6 sm:px-6"
         className2="px-8 sm:px-16 font-bold bg-white py-2 text-xl w-full focus:outline-none 
-          focus:shadow-outline-blue focus:border-blue-300 relative border shadow-sm 
-          border-gray-300 rounded text-gray-800"
+        focus:shadow-outline-blue focus:border-blue-300 relative border shadow-sm 
+        border-gray-300 rounded text-gray-800"
       />
       <div className="flex flex-col items-center justify-center">
         <p

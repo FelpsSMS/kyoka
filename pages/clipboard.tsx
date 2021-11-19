@@ -1,54 +1,152 @@
 import { SearchIcon } from "@heroicons/react/outline";
-import React, { useEffect, useRef, useState } from "react";
-import ClipboardNavbar from "../components/ClipboardNavbar";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
-import PageWrapper from "../components/PageWrapper";
-import { TextArea } from "../components/TextArea";
 import * as localForage from "localforage";
 import DictionaryEntry from "../components/DictionaryEntry";
 import { api, verifyToken } from "../utils/api";
 import parse from "html-react-parser";
-import GenerateCardPrompt from "../components/GenerateCardPrompt";
 
-export default function clipboard() {
-  // eslint-disable-next-line react-hooks/rules-of-hooks
+export default function Clipboard() {
   const [query, setQuery] = useState("");
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  const [querySize, setQuerySize] = useState(1000);
+  const [initialQuery, setInitialQuery] = useState("");
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [dictionaryEntries, setDictionaryEntries] = useState([]);
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [activeDictionary, setActiveDictionary] = useState("");
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const [configDone, setConfigDone] = useState(false);
+
   const [textContent, setTextContent] = useState("");
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [htmlContent, setHtmlContent] = useState("");
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  const [clipboardState, setClipboardState] = useState(false);
-
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  const [clipboardWord, setClipboardWord] = useState("");
-
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const divRef = useRef(null);
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  const [showSentencePrompt, setShowSentencePrompt] = useState(false);
+  const [clipboardText, setClipboardText] = useState("");
 
-  function handleClick(e) {
-    setClipboardWord(e.target.innerText);
+  const [wordStateChanged, setWordStateChanged] = useState(false);
 
-    setClipboardState(!clipboardState);
-  }
+  const handleClick = useCallback(
+    (e) => {
+      const userId = verifyToken();
+      const wordToSet = e.target.innerText;
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
+      api
+        .post("word-states/set-word", {
+          user: userId,
+          word: wordToSet,
+        })
+        .then(() => {
+          setWordStateChanged(!wordStateChanged);
+        });
+    },
+    [wordStateChanged]
+  );
+
+  const getNewText = useCallback(async (data, userId, text) => {
+    const decks = await Promise.all(
+      data.map(async (item) => {
+        const deck = await api.get(`decks/${item.deck}`).then((res) => {
+          return res.data;
+        });
+
+        return { deck: deck, active: item.active };
+      })
+    );
+
+    //get all cards and stats for these decks
+    const cardArrayList = await Promise.all(
+      decks.map(async (item: any) => {
+        const cardData = await api
+          .get(`cards/get_cards/${item.deck._id}`)
+          .then((res) => {
+            return res.data;
+          });
+
+        return cardData;
+      })
+    );
+
+    //group them into a single list
+    const cardList = cardArrayList.reduce((a: any, b: any) => a.concat(b), []);
+
+    //grab relevant info
+    const cardData: any = await Promise.all(
+      cardList.map(async (item) => {
+        const cardStats = await api
+          .post(`card-stats/card`, {
+            cardId: item._id,
+            userId: userId,
+          })
+          .then((res) => {
+            return res.data;
+          });
+
+        return {
+          focus: item.focus,
+          mature: cardStats.mature,
+          state: cardStats.state,
+        };
+      })
+    );
+
+    const strippedString = text.replace(/(<([^>]+)>)/gi, ""); //regex for removing html tags
+
+    const splitString = strippedString.split(" ");
+
+    let newText = "";
+
+    const userWordStates = await api
+      .post("word-states/by-user", {
+        user: userId,
+      })
+      .then((res) => {
+        return res.data;
+      });
+
+    splitString.map((item) => {
+      let color = "bg-gray-300";
+
+      const inCards = cardData.filter((card) => item == card.focus);
+
+      if (inCards.length > 0) {
+        color = inCards[0].mature
+          ? "bg-green-500"
+          : inCards[0].state != 0
+          ? "bg-yellow-500"
+          : "bg-gray-300";
+      }
+
+      const inWordStates = userWordStates.filter((word) => item == word.word);
+
+      if (inWordStates.length > 0) {
+        color =
+          inWordStates[0].state == 1
+            ? "bg-yellow-500"
+            : inWordStates[0].state == 2
+            ? "bg-green-500"
+            : "bg-gray-300";
+      }
+
+      if (item.length > 0)
+        newText += `<a className="${color} font-bold rounded hover:cursor-pointer p-1">${item}</a> `;
+    });
+
+    return newText;
+  }, []);
+
+  useEffect(() => {
+    const timeOutId = setTimeout(() => setClipboardText(textContent), 300); //debounce
+    return () => clearTimeout(timeOutId);
+  }, [textContent, setTextContent]);
+
+  useEffect(() => {
+    const timeOutId = setTimeout(() => setQuery(initialQuery), 300); //debounce
+    return () => clearTimeout(timeOutId);
+  }, [initialQuery, setQuery]);
+
   useEffect(() => {
     const userId = verifyToken();
 
@@ -57,32 +155,25 @@ export default function clipboard() {
         id: userId,
       })
       .then((res) => {
-        api.get(`dictionaries/${res.data.activeDictionary}`).then((res) => {
-          const splitName = res.data.name.split(".");
-          const formattedName = splitName[0] + "_json";
+        const dict = res.data.activeDictionary;
 
-          setActiveDictionary(formattedName);
-        });
+        if (dict) {
+          api.get(`dictionaries/${dict}`).then((res) => {
+            const splitName = res.data.name.split(".");
+            const dictName = splitName[0] + "_json"; //formatted name
+
+            setActiveDictionary(dictName);
+          });
+        }
+      })
+      .catch((err) => {
+        console.log(err.response);
       });
   }, []);
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
     //get active decks for the specific user
     const userId = verifyToken();
-
-    //clipboard state change
-
-    if (clipboardWord.length > 0) {
-      api
-        .post("word-states/set-word", {
-          user: userId,
-          word: clipboardWord,
-        })
-        .then((res) => {
-          setClipboardWord("");
-        });
-    }
 
     api
       .post("deck-stats/user", {
@@ -91,99 +182,7 @@ export default function clipboard() {
       .then(async (res) => {
         const data = res.data;
 
-        const decks = await Promise.all(
-          data.map(async (item) => {
-            const deck = await api.get(`decks/${item.deck}`).then((res) => {
-              return res.data;
-            });
-
-            return { deck: deck, active: item.active };
-            // eslint-disable-next-line react-hooks/exhaustive-deps
-          })
-        );
-
-        //get all cards and stats for these decks
-        const cardArrayList = await Promise.all(
-          decks.map(async (item: any) => {
-            const cardData = await api
-              .get(`cards/get_cards/${item.deck._id}`)
-              .then((res) => {
-                return res.data;
-              });
-
-            return cardData;
-          })
-        );
-
-        //group them into a single list
-        const cardList = cardArrayList.reduce(
-          (a: any, b: any) => a.concat(b),
-          []
-        );
-
-        //grab relevant info
-        const cardData: any = await Promise.all(
-          cardList.map(async (item) => {
-            const cardStats = await api
-              .post(`card-stats/card`, {
-                cardId: item._id,
-                userId: userId,
-              })
-              .then((res) => {
-                return res.data;
-              });
-
-            return {
-              focus: item.focus,
-              mature: cardStats.mature,
-              state: cardStats.state,
-            };
-          })
-        );
-
-        const strippedString = textContent.replace(/(<([^>]+)>)/gi, ""); //regex for removing html tags
-
-        const splitString = strippedString.split(" ");
-
-        let newText = "";
-
-        const userWordStates = await api
-          .post("word-states/by-user", {
-            user: userId,
-          })
-          .then((res) => {
-            return res.data;
-          });
-
-        splitString.map((item) => {
-          let color = "bg-gray-300";
-
-          const inCards = cardData.filter((card) => item == card.focus);
-
-          if (inCards.length > 0) {
-            color = inCards[0].mature
-              ? "bg-green-500"
-              : inCards[0].state != 0
-              ? "bg-yellow-500"
-              : "bg-gray-300";
-          }
-
-          const inWordStates = userWordStates.filter(
-            (word) => item == word.word
-          );
-
-          if (inWordStates.length > 0) {
-            color =
-              inWordStates[0].state == 1
-                ? "bg-yellow-500"
-                : inWordStates[0].state == 2
-                ? "bg-green-500"
-                : "bg-gray-300";
-          }
-
-          if (item.length > 0)
-            newText += `<a className="${color} font-bold rounded hover:cursor-pointer p-1">${item}</a> `;
-        });
+        const newText = await getNewText(data, userId, clipboardText);
 
         setHtmlContent(newText);
 
@@ -196,9 +195,8 @@ export default function clipboard() {
           divRef.current.children[0].onclick = (e) => handleClick(e);
         }
       });
-  }, [textContent, clipboardState]);
+  }, [clipboardText, wordStateChanged, handleClick, getNewText]);
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
     if (activeDictionary) {
       localForage.config({
@@ -209,12 +207,13 @@ export default function clipboard() {
         storeName: activeDictionary, // Should be alphanumeric, with underscores.
         description: "Dictionary for Kyoka",
       });
-    }
-  }, [activeDictionary]);
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
+      setConfigDone(true);
+    }
+  }, [activeDictionary, configDone]);
+
   useEffect(() => {
-    if (activeDictionary) {
+    if (configDone) {
       localForage
         .getItem(query)
         .then(async (res: any) => {
@@ -226,11 +225,7 @@ export default function clipboard() {
               const definition = await localForage
                 .getItem(queryCopy)
                 .then((res: any) => {
-                  if (res) {
-                    return res.definition;
-                  } else {
-                    return null;
-                  }
+                  return res ? res.definition ?? null : null;
                 })
                 .catch((err) => {
                   console.log(err);
@@ -253,7 +248,7 @@ export default function clipboard() {
           console.log(err);
         });
     }
-  }, [query]);
+  }, [query, configDone]);
 
   return (
     <div className="">
@@ -269,7 +264,9 @@ export default function clipboard() {
               <textarea
                 className="rounded-lg text-2xl overflow-scroll outline-none focus:border-2 border-black 
                           p-2 bg-gray-200 resize-none w-full h-full"
-                onChange={(e) => setTextContent(e.currentTarget.value)}
+                onChange={(e) => {
+                  setTextContent(e.currentTarget.value);
+                }}
               />
               <div className="w-full h-full rounded-lg">
                 <div className="p-4 leading-10" ref={divRef}>
@@ -283,10 +280,10 @@ export default function clipboard() {
                 <input
                   type="text"
                   className="w-full rounded-r-lg bg-gray-200 text-xl p-2 outline-none focus:border-2 border-black my-2 mr-2
-              focus:my-1.5" //In tailwind, 2px = 0.5
+                  focus:my-1.5" //In tailwind, 2px = 0.5
                   onChange={(e: any) => {
                     if (activeDictionary)
-                      setQuery(e.target.value.toLowerCase());
+                      setInitialQuery(e.target.value.toLowerCase());
                   }}
                 />
               </div>

@@ -1,8 +1,6 @@
-import axios from "axios";
-import { AnimatePresence, motion, AnimateSharedLayout } from "framer-motion";
+import { motion, AnimateSharedLayout } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { api, verifyToken } from "../utils/api";
-import CardInfo from "./CardInfo";
 import CardTableItem from "./CardTableItem";
 
 function CardTable({ deckId, search, sorting, readOnly }) {
@@ -32,20 +30,12 @@ function CardTable({ deckId, search, sorting, readOnly }) {
 
             return {
               id: item._id,
-              focus: item.focus,
+              layoutInfo: item.layoutInfo[0],
               dateAdded: item.dateAdded,
               dueDate: cardStats.dueDate,
               lapses: cardStats.totalLapses,
               leech: cardStats.leech,
               deckId: item.deck,
-              bilingualDescription: item.bilingualDescription ?? "",
-              focusAudio: item.focusAudio ?? [],
-              images: item.images ?? [],
-              monolingualDescription: item.monolingualDescription ?? "",
-              sentence: item.sentence ?? "",
-              sentenceAudio: item.sentenceAudio ?? "",
-              translation: item.translation ?? "",
-              notes: item.notes ?? "",
             };
           })
         );
@@ -84,18 +74,6 @@ function CardTable({ deckId, search, sorting, readOnly }) {
 
         setCards(cardsInfo);
       })
-      /*       .then(async () => {
-        await api
-          .post("deck-stats/stats", {
-            userId: userId,
-            deckId: deckId,
-          })
-          .then(() => {
-            if (sharedDeck) {
-              setReadOnly(true);
-            }
-          });
-      }) */
       .catch((err) => {
         console.log(err);
       });
@@ -107,6 +85,7 @@ function CardTable({ deckId, search, sorting, readOnly }) {
         <motion.ul layout>
           {hasCards ? (
             cards.map((card, i) => {
+              console.log(card);
               return (
                 <CardTableItem
                   key={i}
@@ -120,7 +99,9 @@ function CardTable({ deckId, search, sorting, readOnly }) {
             })
           ) : (
             <div className="flex items-center justify-center p-4 font-bold italic">
-              <p className="text-3xl">Ainda não há nenhuma carta neste deck</p>
+              <p className="text-3xl my-8">
+                Ainda não há nenhuma carta neste deck
+              </p>
             </div>
           )}
         </motion.ul>
