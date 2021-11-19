@@ -4,11 +4,11 @@ import { api, verifyToken } from "../utils/api";
 import Image from "next/image";
 import ToggleBox from "./ToggleBox";
 import PlayAudioButton from "./PlayAudioButton";
-import ImagePopup from "./ImagePopup";
 import LoadingWheel from "./LoadingWheel";
 import Heatmap from "./Heatmap";
 import { dayInMilliseconds } from "../utils/constants";
 import { nanoid } from "nanoid";
+import ImagePopup from "./modals/ImagePopup";
 
 export default function SRSPanel() {
   const animationHeight = useRef(null);

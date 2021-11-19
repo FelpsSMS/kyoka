@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 
 import AddSharedDeckPrompt from "./AddSharedDeckPrompt";
-
-import HeadsUpMessage from "./HeadsUpMessage";
+import HeadsUpMessage from "./modals/HeadsUpMessage";
 
 export default function SharedDeckOptionsNavbar({ deckId }) {
   const [showAddSharedDeckPrompt, setShowAddSharedDeckPrompt] = useState(false);
