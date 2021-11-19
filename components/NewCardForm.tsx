@@ -1,20 +1,19 @@
 import { Formik, Form } from "formik";
 import { TextField } from "./TextField";
-import * as Yup from "yup";
 import { TextArea } from "./TextArea";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import ImageDropzone from "./ImageDropzone";
 import AudioDropzone from "./AudioDropzone";
 
 import { api, verifyToken } from "../utils/api";
 import router from "next/router";
-import { nanoid } from "nanoid";
+import { useValidator } from "../utils/customHooks";
 
 export const NewCardForm = ({ deckId }) => {
   const [fields, setFields] = useState([]);
   const [initialVal, setInitialVal] = useState({});
 
-  const [validate, setValidate] = useState({});
+  const [needValidation, setNeedValidation] = useState([]);
 
   const [initValues, setInitValues] = useState(false);
 
@@ -22,23 +21,9 @@ export const NewCardForm = ({ deckId }) => {
     return Array.from(Array(4).keys());
   }, []); //4 images
 
-  const createValidator = useCallback((needValidation) => {
-    const validationObject: { [key: string]: Yup.StringSchema } = {};
-
-    needValidation.forEach((item) => {
-      console.log("create validator ran");
-
-      validationObject[item.fieldName] = Yup.string().required(
-        "Este campo é obrigatório"
-      );
-    });
-
-    return Yup.object(validationObject);
-  }, []);
-
   useEffect(() => {
     let init = {};
-    const needValidation = [];
+    const waitingForValidation = [];
 
     api.get(`decks/${deckId}`).then((res) => {
       const layout = res.data.layout;
@@ -55,7 +40,7 @@ export const NewCardForm = ({ deckId }) => {
             const holder = currentField + "Holder";
 
             if (item.required) {
-              needValidation.push(item);
+              waitingForValidation.push(item);
             }
 
             switch (item.fieldType) {
@@ -78,18 +63,14 @@ export const NewCardForm = ({ deckId }) => {
             }
           });
 
-          const validate = createValidator(needValidation);
-
-          setValidate(validate);
+          setNeedValidation(waitingForValidation);
 
           setInitialVal(init);
 
           setInitValues(true);
-
-          console.log("TESTE");
         });
     });
-  }, [deckId, numberOfImages, createValidator]);
+  }, [deckId, numberOfImages]);
 
   function renameFile(originalFile, newName) {
     return new File([originalFile], newName, {
@@ -108,8 +89,6 @@ export const NewCardForm = ({ deckId }) => {
     const config = { headers: { "Content-Type": "multipart/form-data" } };
     let fd = new FormData();
 
-    console.log(values);
-
     Object.entries(values).map((item: any) => {
       if (typeof item[1] === "object") {
         const newFile = renameFile(item[1], item[0]);
@@ -125,13 +104,10 @@ export const NewCardForm = ({ deckId }) => {
     });
 
     imageData.map((item) => {
-      console.log(item);
       fd.append("images", item);
     });
 
     audioData.map((item) => {
-      console.log(item);
-
       fd.append("audios", item);
     });
 
@@ -157,6 +133,8 @@ export const NewCardForm = ({ deckId }) => {
       });
   }
 
+  const validate = useValidator(needValidation);
+
   return (
     <>
       {initValues && (
@@ -169,8 +147,8 @@ export const NewCardForm = ({ deckId }) => {
           {(formik) => (
             <Form
               className="bg-white flex flex-col justify-center items-center sm:my-8 space-y-8 w-full
-        sm:shadow-lg sm:rounded-lg sm:w-4/5 sm:items-start sm:justify-start p-4
-        whitespace-nowrap"
+              sm:shadow-lg sm:rounded-lg sm:w-4/5 sm:items-start sm:justify-start p-4
+              whitespace-nowrap"
             >
               <h1 className="font-black text-3xl sm:text-5xl">
                 Registrar carta
@@ -185,7 +163,7 @@ export const NewCardForm = ({ deckId }) => {
                     case 0:
                       return (
                         <TextField
-                          key={nanoid()}
+                          key={i}
                           label={item.fieldLabel[labelNumber]}
                           name={currentFieldName}
                           type="text"
@@ -195,7 +173,7 @@ export const NewCardForm = ({ deckId }) => {
                     case 1:
                       return (
                         <TextArea
-                          key={nanoid()}
+                          key={i}
                           label={item.fieldLabel[labelNumber]}
                           name={currentFieldName}
                           type="text"
@@ -204,7 +182,7 @@ export const NewCardForm = ({ deckId }) => {
 
                     case 2:
                       return (
-                        <div key={nanoid()}>
+                        <div key={i}>
                           <AudioDropzone
                             label={item.fieldLabel[labelNumber]}
                             name={currentFieldName + "Holder"}
@@ -219,18 +197,15 @@ export const NewCardForm = ({ deckId }) => {
 
                     case 3:
                       return (
-                        <div className="flex flex-col space-y-2" key={nanoid()}>
+                        <div className="flex flex-col space-y-2" key={i}>
                           <label className="text-xl font-normal">
                             {item.fieldLabel[labelNumber]}
                           </label>
-                          <div
-                            className="flex flex-wrap flex-col space-y-4 xs:space-x-4 xs:space-y-0 xs:flex-row"
-                            key={i}
-                          >
+                          <div className="flex flex-wrap flex-col space-y-4 xs:space-x-4 xs:space-y-0 xs:flex-row">
                             <div className="flex space-x-4 xs:space-x-4">
-                              {numberOfImages.map((item) => {
+                              {numberOfImages.map((item, j) => {
                                 return (
-                                  <div key={item}>
+                                  <div key={j * 10}>
                                     <ImageDropzone
                                       name={
                                         currentFieldName +
