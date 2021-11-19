@@ -1,8 +1,6 @@
-import axios from "axios";
-import { AnimatePresence, motion, AnimateSharedLayout } from "framer-motion";
+import { motion, AnimateSharedLayout } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { api, verifyToken } from "../utils/api";
-import CardInfo from "./CardInfo";
 import CardTableItem from "./CardTableItem";
 
 function CardTable({ deckId, search, sorting, readOnly }) {
@@ -17,8 +15,6 @@ function CardTable({ deckId, search, sorting, readOnly }) {
       .then(async (res) => {
         let cardsInfo: any = await Promise.all(
           res.data.map(async (item) => {
-            console.log(item);
-
             const cardStats = await api
               .post(`card-stats/card`, {
                 cardId: item._id,
@@ -78,18 +74,6 @@ function CardTable({ deckId, search, sorting, readOnly }) {
 
         setCards(cardsInfo);
       })
-      /*       .then(async () => {
-        await api
-          .post("deck-stats/stats", {
-            userId: userId,
-            deckId: deckId,
-          })
-          .then(() => {
-            if (sharedDeck) {
-              setReadOnly(true);
-            }
-          });
-      }) */
       .catch((err) => {
         console.log(err);
       });
@@ -115,7 +99,9 @@ function CardTable({ deckId, search, sorting, readOnly }) {
             })
           ) : (
             <div className="flex items-center justify-center p-4 font-bold italic">
-              <p className="text-3xl">Ainda não há nenhuma carta neste deck</p>
+              <p className="text-3xl my-8">
+                Ainda não há nenhuma carta neste deck
+              </p>
             </div>
           )}
         </motion.ul>

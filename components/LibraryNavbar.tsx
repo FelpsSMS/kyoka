@@ -66,13 +66,6 @@ function LibraryNavbar({
           setSorting={setSorting}
         />
       </div>
-      {/*       <button
-        className="confirmation-button mx-2 mb-2 md:mt-4 md:mb-4 md:mx-4"
-        //onClick={() => setSorting("numberOfCards")}
-        onClick={() => setSorting("A-Z")}
-      >
-        Ordenar
-      </button> */}
     </nav>
   );
 }
