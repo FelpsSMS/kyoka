@@ -3,10 +3,9 @@ import { Form, Formik } from "formik";
 import { AnimatePresence, motion } from "framer-motion";
 import React, { useEffect, useRef, useState } from "react";
 import * as Yup from "yup";
-import { TextField } from "./TextField";
-
-import { api, verifyToken } from "../utils/api";
-import Select from "./Select";
+import { api, verifyToken } from "../../utils/api";
+import Select from "../Select";
+import { TextField } from "../TextField";
 
 interface newDeckPromptProps {
   show: boolean;

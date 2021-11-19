@@ -2,7 +2,7 @@ import { Dialog } from "@headlessui/react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/router";
 import React, { useRef } from "react";
-import { api, verifyToken } from "../utils/api";
+import { api, verifyToken } from "../../utils/api";
 
 export default function DeletePrompt({ show, setShow, id, routeName, title }) {
   const completeButtonRef = useRef(null);

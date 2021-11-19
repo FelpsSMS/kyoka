@@ -1,6 +1,6 @@
 import { SearchIcon } from "@heroicons/react/outline";
 import React, { useEffect, useState } from "react";
-import NewDeckPrompt from "./NewDeckPrompt";
+import NewDeckPrompt from "./modals/NewDeckPrompt";
 import Select from "./Select";
 
 export default function LibraryNavbar({

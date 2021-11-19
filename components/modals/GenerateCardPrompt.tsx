@@ -2,9 +2,9 @@ import { Dialog } from "@headlessui/react";
 import { Form, Formik } from "formik";
 import { AnimatePresence, motion } from "framer-motion";
 import React, { useRef } from "react";
-import { TextField } from "./TextField";
+import { TextField } from "../TextField";
 
-import { api, verifyToken } from "../utils/api";
+import { api, verifyToken } from "../../utils/api";
 
 export default function GenerateCardPrompt({
   show,

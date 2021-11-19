@@ -1,13 +1,13 @@
 import { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
 import { parseCookies } from "nookies";
+import React from "react";
 import Container from "../../../components/Container";
 import Footer from "../../../components/Footer";
 import Navbar from "../../../components/Navbar";
 import { NewCardForm } from "../../../components/NewCardForm";
 
-function create_card() {
-  // eslint-disable-next-line react-hooks/rules-of-hooks
+export default function CreateCard() {
   const router = useRouter();
   const { deckId } = router.query;
 
@@ -22,11 +22,8 @@ function create_card() {
   );
 }
 
-export default create_card;
-
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { ["kyoka-token"]: token } = parseCookies(ctx);
-  //const apiClient = getAPIClient(ctx);
 
   if (!token) {
     return {
@@ -36,8 +33,6 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       },
     };
   }
-
-  //await apiClient.get("/users");
 
   return { props: {} };
 };

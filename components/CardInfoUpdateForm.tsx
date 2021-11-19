@@ -4,11 +4,12 @@ import { TextArea } from "./TextArea";
 import React, { useEffect, useMemo, useState } from "react";
 import ImageDropzone from "./ImageDropzone";
 import AudioDropzone from "./AudioDropzone";
-import DeletePrompt from "./DeletePrompt";
+
 import { api } from "../utils/api";
 
 import router from "next/router";
 import { useValidator } from "../utils/customHooks";
+import DeletePrompt from "./modals/DeletePrompt";
 
 export const CardInfoUpdateForm = ({ cardDetails: card, readOnly }) => {
   const [fields, setFields] = useState([]);

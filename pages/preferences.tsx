@@ -1,66 +1,45 @@
 import { Form, Formik } from "formik";
-import React, { useEffect, useState } from "react";
-import Container from "../components/Container";
-import Footer from "../components/Footer";
-import Library from "../components/Library";
-import LibraryNavbar from "../components/LibraryNavbar";
-import Navbar from "../components/Navbar";
-import { TextField } from "../components/TextField";
-import ToggleButton from "../components/ToggleButton";
-import * as Yup from "yup";
-import { api, verifyToken } from "../utils/api";
-import LoadingWheel from "../components/LoadingWheel";
+import * as localForage from "localforage";
 import { GetServerSideProps } from "next";
 import { parseCookies } from "nookies";
+import { useEffect, useState } from "react";
+import Footer from "../components/Footer";
 import JsonDropzone from "../components/JsonDropzone";
-import * as localForage from "localforage";
-import DisplayLoading from "../components/DisplayLoading";
+import LoadingWheel from "../components/LoadingWheel";
+import DisplayLoading from "../components/modals/DisplayLoading";
+import HeadsUpMessage from "../components/modals/HeadsUpMessage";
+import Navbar from "../components/Navbar";
 import Select from "../components/Select";
-import HeadsUpMessage from "../components/HeadsUpMessage";
+import ToggleButton from "../components/ToggleButton";
+import { api, verifyToken } from "../utils/api";
 
-export default function preferences() {
-  // eslint-disable-next-line react-hooks/rules-of-hooks
+export default function Preferences() {
   const [sorting, setSorting] = useState();
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [libraryChanged, setLibraryChanged] = useState("A-Z");
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [enabled, setEnabled] = useState(false);
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [lapseThreshold, setLapseThreshold] = useState(0);
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [numberOfNewCards, setNumberOfNewCards] = useState(0);
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [jsonResponse, setJsonResponse] = useState([{}]);
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [fileName, setFileName] = useState("");
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [isDataLoaded, setIsDataLoaded] = useState(false);
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [loadingBarProgress, setLoadingBarProgress] = useState(0);
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [showLoadingPrompt, setShowLoadingPrompt] = useState(false);
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [dictsState, setDictsState] = useState([]);
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [targetDecksState, setTargetDecksState] = useState([]);
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [selectedDict, setSelectedDict] = useState(0);
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [selectedTargetDeck, setSelectedTargetDeck] = useState(0);
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [showMessage, setShowMessage] = useState(false);
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
     const userId = verifyToken();
 
@@ -96,7 +75,7 @@ export default function preferences() {
         setTargetDecksState(formattedDecks);
       });
   }, []);
-  // eslint-disable-next-line react-hooks/rules-of-hooks
+
   useEffect(() => {
     const userId = verifyToken();
 
@@ -241,12 +220,11 @@ export default function preferences() {
         });
       });
     }
-  }, [jsonResponse]);
+  }, [jsonResponse, fileName]);
 
   return (
-    <div className="">
+    <div>
       <Navbar />
-
       <div className="flex justify-center items-center min-h-screen">
         <div
           className="bg-white flex flex-col min-h-screen w-screen items-center justify-center sm:rounded-lg 
@@ -373,7 +351,6 @@ export default function preferences() {
           )}
         </div>
       </div>
-
       <Footer />
     </div>
   );
@@ -381,7 +358,6 @@ export default function preferences() {
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { ["kyoka-token"]: token } = parseCookies(ctx);
-  //const apiClient = getAPIClient(ctx);
 
   if (!token) {
     return {
@@ -391,8 +367,6 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       },
     };
   }
-
-  //await apiClient.get("/users");
 
   return { props: {} };
 };

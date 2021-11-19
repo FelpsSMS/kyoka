@@ -1,18 +1,14 @@
 import { GetServerSideProps } from "next";
 import { parseCookies } from "nookies";
 import React, { useState } from "react";
-import Container from "../components/Container";
 import Footer from "../components/Footer";
 import Library from "../components/Library";
 import LibraryNavbar from "../components/LibraryNavbar";
 import Navbar from "../components/Navbar";
 
-export default function library() {
-  // eslint-disable-next-line react-hooks/rules-of-hooks
+export default function LibraryPage() {
   const [sorting, setSorting] = useState();
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [libraryChanged, setLibraryChanged] = useState("A-Z");
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [search, setSearch] = useState("");
 
   return (
@@ -34,7 +30,6 @@ export default function library() {
           search={search}
         />
       </div>
-
       <Footer />
     </div>
   );
@@ -42,7 +37,6 @@ export default function library() {
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { ["kyoka-token"]: token } = parseCookies(ctx);
-  //const apiClient = getAPIClient(ctx);
 
   if (!token) {
     return {
@@ -52,8 +46,6 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       },
     };
   }
-
-  //await apiClient.get("/users");
 
   return { props: {} };
 };

@@ -1,8 +1,8 @@
 import { SaveIcon } from "@heroicons/react/outline";
 import React, { useEffect, useState } from "react";
 import { api } from "../utils/api";
-import GenerateCardPrompt from "./GenerateCardPrompt";
-import HeadsUpMessage from "./HeadsUpMessage";
+import GenerateCardPrompt from "./modals/GenerateCardPrompt";
+import HeadsUpMessage from "./modals/HeadsUpMessage";
 import PlayAudioButton from "./PlayAudioButton";
 
 export default function DictionaryEntry({ term, text }) {

@@ -7,49 +7,27 @@ import DictionaryEntry from "../components/DictionaryEntry";
 import { api, verifyToken } from "../utils/api";
 import parse from "html-react-parser";
 
-export default function clipboard() {
-  // eslint-disable-next-line react-hooks/rules-of-hooks
+export default function Clipboard() {
   const [query, setQuery] = useState("");
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [initialQuery, setInitialQuery] = useState("");
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  const [querySize, setQuerySize] = useState(1000);
-
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [dictionaryEntries, setDictionaryEntries] = useState([]);
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [activeDictionary, setActiveDictionary] = useState("");
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const [configDone, setConfigDone] = useState(false);
+
   const [textContent, setTextContent] = useState("");
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [htmlContent, setHtmlContent] = useState("");
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  const [clipboardState, setClipboardState] = useState(false);
-
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  const [clipboardWord, setClipboardWord] = useState("");
-
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const divRef = useRef(null);
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  const [showSentencePrompt, setShowSentencePrompt] = useState(false);
-
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [clipboardText, setClipboardText] = useState("");
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  //const [wordToSet, setWordToSet] = useState("");
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [wordStateChanged, setWordStateChanged] = useState(false);
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const handleClick = useCallback(
     (e) => {
       const userId = verifyToken();
@@ -67,7 +45,6 @@ export default function clipboard() {
     [wordStateChanged]
   );
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const getNewText = useCallback(async (data, userId, text) => {
     const decks = await Promise.all(
       data.map(async (item) => {
@@ -76,7 +53,6 @@ export default function clipboard() {
         });
 
         return { deck: deck, active: item.active };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
       })
     );
 
@@ -161,19 +137,16 @@ export default function clipboard() {
     return newText;
   }, []);
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
     const timeOutId = setTimeout(() => setClipboardText(textContent), 300); //debounce
     return () => clearTimeout(timeOutId);
   }, [textContent, setTextContent]);
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
     const timeOutId = setTimeout(() => setQuery(initialQuery), 300); //debounce
     return () => clearTimeout(timeOutId);
   }, [initialQuery, setQuery]);
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
     const userId = verifyToken();
 
@@ -182,23 +155,22 @@ export default function clipboard() {
         id: userId,
       })
       .then((res) => {
-        let dict = res.data.activeDictionary;
+        const dict = res.data.activeDictionary;
 
         if (dict) {
           api.get(`dictionaries/${dict}`).then((res) => {
             const splitName = res.data.name.split(".");
-            dict = splitName[0] + "_json"; //formatted name
+            const dictName = splitName[0] + "_json"; //formatted name
+
+            setActiveDictionary(dictName);
           });
         }
-
-        setActiveDictionary(dict);
       })
       .catch((err) => {
         console.log(err.response);
       });
   }, []);
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
     //get active decks for the specific user
     const userId = verifyToken();
@@ -225,7 +197,6 @@ export default function clipboard() {
       });
   }, [clipboardText, wordStateChanged, handleClick, getNewText]);
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
     if (activeDictionary) {
       localForage.config({
@@ -236,12 +207,13 @@ export default function clipboard() {
         storeName: activeDictionary, // Should be alphanumeric, with underscores.
         description: "Dictionary for Kyoka",
       });
-    }
-  }, [activeDictionary]);
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
+      setConfigDone(true);
+    }
+  }, [activeDictionary, configDone]);
+
   useEffect(() => {
-    if (activeDictionary) {
+    if (configDone) {
       localForage
         .getItem(query)
         .then(async (res: any) => {
@@ -254,11 +226,6 @@ export default function clipboard() {
                 .getItem(queryCopy)
                 .then((res: any) => {
                   return res ? res.definition ?? null : null;
-                  /*      if (res) {
-                  return res.definition;
-                } else {
-                  return null;
-                } */
                 })
                 .catch((err) => {
                   console.log(err);
@@ -281,7 +248,7 @@ export default function clipboard() {
           console.log(err);
         });
     }
-  }, [query, activeDictionary]);
+  }, [query, configDone]);
 
   return (
     <div className="">
