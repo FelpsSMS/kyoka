@@ -2,25 +2,44 @@ import { Formik, Form } from "formik";
 import { TextField } from "./TextField";
 import * as Yup from "yup";
 import { TextArea } from "./TextArea";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import ImageDropzone from "./ImageDropzone";
 import AudioDropzone from "./AudioDropzone";
 
 import { api, verifyToken } from "../utils/api";
 import router from "next/router";
+import { nanoid } from "nanoid";
 
 export const NewCardForm = ({ deckId }) => {
   const [fields, setFields] = useState([]);
   const [initialVal, setInitialVal] = useState({});
 
-  const [needValidation, setNeedValidation] = useState([]);
+  const [validate, setValidate] = useState({});
 
   const [initValues, setInitValues] = useState(false);
-  const numberOfImages = Array.from(Array(4).keys()); //4 images
 
-  let init = {};
+  const numberOfImages = useMemo(() => {
+    return Array.from(Array(4).keys());
+  }, []); //4 images
+
+  const createValidator = useCallback((needValidation) => {
+    const validationObject: { [key: string]: Yup.StringSchema } = {};
+
+    needValidation.forEach((item) => {
+      console.log("create validator ran");
+
+      validationObject[item.fieldName] = Yup.string().required(
+        "Este campo é obrigatório"
+      );
+    });
+
+    return Yup.object(validationObject);
+  }, []);
 
   useEffect(() => {
+    let init = {};
+    const needValidation = [];
+
     api.get(`decks/${deckId}`).then((res) => {
       const layout = res.data.layout;
 
@@ -36,7 +55,7 @@ export const NewCardForm = ({ deckId }) => {
             const holder = currentField + "Holder";
 
             if (item.required) {
-              setNeedValidation([...needValidation, item]);
+              needValidation.push(item);
             }
 
             switch (item.fieldType) {
@@ -57,31 +76,20 @@ export const NewCardForm = ({ deckId }) => {
                 });
                 break;
             }
-
-            setInitialVal(init);
-
-            console.log(init);
-            setInitValues(true);
           });
+
+          const validate = createValidator(needValidation);
+
+          setValidate(validate);
+
+          setInitialVal(init);
+
+          setInitValues(true);
+
+          console.log("TESTE");
         });
     });
-  }, []);
-
-  function createValidator() {
-    const validationObject: { [key: string]: Yup.StringSchema } = {};
-
-    needValidation.forEach((item) => {
-      console.log("ue");
-      console.log(item.fieldName);
-
-      validationObject[item.fieldName] = Yup.string().required(
-        "Este campo é obrigatório"
-      );
-    });
-    console.log(validationObject);
-
-    return Yup.object(validationObject);
-  }
+  }, [deckId, numberOfImages, createValidator]);
 
   function renameFile(originalFile, newName) {
     return new File([originalFile], newName, {
@@ -89,8 +97,6 @@ export const NewCardForm = ({ deckId }) => {
       lastModified: originalFile.lastModified,
     });
   }
-
-  const validate = createValidator();
 
   function sendToServer(values) {
     //Get user ID from jwt token
@@ -179,7 +185,7 @@ export const NewCardForm = ({ deckId }) => {
                     case 0:
                       return (
                         <TextField
-                          key={i}
+                          key={nanoid()}
                           label={item.fieldLabel[labelNumber]}
                           name={currentFieldName}
                           type="text"
@@ -189,7 +195,7 @@ export const NewCardForm = ({ deckId }) => {
                     case 1:
                       return (
                         <TextArea
-                          key={i}
+                          key={nanoid()}
                           label={item.fieldLabel[labelNumber]}
                           name={currentFieldName}
                           type="text"
@@ -198,7 +204,7 @@ export const NewCardForm = ({ deckId }) => {
 
                     case 2:
                       return (
-                        <div key={i}>
+                        <div key={nanoid()}>
                           <AudioDropzone
                             label={item.fieldLabel[labelNumber]}
                             name={currentFieldName + "Holder"}
@@ -213,7 +219,7 @@ export const NewCardForm = ({ deckId }) => {
 
                     case 3:
                       return (
-                        <>
+                        <div className="flex flex-col space-y-2" key={nanoid()}>
                           <label className="text-xl font-normal">
                             {item.fieldLabel[labelNumber]}
                           </label>
@@ -248,7 +254,7 @@ export const NewCardForm = ({ deckId }) => {
                               })}
                             </div>
                           </div>
-                        </>
+                        </div>
                       );
                   }
                 })}

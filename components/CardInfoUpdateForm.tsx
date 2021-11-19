@@ -10,6 +10,7 @@ import DeletePrompt from "./DeletePrompt";
 import { api } from "../utils/api";
 
 import router from "next/router";
+import { nanoid } from "nanoid";
 
 export const CardInfoUpdateForm = ({ cardDetails: card, readOnly }) => {
   const [fields, setFields] = useState([]);
@@ -59,14 +60,18 @@ export const CardInfoUpdateForm = ({ cardDetails: card, readOnly }) => {
                 numberOfImages.map((item2) => {
                   init[currentField + item2.toString()] = init[
                     holder + item2.toString()
-                  ] = card.layoutInfo[currentField][item2]
-                    ? card.layoutInfo[currentField][item2].url
+                  ] = card.layoutInfo[currentField]
+                    ? card.layoutInfo[currentField][item2]
+                      ? card.layoutInfo[currentField][item2].url
+                      : ""
                     : "";
 
                   init[holder + item2.toString()] = card.layoutInfo[
                     currentField
-                  ][item2]
-                    ? card.layoutInfo[currentField][item2].url
+                  ]
+                    ? card.layoutInfo[currentField][item2]
+                      ? card.layoutInfo[currentField][item2].url
+                      : ""
                     : "";
                 });
                 break;
@@ -171,7 +176,7 @@ export const CardInfoUpdateForm = ({ cardDetails: card, readOnly }) => {
             {(formik) => (
               <Form className="flex flex-col flex-wrap m-4">
                 <div className="flex flex-col w-full space-y-4">
-                  {fields.map((item, i) => {
+                  {fields.map((item) => {
                     const currentFieldName = item.fieldName;
                     const labelNumber = 0;
 
@@ -179,7 +184,7 @@ export const CardInfoUpdateForm = ({ cardDetails: card, readOnly }) => {
                       case 0:
                         return (
                           <TextField
-                            key={i}
+                            key={nanoid()}
                             label={item.fieldLabel[labelNumber]}
                             name={currentFieldName}
                             type="text"
@@ -190,7 +195,7 @@ export const CardInfoUpdateForm = ({ cardDetails: card, readOnly }) => {
                       case 1:
                         return (
                           <TextArea
-                            key={i}
+                            key={nanoid()}
                             label={item.fieldLabel[labelNumber]}
                             name={currentFieldName}
                             type="text"
@@ -200,7 +205,7 @@ export const CardInfoUpdateForm = ({ cardDetails: card, readOnly }) => {
 
                       case 2:
                         return (
-                          <div key={i}>
+                          <div key={nanoid()}>
                             <AudioDropzone
                               label={item.fieldLabel[labelNumber]}
                               name={currentFieldName + "Holder"}
@@ -221,18 +226,18 @@ export const CardInfoUpdateForm = ({ cardDetails: card, readOnly }) => {
 
                       case 3:
                         return (
-                          <>
+                          <div
+                            className="flex flex-col space-y-2"
+                            key={nanoid()}
+                          >
                             <label className="text-xl font-normal">
                               {item.fieldLabel[labelNumber]}
                             </label>
-                            <div
-                              className="flex flex-wrap flex-col space-y-4 xs:space-x-4 xs:space-y-0 xs:flex-row"
-                              key={i}
-                            >
+                            <div className="flex flex-wrap flex-col space-y-4 xs:space-x-4 xs:space-y-0 xs:flex-row">
                               <div className="flex space-x-4 xs:space-x-4">
                                 {numberOfImages.map((item) => {
                                   return (
-                                    <div key={item}>
+                                    <div key={nanoid()}>
                                       <ImageDropzone
                                         name={
                                           currentFieldName +
@@ -246,12 +251,14 @@ export const CardInfoUpdateForm = ({ cardDetails: card, readOnly }) => {
                                           );
                                         }}
                                         webSource={
-                                          card.layoutInfo[currentFieldName][
-                                            item
-                                          ]
+                                          card.layoutInfo[currentFieldName]
                                             ? card.layoutInfo[currentFieldName][
                                                 item
-                                              ].url
+                                              ]
+                                              ? card.layoutInfo[
+                                                  currentFieldName
+                                                ][item].url
+                                              : ""
                                             : ""
                                         }
                                         readOnly={readOnly}
@@ -268,7 +275,7 @@ export const CardInfoUpdateForm = ({ cardDetails: card, readOnly }) => {
                                 })}
                               </div>
                             </div>
-                          </>
+                          </div>
                         );
                     }
                   })}
