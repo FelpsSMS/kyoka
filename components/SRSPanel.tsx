@@ -9,9 +9,10 @@ import Heatmap from "./Heatmap";
 import { dayInMilliseconds } from "../utils/constants";
 import { nanoid } from "nanoid";
 import ImagePopup from "./modals/ImagePopup";
+import { useTranslation } from "next-i18next";
 
 export default function SRSPanel() {
-  const animationHeight = useRef(null);
+  const { t } = useTranslation();
 
   const [show, setShow] = useState(false);
   const [src, setSRC] = useState("");
@@ -19,10 +20,6 @@ export default function SRSPanel() {
   const imageLoader = ({ src }) => {
     return src;
   };
-
-  useEffect(() => {
-    //animationHeight.current = window.innerWidth > 640 ? "80%" : "100%"; //640px is the cutoff for sm in tailwind
-  }, []);
 
   const [newCardsNumber, setNewCardsNumber] = useState(0);
   const [reviewedCardsNumber, setReviewedCardsNumber] = useState(0);
@@ -569,13 +566,13 @@ export default function SRSPanel() {
                 className="confirmation-button"
                 onClick={() => parseSRSResponse(cardsToBeShowed[0], true)}
               >
-                Acertei
+                {t("common:pass")}
               </button>
               <button
                 className="confirmation-button"
                 onClick={() => parseSRSResponse(cardsToBeShowed[0], false)}
               >
-                Errei
+                {t("common:fail")}
               </button>
             </div>
           </div>
@@ -613,28 +610,28 @@ export default function SRSPanel() {
                 className="confirmation-button"
                 onClick={() => setIsCardFlipped(true)}
               >
-                Virar carta
+                {t("common:flip_card")}
               </button>
             </div>
           </div>
         )
       ) : (
         <div className="flex flex-col justify-center items-center space-y-2 mx-4">
-          <p className="text-3xl font-bol">Bem-vindo de volta!</p>
+          <p className="text-3xl font-bol">{t("common:welcome_msg")}</p>
 
           <div className="flex flex-col">
             <div className="flex space-x-2">
-              <p>Novas cartas: </p>
+              <p>{t("common:new_cards")}</p>
               <p className="text-blue-700">{newCardsNumber}</p>
             </div>
 
             <div className="flex space-x-2">
-              <p>Cartas para revisão: </p>
+              <p>{t("common:cards_to_review")}</p>
               <p className="text-green-700">{reviewedCardsNumber}</p>
             </div>
 
             <div className="flex space-x-2">
-              <p>Cartas a serem reaprendidas: </p>
+              <p>{t("common:cards_to_relearn")}</p>
               <p className="text-red-700">{relearnedCardsNumber}</p>
             </div>
           </div>
@@ -644,7 +641,7 @@ export default function SRSPanel() {
               setSessionStart(true);
             }}
           >
-            Começar
+            {t("common:srs_start")}
           </button>
         </div>
       )}

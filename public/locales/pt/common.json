@@ -1,0 +1,14 @@
+{
+  "srs_start": "Começar",
+  "flip_card": "Virar carta",
+  "welcome_msg": "Bem-vindo de volta!",
+  "new_cards": "Novas cartas: ",
+  "cards_to_review": "Cartas para revisão: ",
+  "cards_to_relearn": "Cartas a serem reaprendidas: ",
+  "pass": "Acertei",
+  "fail": "Errei",
+  "heatmap_main_message": "Você revisou {{lastSessionReviews}} carta(s) em sua última sessão, com uma duração de {{date}}",
+  "heatmap_retention": "Taxa de retenção: {{lastRetentionRate}}",
+  "tooltip_msg": "{{tooltipReviewInfo}} cartas revisadas em {{tooltipDateInfo}}",
+  "last_retention_string": "N/D"
+}

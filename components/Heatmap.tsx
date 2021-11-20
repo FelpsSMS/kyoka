@@ -2,9 +2,14 @@ import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { api, verifyToken } from "../utils/api";
 import { dayInMilliseconds } from "../utils/constants";
+import { useTranslation } from "next-i18next";
+import { useRouter } from "next/router";
 
 export default function Heatmap() {
   const [sessions, setSessions] = useState([]);
+
+  const { t } = useTranslation();
+  const router = useRouter();
 
   const [tooltip, setTooltip] = useState(false);
   const [tooltipDateInfo, setTooltipDateInfo] = useState("");
@@ -17,7 +22,6 @@ export default function Heatmap() {
 
   useEffect(() => {
     const userId = verifyToken();
-
     api
       .post("users/user-info", {
         id: userId,
@@ -59,11 +63,15 @@ export default function Heatmap() {
               }%`
             );
           } else {
-            setLastRetentionRate("N/D");
+            const lastRetentionString = t("last_retention_string");
+
+            setLastRetentionRate(lastRetentionString);
           }
 
+          const { locale } = router;
+
           dateNewestToOldest.reverse().map((item) => {
-            const date = new Date(item.endTime).toLocaleDateString("pt-br");
+            const date = new Date(item.endTime).toLocaleDateString(locale);
 
             if (hashMap.hasOwnProperty(date)) {
               hashMap[date].numberOfCardsReviewed += item.numberOfCardsReviewed;
@@ -96,16 +104,23 @@ export default function Heatmap() {
 
         setSessions(formattedSessions);
       });
-  }, []);
+  }, [router, t]);
 
   return (
     <div className="flex flex-col justify-center items-center mt-4 relative mx-4">
-      <label className="">{`Você revisou ${lastSessionReviews} carta(s) em sua última sessão, com uma duração de ${new Date(
-        lastSessionDuration
-      )
-        .toISOString()
-        .slice(11, 19)}.`}</label>
-      <label>{`Taxa de retenção: ${lastRetentionRate}`}</label>
+      <label className="">
+        {t("common:heatmap_main_message", {
+          lastSessionReviews: lastSessionReviews,
+          date: new Date(lastSessionDuration).toISOString().slice(11, 19),
+        })}
+      </label>
+
+      <label>
+        {t("common:heatmap_retention", {
+          lastRetentionRate: lastRetentionRate,
+        })}
+      </label>
+      {/*  <label>{`Taxa de retenção: ${lastRetentionRate}`}</label> */}
       <div className="inline-grid grid-cols-8 gap-2 bg-gray-100 my-4 p-2 rounded-lg mx-2 sm:w-1/2">
         {sessions.map((item, i) => {
           return (
@@ -120,8 +135,10 @@ export default function Heatmap() {
               }`}
               key={i}
               onMouseEnter={() => {
+                const { locale } = router;
+
                 const formattedDate = new Date(item.date).toLocaleDateString(
-                  "pt-br"
+                  locale
                 );
 
                 setTooltip(true);
@@ -139,8 +156,12 @@ export default function Heatmap() {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.3 }}
           className="bg-gray-100 absolute p-4 rounded-lg mt-56 hidden sm:inline-block"
-        >{`${tooltipReviewInfo} 
-        cartas revisadas em ${tooltipDateInfo}`}</motion.div>
+        >
+          {t("common:tooltip_msg", {
+            tooltipReviewInfo: tooltipReviewInfo,
+            tooltipDateInfo: tooltipDateInfo,
+          })}
+        </motion.div>
       )}
     </div>
   );

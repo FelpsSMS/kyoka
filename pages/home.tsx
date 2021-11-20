@@ -5,8 +5,12 @@ import React from "react";
 import Footer from "../components/Footer";
 import { GetServerSideProps } from "next";
 import { parseCookies } from "nookies";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { useTranslation } from "next-i18next";
 
-export default function home() {
+export default function Home() {
+  const { t } = useTranslation();
+
   return (
     <div
       id="container"
@@ -27,7 +31,6 @@ export default function home() {
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { ["kyoka-token"]: token } = parseCookies(ctx);
-  //const apiClient = getAPIClient(ctx);
 
   if (!token) {
     return {
@@ -38,7 +41,9 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     };
   }
 
-  //await apiClient.get("/users");
+  console.log(ctx.locale);
 
-  return { props: {} };
+  return {
+    props: { ...(await serverSideTranslations(ctx.locale, ["common"])) },
+  };
 };
