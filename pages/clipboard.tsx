@@ -94,6 +94,8 @@ export default function Clipboard() {
 
     const strippedString = text.replace(/(<([^>]+)>)/gi, ""); //regex for removing html tags
 
+    console.log(strippedString.match("\\P{L}"));
+
     const splitString = strippedString.split(" ");
 
     let newText = "";
@@ -108,6 +110,25 @@ export default function Clipboard() {
 
     splitString.map((item) => {
       let color = "bg-gray-300";
+      let finalWord = item;
+      let trail = "";
+
+      const match = item.match("[^A-z\\s][\\\\^]?")
+        ? item.match("[^A-z\\s][\\\\^]?")[0]
+        : null;
+
+      const permittedSpecialCharacters = ["'", "-"];
+
+      // prettier-ignore
+      //console.log(item.match(/[\p{L}-]+/ug));
+      //this is a better way to do it, but, due to a nextjs bug, this doesn't work at the moment
+
+      if (match && !permittedSpecialCharacters.includes(match)) {
+        const splitMatch = item.split(match);
+
+        finalWord = splitMatch[0];
+        trail = match + splitMatch[1];
+      }
 
       const inCards = cardData.filter((card) => item == card.focus);
 
@@ -131,7 +152,7 @@ export default function Clipboard() {
       }
 
       if (item.length > 0)
-        newText += `<a className="${color} font-bold rounded hover:cursor-pointer p-1">${item}</a> `;
+        newText += `<a className="${color} font-bold rounded hover:cursor-pointer p-1">${finalWord}</a>${trail} `;
     });
 
     return newText;
