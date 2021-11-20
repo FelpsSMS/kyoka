@@ -21,6 +21,8 @@ export default function Preferences() {
   const [enabled, setEnabled] = useState(false);
   const [lapseThreshold, setLapseThreshold] = useState(0);
   const [numberOfNewCards, setNumberOfNewCards] = useState(0);
+  const [nameAlreadyExistsMessage, setNameAlreadyExistsMessage] =
+    useState(false);
 
   const [jsonResponse, setJsonResponse] = useState([{}]);
 
@@ -126,10 +128,6 @@ export default function Preferences() {
       });
   }, []);
 
-  function uploadDict(values) {
-    console.log(values);
-  }
-
   function sendToServer() {
     const userId = verifyToken();
 
@@ -192,65 +190,71 @@ export default function Preferences() {
     //in case the language has multiple scripts, like in Japanese, Korean, etc
     if (Object.keys(jsonResponse[0]).includes("altReading")) altReading = true;
 
-    if (jsonResponse[0]["term"]) {
-      setShowLoadingPrompt(true);
+    if (jsonResponse[0]["term"] && jsonResponse[0]["definition"]) {
+      const strippedFileName = fileName.split(".")[0];
 
-      localForage.config({
-        driver: localForage.INDEXEDDB, // Force WebSQL; same as using setDriver()
-        name: "kyokaDicts",
-        version: 1.0,
-        // size: 4980736, // Size of database, in bytes. WebSQL-only for now.
-        storeName: fileName, // Should be alphanumeric, with underscores.
-        description: "Dictionary for Kyoka",
-      });
+      if (!dictsState.includes(strippedFileName)) {
+        setShowLoadingPrompt(true);
 
-      let numberOfChunks = 1;
-
-      const jsonSize = jsonResponse.length;
-
-      const responseLength = jsonSize.toString().length;
-
-      if (responseLength > 3) {
-        numberOfChunks = (responseLength - 1) * 200;
-      }
-
-      const chunkedArray = chunk(jsonResponse, numberOfChunks);
-
-      let counter = 0;
-
-      //need to look into how to improve loading performance
-      Promise.all(
-        chunkedArray.map(async (chunk) => {
-          await Promise.all(
-            chunk.map(async (item) => {
-              let dictEntry;
-
-              if (altReading) {
-                dictEntry = {
-                  definition: item["definition"],
-                  altReading: item["altReading"],
-                };
-              } else {
-                dictEntry = {
-                  definition: item["definition"],
-                };
-              }
-
-              await localForage.setItem(item["term"], dictEntry);
-            })
-          ).then(() => {
-            counter += numberOfChunks;
-            setLoadingBarProgress(Math.round((counter / jsonSize) * 100));
-          });
-        })
-      ).then(() => {
-        api.post("dictionaries", {
-          user: userId,
-          name: fileName,
+        localForage.config({
+          driver: localForage.INDEXEDDB, // Force WebSQL; same as using setDriver()
+          name: "kyokaDicts",
+          version: 1.0,
+          // size: 4980736, // Size of database, in bytes. WebSQL-only for now.
+          storeName: fileName, // Should be alphanumeric, with underscores.
+          description: "Dictionary for Kyoka",
         });
-      });
+
+        let numberOfChunks = 1;
+
+        const jsonSize = jsonResponse.length;
+
+        const responseLength = jsonSize.toString().length;
+
+        if (responseLength > 3) {
+          numberOfChunks = (responseLength - 1) * 200;
+        }
+
+        const chunkedArray = chunk(jsonResponse, numberOfChunks);
+
+        let counter = 0;
+
+        //need to look into how to improve loading performance
+        Promise.all(
+          chunkedArray.map(async (chunk) => {
+            await Promise.all(
+              chunk.map(async (item) => {
+                let dictEntry;
+
+                if (altReading) {
+                  dictEntry = {
+                    definition: item["definition"],
+                    altReading: item["altReading"],
+                  };
+                } else {
+                  dictEntry = {
+                    definition: item["definition"],
+                  };
+                }
+
+                await localForage.setItem(item["term"], dictEntry);
+              })
+            ).then(() => {
+              counter += numberOfChunks;
+              setLoadingBarProgress(Math.round((counter / jsonSize) * 100));
+            });
+          })
+        ).then(() => {
+          api.post("dictionaries", {
+            user: userId,
+            name: fileName,
+          });
+        });
+      } else {
+        setNameAlreadyExistsMessage(true);
+      }
     }
-  }, [jsonResponse, fileName]);
+  }, [jsonResponse, fileName, dictsState]);
 
   return (
     <div>
@@ -265,6 +269,15 @@ export default function Preferences() {
               show={showMessage}
               setShow={() => setShowMessage(false)}
               title="Configurações alteradas com sucesso!"
+              color="bg-blue-800"
+              colorFocusOrHover="bg-blue-900"
+            />
+          )}
+          {nameAlreadyExistsMessage && (
+            <HeadsUpMessage
+              show={nameAlreadyExistsMessage}
+              setShow={() => setNameAlreadyExistsMessage(false)}
+              title="Um dicionário com este nome já foi adicionado à sua conta"
               color="bg-blue-800"
               colorFocusOrHover="bg-blue-900"
             />
@@ -389,7 +402,7 @@ export default function Preferences() {
 
                 <Formik
                   initialValues={{ dict: "", dictHolder: "" }}
-                  onSubmit={(values) => uploadDict(values)}
+                  onSubmit={() => {}}
                 >
                   {(formik: any) => (
                     <Form className="flex flex-col items-center justify-center my-8 relative z-0">
