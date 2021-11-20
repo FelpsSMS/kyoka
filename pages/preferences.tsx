@@ -355,10 +355,10 @@ export default function Preferences() {
                       selectedItem={selectedDict}
                       setSelectedItem={setSelectedDict}
                       items={dictsState}
-                      className="flex w-full justify-center my-6 sm:px-6"
+                      className="flex w-full justify-center my-6 sm:px-6 z-20"
                       className2="px-8 sm:px-20 font-bold bg-white py-2 text-xl w-full focus:outline-none
-                  focus:shadow-outline-blue focus:border-blue-300 relative border shadow-sm
-                  border-gray-300 rounded text-gray-800"
+                      focus:shadow-outline-blue focus:border-blue-300 relative border shadow-sm
+                      border-gray-300 rounded text-gray-800"
                     />
                   </div>
 
@@ -372,10 +372,10 @@ export default function Preferences() {
                       items={targetDecksState.map((item) => {
                         return item.name;
                       })}
-                      className="flex w-full justify-center my-6 sm:px-6"
+                      className="flex w-full justify-center my-6 sm:px-6 z-10"
                       className2="px-8 sm:px-20 font-bold bg-white py-2 text-xl w-full focus:outline-none
-                  focus:shadow-outline-blue focus:border-blue-300 relative border shadow-sm
-                  border-gray-300 rounded text-gray-800"
+                      focus:shadow-outline-blue focus:border-blue-300 relative border shadow-sm
+                      border-gray-300 rounded text-gray-800"
                     />
                   </div>
 
@@ -392,7 +392,7 @@ export default function Preferences() {
                   onSubmit={(values) => uploadDict(values)}
                 >
                   {(formik: any) => (
-                    <Form className="flex flex-col items-center justify-center my-8">
+                    <Form className="flex flex-col items-center justify-center my-8 relative z-0">
                       <JsonDropzone
                         label="Adicionar dicionário"
                         name="dict"
