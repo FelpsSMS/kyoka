@@ -17,6 +17,7 @@ import { api, verifyToken } from "../utils/api";
 import * as Yup from "yup";
 import { useRouter } from "next/router";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { useTranslation } from "next-i18next";
 
 export default function Preferences() {
   const [enabled, setEnabled] = useState(false);
@@ -24,6 +25,8 @@ export default function Preferences() {
   const [numberOfNewCards, setNumberOfNewCards] = useState(0);
   const [nameAlreadyExistsMessage, setNameAlreadyExistsMessage] =
     useState(false);
+
+  const { t } = useTranslation();
 
   const [jsonResponse, setJsonResponse] = useState([{}]);
 
@@ -63,18 +66,17 @@ export default function Preferences() {
 
   const regex2: RegExp = new RegExp("^(?!.*\\s)");
 
+  const passwordMinSize = 6;
+
   const validatePassword = Yup.object({
     password: Yup.string()
-      .required("Por favor, insira uma senha")
-      .min(6, "Sua senha deve conter um mínimo de 6 caracteres")
-      .matches(
-        regex,
-        "Sua senha deve conter pelo menos 1 número, 1 letra maiúscula e 1 letra minúscula"
-      )
-      .matches(regex2, "Sua senha não pode conter espaços vazios"),
+      .required(t("password_register_validation_required_msg"))
+      .min(passwordMinSize, t("password_min_len_msg"))
+      .matches(regex, t("password_requirements_msg"))
+      .matches(regex2, t("password_no_spaces_msg")),
     passwordConfirmation: Yup.string()
-      .required("As senhas devem corresponder")
-      .oneOf([Yup.ref("password"), null], "As senhas devem corresponder"),
+      .required(t("passwords_must_match_msg"))
+      .oneOf([Yup.ref("password"), null], t("passwords_must_match_msg")),
   });
 
   useEffect(() => {
@@ -269,7 +271,7 @@ export default function Preferences() {
             <HeadsUpMessage
               show={showMessage}
               setShow={() => setShowMessage(false)}
-              title="Configurações alteradas com sucesso!"
+              title={t("settings_changed_successfully")}
               color="bg-blue-800"
               colorFocusOrHover="bg-blue-900"
             />
@@ -278,7 +280,7 @@ export default function Preferences() {
             <HeadsUpMessage
               show={nameAlreadyExistsMessage}
               setShow={() => setNameAlreadyExistsMessage(false)}
-              title="Um dicionário com este nome já foi adicionado à sua conta"
+              title={t("dict_already_exists")}
               color="bg-blue-800"
               colorFocusOrHover="bg-blue-900"
             />
@@ -303,7 +305,7 @@ export default function Preferences() {
                 >
                   <Form className="flex flex-col p-4 space-y-4 justify-center items-center">
                     <h1 className="font-black text-3xl sm:text-5xl">
-                      Alterar senha
+                      {t("change_password")}
                     </h1>
                     <div className="flex flex-col w-full space-y-4">
                       <TextField
@@ -318,7 +320,7 @@ export default function Preferences() {
                       />
                     </div>
                     <button className="confirmation-button" type="submit">
-                      Enviar
+                      {t("send")}
                     </button>
                   </Form>
                 </Formik>
@@ -328,12 +330,12 @@ export default function Preferences() {
                   enabled={enabled}
                   setEnabled={setEnabled}
                   textColor={"black"}
-                  label={"Remover leeches"}
+                  label={t("remove_leeches")}
                 />
                 <div className="flex flex-col justify-center items-center">
                   <div className="flex flex-col sm:flex-row justify-center items-center">
                     <label className="m-4 font-bold text-black">
-                      Limite para leeches
+                      {t("leech_limit")}
                     </label>
                     <input
                       name="limit"
@@ -348,7 +350,7 @@ export default function Preferences() {
 
                   <div className="flex flex-col sm:flex-row justify-center items-center">
                     <label className="m-4 font-bold text-black">
-                      Número de novas cartas diárias
+                      {t("number_of_new_daily_cards")}
                     </label>
                     <input
                       name="newCards"
@@ -363,7 +365,7 @@ export default function Preferences() {
 
                   <div className="flex flex-col items-center justify-center mt-4">
                     <label className="text-xl font-normal">
-                      Dicionário selecionado
+                      {t("selected_dict")}
                     </label>
                     <Select
                       selectedItem={selectedDict}
@@ -378,7 +380,7 @@ export default function Preferences() {
 
                   <div className="flex flex-col items-center justify-center mt-4">
                     <label className="text-xl font-normal">
-                      Deck onde serão salvas as cartas geradas automaticamente
+                      {t("deck_where_generated_cards_reside")}
                     </label>
                     <Select
                       selectedItem={selectedTargetDeck}
@@ -397,7 +399,7 @@ export default function Preferences() {
                     className="px-8 mt-4 confirmation-button sm:px-16"
                     onClick={() => sendToServer()}
                   >
-                    Salvar
+                    {t("save")}
                   </button>
                 </div>
 

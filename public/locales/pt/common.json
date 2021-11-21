@@ -69,5 +69,15 @@
   "insert_deck_info": "Insira as informações do deck",
   "layout": "Layout",
   "name": "Nome",
-  "subject": "Assunto"
+  "subject": "Assunto",
+  "choose_deck_to_add": "Escolha um deck para adicionar à sua biblioteca",
+  "settings_changed_successfully": "Configurações alteradas com sucesso!",
+  "dict_already_exists": "Um dicionário com este nome já foi adicionado à sua conta",
+  "change_password": "Alterar senha",
+  "remove_leeches": "Remover leeches",
+  "leech_limit": "Limite para leeches",
+  "number_of_new_daily_cards": "Número de novas cartas diárias",
+  "selected_dict": "Dicionário selecionado",
+  "deck_where_generated_cards_reside": "Deck onde serão salvas as cartas geradas automaticamente",
+  "save": "Salvar"
 }

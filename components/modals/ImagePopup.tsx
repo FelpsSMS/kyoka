@@ -49,6 +49,7 @@ export default function ImagePopup({ show, setShow, src }) {
                     alt="Uploaded image"
                     layout="fill"
                     objectFit="contain"
+                    unoptimized={true}
                   />
                 </motion.div>
                 {src.photographer && (

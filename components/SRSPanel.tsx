@@ -10,12 +10,17 @@ import { dayInMilliseconds } from "../utils/constants";
 import { nanoid } from "nanoid";
 import ImagePopup from "./modals/ImagePopup";
 import { useTranslation } from "next-i18next";
+import getLabelLocale from "../utils/getLabelLocale";
+import { useRouter } from "next/router";
 
 export default function SRSPanel() {
   const { t } = useTranslation();
-
+  const [labelLocale, setLabelLocale] = useState(1);
   const [show, setShow] = useState(false);
   const [src, setSRC] = useState("");
+  const router = useRouter();
+
+  const { locale } = router;
 
   const imageLoader = ({ src }) => {
     return src;
@@ -418,13 +423,17 @@ export default function SRSPanel() {
         setReviewedCardsNumber(totalReviewedCards);
         setRelearnedCardsNumber(cardsBeingRelearned.length);
 
+        const labelNumber = getLabelLocale(locale);
+
+        setLabelLocale(labelNumber);
+
         setIsPageLoaded(true);
 
         setIsDataLoaded(true);
       });
 
     return () => {};
-  }, [reloadCards]);
+  }, [reloadCards, locale]);
 
   const getTotalCardsNumber = useCallback(() => {
     return newCardsNumber + reviewedCardsNumber + relearnedCardsNumber;
@@ -498,7 +507,7 @@ export default function SRSPanel() {
                           field.fieldName
                         ] && (
                           <ToggleBox
-                            title={field.fieldLabel[0]}
+                            title={field.fieldLabel[labelLocale]}
                             text={
                               cardsToBeShowed[0].card.layoutInfo[0][
                                 field.fieldName
@@ -538,7 +547,8 @@ export default function SRSPanel() {
                           ].map((item) => {
                             return (
                               <div
-                                className="w-16 h-16 sm:w-32 sm:h-32 2xl:w-48 2xl:h-48 scale-105 rounded-lg hover:cursor-pointer hover:scale-110"
+                                className="w-16 h-16 sm:w-32 sm:h-32 2xl:w-48 2xl:h-48 scale-105 rounded-lg 
+                                hover:cursor-pointer hover:scale-110 relative"
                                 key={nanoid()}
                               >
                                 <Image
@@ -547,6 +557,7 @@ export default function SRSPanel() {
                                   alt="Uploaded image"
                                   layout="fill"
                                   objectFit="contain"
+                                  unoptimized={true}
                                   onClick={() => {
                                     showImage(item);
                                   }}

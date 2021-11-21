@@ -72,7 +72,7 @@ export default function ImageDropzone(props) {
       <div
         className={`${
           props.readOnly ? "bg-gray-400" : "bg-gray-200"
-        } w-16 h-16 scale-105 rounded-lg hover:cursor-pointer hover:scale-110`}
+        } w-16 h-16 scale-105 rounded-lg hover:cursor-pointer hover:scale-110 relative`}
         {...getRootProps()}
       >
         {imageContentURL && (
@@ -82,6 +82,7 @@ export default function ImageDropzone(props) {
             alt="Uploaded image"
             layout="fill"
             objectFit="contain"
+            unoptimized={true}
           />
         )}
         {!props.readOnly && (
