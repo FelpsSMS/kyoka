@@ -1,5 +1,4 @@
 import { Form, Formik } from "formik";
-import { motion } from "framer-motion";
 import * as localForage from "localforage";
 import { GetServerSideProps } from "next";
 import { parseCookies } from "nookies";
@@ -18,6 +17,7 @@ import * as Yup from "yup";
 import { useRouter } from "next/router";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useTranslation } from "next-i18next";
+import Head from "next/head";
 
 export default function Preferences() {
   const [enabled, setEnabled] = useState(false);
@@ -261,6 +261,11 @@ export default function Preferences() {
 
   return (
     <div>
+      <Head>
+        <title>{t("preferences_page_title")}</title>
+        <meta name="description" content="Kyoka" />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
       <Navbar />
       <div className="flex justify-center items-center min-h-screen">
         <div

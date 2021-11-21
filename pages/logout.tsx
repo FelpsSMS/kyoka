@@ -1,8 +1,20 @@
 import { GetServerSideProps } from "next";
 import { parseCookies, destroyCookie } from "nookies";
+import Head from "next/head";
+import { useTranslation } from "next-i18next";
 
-export default function logout() {
-  return <div></div>;
+export default function Logout() {
+  const { t } = useTranslation();
+
+  return (
+    <div>
+      <Head>
+        <title>{t("logout_page_title")}</title>
+        <meta name="description" content="Kyoka" />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
+    </div>
+  );
 }
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {

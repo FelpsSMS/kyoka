@@ -18,7 +18,7 @@ export default function Footer() {
 
       if (router.locale != newLocale) {
         setCookie(undefined, "NEXT_LOCALE", newLocale, {
-          maxAge: 60 * 60 * 24, //1 day
+          maxAge: 60 * 60 * 24 * 30, //30 days
           path: "/",
         });
 

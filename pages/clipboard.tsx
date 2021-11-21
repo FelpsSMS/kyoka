@@ -9,9 +9,12 @@ import parse from "html-react-parser";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { GetServerSideProps } from "next";
 import { parseCookies } from "nookies";
+import Head from "next/head";
+import { useTranslation } from "next-i18next";
 
 export default function Clipboard() {
   const [query, setQuery] = useState("");
+  const { t } = useTranslation();
 
   const [initialQuery, setInitialQuery] = useState("");
 
@@ -276,6 +279,11 @@ export default function Clipboard() {
 
   return (
     <div className="">
+      <Head>
+        <title>{t("clipboard_page_title")}</title>
+        <meta name="description" content="Kyoka" />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
       <Navbar />
 
       <div className="flex justify-center items-center min-h-screen">

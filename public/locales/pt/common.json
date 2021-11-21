@@ -79,5 +79,15 @@
   "number_of_new_daily_cards": "Número de novas cartas diárias",
   "selected_dict": "Dicionário selecionado",
   "deck_where_generated_cards_reside": "Deck onde serão salvas as cartas geradas automaticamente",
-  "save": "Salvar"
+  "save": "Salvar",
+  "preferences_page_title": "Preferências",
+  "logout_page_title": "Logout",
+  "library_page_title": "Biblioteca",
+  "home_page_title": "Home",
+  "deck_repo_page_title": "Repositório de decks",
+  "credits_page_title": "Créditos",
+  "clipboard_page_title": "Clipboard",
+  "shared_decks_page_title": "Deck compartilhado",
+  "decks_page_title": "Deck",
+  "create_card_page_title": "Criar carta"
 }

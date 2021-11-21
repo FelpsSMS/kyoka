@@ -7,12 +7,18 @@ import { useTranslation } from "next-i18next";
 
 import Navbar from "../components/Navbar";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import Head from "next/head";
 
 export default function Deck_repo() {
   const { t } = useTranslation();
 
   return (
     <div className="flex flex-col space-y-8">
+      <Head>
+        <title>{t("deck_repo_page_title")}</title>
+        <meta name="description" content="Kyoka" />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
       <div>
         <Navbar />
       </div>

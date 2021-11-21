@@ -9,9 +9,12 @@ import Footer from "../../../components/Footer";
 import Navbar from "../../../components/Navbar";
 import { api, verifyToken } from "../../../utils/api";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import Head from "next/head";
+import { useTranslation } from "next-i18next";
 
 export default function CreateCardIndex() {
   const router = useRouter();
+  const { t } = useTranslation();
 
   const [sorting, setSorting] = useState();
   const [search, setSearch] = useState("");
@@ -34,6 +37,11 @@ export default function CreateCardIndex() {
 
   return (
     <div className="">
+      <Head>
+        <title>{t("decks_page_title")}</title>
+        <meta name="description" content="Kyoka" />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
       <Navbar />
       <DeckNavbar
         deckId={deckId}

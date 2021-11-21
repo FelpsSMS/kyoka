@@ -6,14 +6,22 @@ import Library from "../components/Library";
 import LibraryNavbar from "../components/LibraryNavbar";
 import Navbar from "../components/Navbar";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import Head from "next/head";
+import { useTranslation } from "next-i18next";
 
 export default function LibraryPage() {
   const [sorting, setSorting] = useState();
   const [libraryChanged, setLibraryChanged] = useState("A-Z");
   const [search, setSearch] = useState("");
+  const { t } = useTranslation();
 
   return (
     <div className="flex flex-col space-y-8">
+      <Head>
+        <title>{t("library_page_title")}</title>
+        <meta name="description" content="Kyoka" />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
       <div>
         <Navbar />
         <LibraryNavbar

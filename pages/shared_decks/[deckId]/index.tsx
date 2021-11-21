@@ -12,16 +12,23 @@ import { NewCardForm } from "../../../components/NewCardForm";
 import SharedDeckOptionsNavbar from "../../../components/SharedDeckOptionsNavbar";
 import { api, verifyToken } from "../../../utils/api";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { useTranslation } from "next-i18next";
+import Head from "next/head";
 
 export default function SharedDecksIndex() {
   const router = useRouter();
   const [sorting, setSorting] = useState();
   const [search, setSearch] = useState("");
-
+  const { t } = useTranslation();
   const { deckId } = router.query;
 
   return (
     <div className="">
+      <Head>
+        <title>{t("shared_decks_page_title")}</title>
+        <meta name="description" content="Kyoka" />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
       <Navbar />
 
       <div className="flex flex-col justify-start items-center min-h-screen min-w-screen h-full overflow-x-hidden">
