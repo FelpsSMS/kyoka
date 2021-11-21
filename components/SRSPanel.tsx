@@ -566,13 +566,13 @@ export default function SRSPanel() {
                 className="confirmation-button"
                 onClick={() => parseSRSResponse(cardsToBeShowed[0], true)}
               >
-                {t("common:pass")}
+                {t("pass")}
               </button>
               <button
                 className="confirmation-button"
                 onClick={() => parseSRSResponse(cardsToBeShowed[0], false)}
               >
-                {t("common:fail")}
+                {t("fail")}
               </button>
             </div>
           </div>
@@ -610,28 +610,28 @@ export default function SRSPanel() {
                 className="confirmation-button"
                 onClick={() => setIsCardFlipped(true)}
               >
-                {t("common:flip_card")}
+                {t("flip_card")}
               </button>
             </div>
           </div>
         )
       ) : (
         <div className="flex flex-col justify-center items-center space-y-2 mx-4">
-          <p className="text-3xl font-bol">{t("common:welcome_msg")}</p>
+          <p className="text-3xl font-bol">{t("welcome_msg")}</p>
 
           <div className="flex flex-col">
             <div className="flex space-x-2">
-              <p>{t("common:new_cards")}</p>
+              <p>{t("new_cards")}</p>
               <p className="text-blue-700">{newCardsNumber}</p>
             </div>
 
             <div className="flex space-x-2">
-              <p>{t("common:cards_to_review")}</p>
+              <p>{t("cards_to_review")}</p>
               <p className="text-green-700">{reviewedCardsNumber}</p>
             </div>
 
             <div className="flex space-x-2">
-              <p>{t("common:cards_to_relearn")}</p>
+              <p>{t("cards_to_relearn")}</p>
               <p className="text-red-700">{relearnedCardsNumber}</p>
             </div>
           </div>
@@ -641,7 +641,7 @@ export default function SRSPanel() {
               setSessionStart(true);
             }}
           >
-            {t("common:srs_start")}
+            {t("srs_start")}
           </button>
         </div>
       )}

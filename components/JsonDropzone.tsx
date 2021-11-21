@@ -2,12 +2,15 @@ import { useField } from "formik";
 import React, { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { UploadIcon } from "@heroicons/react/outline";
+import { useTranslation } from "next-i18next";
 
 export default function JsonDropzone(props) {
   const [field, meta, helpers] = useField(props);
 
   const [rejectFile, setRejectFile] = useState(false);
   const [rejectFileSize, setRejectFileSize] = useState(false);
+
+  const { t } = useTranslation();
 
   const checkFile = useCallback(
     (file) => {
@@ -71,7 +74,7 @@ export default function JsonDropzone(props) {
       </div>
 
       {rejectFile && (
-        <p className="text-red-700 ">O arquivo precisa ser um do tipo JSON</p>
+        <p className="text-red-700 ">{t("file_needs_to_be_json")}</p>
       )}
       {/* {rejectFileSize && (
         <p className="text-red-700 ">O arquivo precisa ser menor do que 5MB</p>

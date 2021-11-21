@@ -4,6 +4,7 @@ import { api } from "../utils/api";
 import GenerateCardPrompt from "./modals/GenerateCardPrompt";
 import HeadsUpMessage from "./modals/HeadsUpMessage";
 import PlayAudioButton from "./PlayAudioButton";
+import { useTranslation } from "next-i18next";
 
 export default function DictionaryEntry({ term, text }) {
   const splitText = text.split("<br>");
@@ -13,6 +14,8 @@ export default function DictionaryEntry({ term, text }) {
   const [showSentencePrompt, setShowSentencePrompt] = useState(false);
 
   const [showMessage, setShowMessage] = useState(false);
+
+  const { t } = useTranslation();
 
   useEffect(() => {
     api
@@ -41,7 +44,7 @@ export default function DictionaryEntry({ term, text }) {
         <HeadsUpMessage
           show={showMessage}
           setShow={() => setShowMessage(false)}
-          title="Carta adicionada com sucesso!"
+          title={t("add_card_success_msg")}
           color="bg-blue-800"
           colorFocusOrHover="bg-blue-900"
         />

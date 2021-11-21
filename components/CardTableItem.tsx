@@ -1,14 +1,25 @@
 import { AnimatePresence, motion } from "framer-motion";
+import { useRouter } from "next/router";
 import React, { useState } from "react";
 import CardInfo from "./CardInfo";
+import { useTranslation } from "next-i18next";
 
-function CardTableItem({ cardDetails: { card, tableKey }, readOnly }) {
+export default function CardTableItem({
+  cardDetails: { card, tableKey },
+  readOnly,
+}) {
   const [showCardInfo, setShowCardInfo] = useState(false);
 
+  const router = useRouter();
+
+  const { locale } = router;
+
+  const { t } = useTranslation();
+
   const formattedDateAdded = new Date(card.dateAdded).toLocaleDateString(
-    "pt-br"
+    locale
   );
-  const formattedDueDate = new Date(card.dueDate).toLocaleDateString("pt-br");
+  const formattedDueDate = new Date(card.dueDate).toLocaleDateString(locale);
 
   return (
     <motion.li
@@ -31,7 +42,7 @@ function CardTableItem({ cardDetails: { card, tableKey }, readOnly }) {
           <div className="flex flex-col w-full border-r-2 min-w-0">
             {/* Min width to make it so truncate doesn't overflow */}
             <div className="text-center bg-black text-white p-2 border-b-2">
-              Foco
+              {t("focus")}
             </div>
             <div className="text-right text-black p-2 truncate">
               {card.layoutInfo.focus}
@@ -40,14 +51,14 @@ function CardTableItem({ cardDetails: { card, tableKey }, readOnly }) {
           {/* Col */}
           <div className="flex-col w-32 hidden ms:inline-block border-r-2">
             <div className="text-center bg-black text-white p-2 whitespace-nowrap border-b-2">
-              Próxima revisão
+              {t("next_revision")}
             </div>
             <div className="text-right text-black p-2">{formattedDueDate}</div>
           </div>
           {/* Col */}
           <div className="flex-col w-32 whitespace-nowrap border-r-2 hidden sm:inline-block">
             <div className="text-center bg-black text-white border-b-2 p-2">
-              Data de adição
+              {t("add_date")}
             </div>
             <div className="text-right text-black p-2">
               {formattedDateAdded}
@@ -56,7 +67,7 @@ function CardTableItem({ cardDetails: { card, tableKey }, readOnly }) {
           {/* Col */}
           <div className="flex-col w-16 hidden sm:inline-block">
             <div className="text-center bg-black text-white p-2 border-b-2">
-              Lapsos
+              {t("lapses")}
             </div>
             <div className="text-right text-black p-2">{card.lapses}</div>
           </div>
@@ -69,5 +80,3 @@ function CardTableItem({ cardDetails: { card, tableKey }, readOnly }) {
     </motion.li>
   );
 }
-
-export default CardTableItem;

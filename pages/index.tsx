@@ -4,6 +4,7 @@ import React from "react";
 import Footer from "../components/Footer";
 import { LoginForm } from "../components/LoginForm";
 import Head from "next/head";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 
 export default function login() {
   return (
@@ -21,14 +22,17 @@ export default function login() {
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { ["kyoka-token"]: token } = parseCookies(ctx);
-  if (token) {
+
+  if (!token) {
     return {
       redirect: {
-        destination: "/home",
+        destination: "/",
         permanent: false,
       },
     };
   }
 
-  return { props: {} };
+  return {
+    props: { ...(await serverSideTranslations(ctx.locale, ["common"])) },
+  };
 };

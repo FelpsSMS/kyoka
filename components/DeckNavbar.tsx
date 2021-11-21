@@ -2,6 +2,7 @@ import { SearchIcon } from "@heroicons/react/outline";
 import router from "next/router";
 import React, { useEffect, useState } from "react";
 import Select from "./Select";
+import { useTranslation } from "next-i18next";
 
 export default function DeckNavbar({
   deckId,
@@ -16,6 +17,8 @@ export default function DeckNavbar({
     });
   }
 
+  const { t } = useTranslation();
+
   const [query, setQuery] = useState("");
 
   useEffect(() => {
@@ -23,7 +26,7 @@ export default function DeckNavbar({
     return () => clearTimeout(timeOutId);
   }, [query, setSearch]);
 
-  const sortingOptions = ["A-Z", "Revisão"];
+  const sortingOptions = ["A-Z", t("review")];
 
   const [selectSorting, setSelectSorting] = useState();
 
@@ -44,7 +47,7 @@ export default function DeckNavbar({
             className="confirmation-button mx-2 mb-2 md:mt-4 md:mb-4 md:mx-4 whitespace-nowrap w-1/2"
             onClick={() => handleCardCreation(deckId)}
           >
-            Criar carta
+            {t("create_card")}
           </button>
         )}
         <Select

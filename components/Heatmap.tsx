@@ -109,14 +109,14 @@ export default function Heatmap() {
   return (
     <div className="flex flex-col justify-center items-center mt-4 relative mx-4">
       <label className="">
-        {t("common:heatmap_main_message", {
+        {t("heatmap_main_message", {
           lastSessionReviews: lastSessionReviews,
           date: new Date(lastSessionDuration).toISOString().slice(11, 19),
         })}
       </label>
 
       <label>
-        {t("common:heatmap_retention", {
+        {t("heatmap_retention", {
           lastRetentionRate: lastRetentionRate,
         })}
       </label>
@@ -157,7 +157,7 @@ export default function Heatmap() {
           transition={{ duration: 0.3 }}
           className="bg-gray-100 absolute p-4 rounded-lg mt-56 hidden sm:inline-block"
         >
-          {t("common:tooltip_msg", {
+          {t("tooltip_msg", {
             tooltipReviewInfo: tooltipReviewInfo,
             tooltipDateInfo: tooltipDateInfo,
           })}

@@ -5,6 +5,7 @@ import Footer from "../components/Footer";
 import Library from "../components/Library";
 import LibraryNavbar from "../components/LibraryNavbar";
 import Navbar from "../components/Navbar";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 
 export default function LibraryPage() {
   const [sorting, setSorting] = useState();
@@ -47,5 +48,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     };
   }
 
-  return { props: {} };
+  return {
+    props: { ...(await serverSideTranslations(ctx.locale, ["common"])) },
+  };
 };

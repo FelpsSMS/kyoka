@@ -6,11 +6,8 @@ import Footer from "../components/Footer";
 import { GetServerSideProps } from "next";
 import { parseCookies } from "nookies";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { useTranslation } from "next-i18next";
 
 export default function Home() {
-  const { t } = useTranslation();
-
   return (
     <div
       id="container"
@@ -40,8 +37,6 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       },
     };
   }
-
-  console.log(ctx.locale);
 
   return {
     props: { ...(await serverSideTranslations(ctx.locale, ["common"])) },

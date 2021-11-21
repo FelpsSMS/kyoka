@@ -2,12 +2,15 @@ import { useField } from "formik";
 import Image from "next/image";
 import React, { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
+import { useTranslation } from "next-i18next";
 
 export default function ImageDropzone(props) {
   const [field, meta, helpers] = useField(props);
   const [imageContentURL, setImageContentURL] = useState(props.webSource ?? "");
   const [rejectFile, setRejectFile] = useState(false);
   const [rejectFileSize, setRejectFileSize] = useState(false);
+
+  const { t } = useTranslation();
 
   const imageLoader = ({ src }) => {
     return src;
@@ -93,12 +96,12 @@ export default function ImageDropzone(props) {
       </div>
       {rejectFile && (
         <p className="absolute mt-16 text-red-700">
-          O arquivo precisa ser uma imagem
+          {t("file_needs_to_be_image")}
         </p>
       )}
       {rejectFileSize && (
         <p className="absolute mt-16 text-red-700">
-          O arquivo precisa ser menor do que 5MB
+          {t("file_needs_to_be_smaller")}
         </p>
       )}
     </div>

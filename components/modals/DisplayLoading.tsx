@@ -1,9 +1,11 @@
 import { Dialog } from "@headlessui/react";
 import { AnimatePresence, motion } from "framer-motion";
 import React, { useRef } from "react";
+import { useTranslation } from "next-i18next";
 
 export default function DisplayLoading({ show, setShow, loadingBarProgress }) {
   const completeButtonRef = useRef(null);
+  const { t } = useTranslation();
 
   return (
     <AnimatePresence>
@@ -40,7 +42,7 @@ export default function DisplayLoading({ show, setShow, loadingBarProgress }) {
                   >
                     <div className="p-4 items-center justify-center space-y-4">
                       <label className="font-bold text-2xl">
-                        Carregando...
+                        {t("loading")}
                       </label>
                       <div
                         className={`bg-black h-4 rounded`}
@@ -54,7 +56,7 @@ export default function DisplayLoading({ show, setShow, loadingBarProgress }) {
                         focus:bg-blue-900 hover:text-gray-200 hover:bg-blue-900 outline-none px-2"
                           onClick={() => setShow()}
                         >
-                          Confirmar
+                          {t("confirm")}
                         </button>
                       )}
                     </div>

@@ -4,6 +4,7 @@ import { TextArea } from "./TextArea";
 import React, { useEffect, useMemo, useState } from "react";
 import ImageDropzone from "./ImageDropzone";
 import AudioDropzone from "./AudioDropzone";
+import { useTranslation } from "next-i18next";
 
 import { api } from "../utils/api";
 
@@ -14,6 +15,7 @@ import DeletePrompt from "./modals/DeletePrompt";
 export const CardInfoUpdateForm = ({ cardDetails: card, readOnly }) => {
   const [fields, setFields] = useState([]);
   const [initialVal, setInitialVal] = useState({});
+  const { t } = useTranslation();
 
   const [needValidation, setNeedValidation] = useState([]);
 
@@ -146,7 +148,7 @@ export const CardInfoUpdateForm = ({ cardDetails: card, readOnly }) => {
             setShow={() => setShowDeletePrompt(false)}
             id={card.id}
             routeName={"cards"}
-            title="Você realmente deseja excluir esta carta?"
+            title={t("delete_card_confirmation_msg")}
           />
           <Formik
             initialValues={initialVal}
@@ -260,14 +262,14 @@ export const CardInfoUpdateForm = ({ cardDetails: card, readOnly }) => {
                       className="px-8 mt-4 confirmation-button sm:px-16"
                       type="submit"
                     >
-                      Atualizar
+                      {t("update")}
                     </button>
                     <button
                       className="px-8 mt-4 confirmation-button sm:px-16"
                       onClick={() => setShowDeletePrompt(true)}
                       type="button"
                     >
-                      Excluir
+                      {t("delete")}
                     </button>
                   </div>
                 )}

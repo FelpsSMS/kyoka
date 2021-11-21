@@ -8,6 +8,7 @@ import DeckOptionsNavbar from "../../../components/DeckOptionsNavbar";
 import Footer from "../../../components/Footer";
 import Navbar from "../../../components/Navbar";
 import { api, verifyToken } from "../../../utils/api";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 
 export default function CreateCardIndex() {
   const router = useRouter();
@@ -66,5 +67,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     };
   }
 
-  return { props: {} };
+  return {
+    props: { ...(await serverSideTranslations(ctx.locale, ["common"])) },
+  };
 };

@@ -2,6 +2,7 @@ import { SearchIcon } from "@heroicons/react/outline";
 import React, { useEffect, useState } from "react";
 import NewDeckPrompt from "./modals/NewDeckPrompt";
 import Select from "./Select";
+import { useTranslation } from "next-i18next";
 
 export default function LibraryNavbar({
   setSorting,
@@ -10,6 +11,7 @@ export default function LibraryNavbar({
   setSearch,
 }) {
   const [query, setQuery] = useState("");
+  const { t } = useTranslation();
 
   useEffect(() => {
     const timeOutId = setTimeout(() => setSearch(query), 300); //debounce
@@ -18,7 +20,7 @@ export default function LibraryNavbar({
 
   const [showNewDeckPrompt, setShowNewDeckPrompt] = useState(false);
 
-  const sortingOptions = ["A-Z", "Quantidade"];
+  const sortingOptions = ["A-Z", t("quantity")];
 
   const [selectSorting, setSelectSorting] = useState();
 
@@ -45,7 +47,7 @@ export default function LibraryNavbar({
           className="confirmation-button mx-2 mb-2 md:mt-4 md:mb-4 md:mx-4 whitespace-nowrap w-1/2"
           onClick={() => setShowNewDeckPrompt(true)}
         >
-          Criar deck
+          {t("create_deck")}
         </button>
         <Select
           className="mx-2 mb-2 md:mt-4 md:mb-4 md:mx-4 w-1/2"

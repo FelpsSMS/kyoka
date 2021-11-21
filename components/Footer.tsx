@@ -2,6 +2,7 @@ import router, { useRouter } from "next/router";
 import { parseCookies, setCookie } from "nookies";
 import { useCallback, useEffect, useState, useMemo } from "react";
 import Select from "./Select";
+import { useTranslation } from "next-i18next";
 
 export default function Footer() {
   const router = useRouter();
@@ -9,6 +10,7 @@ export default function Footer() {
   const languages = ["Português", "English", "日本語"];
   const [selectedLanguage, setSelectedLanguage] = useState(0);
   const [isCookieLoaded, setIsCookieLoaded] = useState(false);
+  const { t } = useTranslation();
 
   const reroute = useCallback(
     (newLocale) => {
@@ -88,7 +90,7 @@ export default function Footer() {
             router.push("credits");
           }}
         >
-          Credits
+          {t("credits")}
         </p>
         <p className="text-white font-black my-3">Kyoka - 2021</p>
       </div>

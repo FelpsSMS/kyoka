@@ -2,10 +2,12 @@ import { motion, AnimateSharedLayout } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { api, verifyToken } from "../utils/api";
 import CardTableItem from "./CardTableItem";
+import { useTranslation } from "next-i18next";
 
-function CardTable({ deckId, search, sorting, readOnly }) {
+export default function CardTable({ deckId, search, sorting, readOnly }) {
   const [cards, setCards] = useState([]);
   const [hasCards, setHasCards] = useState(true);
+  const { t } = useTranslation();
 
   useEffect(() => {
     const userId = verifyToken();
@@ -99,9 +101,7 @@ function CardTable({ deckId, search, sorting, readOnly }) {
             })
           ) : (
             <div className="flex items-center justify-center p-4 font-bold italic">
-              <p className="text-3xl my-8">
-                Ainda não há nenhuma carta neste deck
-              </p>
+              <p className="text-3xl my-8">{t("no_cards_yet_msg")}</p>
             </div>
           )}
         </motion.ul>
@@ -109,5 +109,3 @@ function CardTable({ deckId, search, sorting, readOnly }) {
     </div>
   );
 }
-
-export default CardTable;

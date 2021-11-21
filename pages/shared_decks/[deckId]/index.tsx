@@ -11,6 +11,7 @@ import Navbar from "../../../components/Navbar";
 import { NewCardForm } from "../../../components/NewCardForm";
 import SharedDeckOptionsNavbar from "../../../components/SharedDeckOptionsNavbar";
 import { api, verifyToken } from "../../../utils/api";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 
 export default function SharedDecksIndex() {
   const router = useRouter();
@@ -49,5 +50,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     };
   }
 
-  return { props: {} };
+  return {
+    props: { ...(await serverSideTranslations(ctx.locale, ["common"])) },
+  };
 };

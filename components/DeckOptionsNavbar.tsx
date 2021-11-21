@@ -2,10 +2,11 @@ import React, { useEffect, useState } from "react";
 import { api, verifyToken } from "../utils/api";
 import DeletePrompt from "./modals/DeletePrompt";
 import NewDeckPrompt from "./modals/NewDeckPrompt";
+import { useTranslation } from "next-i18next";
 
 import ToggleButton from "./ToggleButton";
 
-function DeckOptionsNavbar({ deckId, readOnly }) {
+export default function DeckOptionsNavbar({ deckId, readOnly }) {
   const [showDeckNameChangePrompt, setShowDeckNameChangePrompt] =
     useState(false);
 
@@ -13,6 +14,7 @@ function DeckOptionsNavbar({ deckId, readOnly }) {
   const [toggleLoaded, setToggleLoaded] = useState(false);
 
   const [showDeletePrompt, setShowDeletePrompt] = useState(false);
+  const { t } = useTranslation();
 
   useEffect(() => {
     const userId = verifyToken();
@@ -66,7 +68,7 @@ function DeckOptionsNavbar({ deckId, readOnly }) {
         setShow={() => setShowDeletePrompt(false)}
         id={deckId}
         routeName={"decks"}
-        title="Você realmente deseja excluir este deck?"
+        title={t("delete_deck_confirmation_msg")}
       />
 
       {toggleLoaded && !readOnly && (
@@ -74,7 +76,7 @@ function DeckOptionsNavbar({ deckId, readOnly }) {
           enabled={enabled}
           setEnabled={setEnabled}
           textColor={"white"}
-          label={"Ativar deck"}
+          label={t("activate_deck")}
         />
       )}
 
@@ -84,7 +86,7 @@ function DeckOptionsNavbar({ deckId, readOnly }) {
             className="confirmation-button sm:px-8 md:px-16 mx-2 mb-2 mt-2 md:mt-4 md:mb-4 md:mx-4 whitespace-nowrap"
             onClick={() => setShowDeckNameChangePrompt(true)}
           >
-            Editar deck
+            {t("update_deck")}
           </button>
         )}
 
@@ -92,11 +94,9 @@ function DeckOptionsNavbar({ deckId, readOnly }) {
           className="confirmation-button mx-2 mb-2 mt-2 md:mt-4 md:mb-4 md:mx-4 whitespace-nowrap"
           onClick={() => setShowDeletePrompt(true)}
         >
-          Excluir deck
+          {t("delete_deck")}
         </button>
       </div>
     </nav>
   );
 }
-
-export default DeckOptionsNavbar;

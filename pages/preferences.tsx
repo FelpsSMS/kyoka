@@ -16,6 +16,7 @@ import ToggleButton from "../components/ToggleButton";
 import { api, verifyToken } from "../utils/api";
 import * as Yup from "yup";
 import { useRouter } from "next/router";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 
 export default function Preferences() {
   const [enabled, setEnabled] = useState(false);
@@ -444,5 +445,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     };
   }
 
-  return { props: {} };
+  return {
+    props: { ...(await serverSideTranslations(ctx.locale, ["common"])) },
+  };
 };

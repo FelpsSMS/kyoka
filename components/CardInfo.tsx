@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { CardInfoUpdateForm } from "./CardInfoUpdateForm";
 
-function CardInfo({ cardDetails: card, readOnly }) {
+export default function CardInfo({ cardDetails: card, readOnly }) {
   return (
     <motion.div
       className="bg-white border-t-2"
@@ -15,5 +15,3 @@ function CardInfo({ cardDetails: card, readOnly }) {
     </motion.div>
   );
 }
-
-export default CardInfo;

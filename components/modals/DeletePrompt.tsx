@@ -3,10 +3,12 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/router";
 import React, { useRef } from "react";
 import { api, verifyToken } from "../../utils/api";
+import { useTranslation } from "next-i18next";
 
 export default function DeletePrompt({ show, setShow, id, routeName, title }) {
   const completeButtonRef = useRef(null);
   const router = useRouter();
+  const { t } = useTranslation();
 
   async function confirmFunction() {
     const userId = verifyToken();
@@ -155,14 +157,14 @@ export default function DeletePrompt({ show, setShow, id, routeName, title }) {
                       focus:bg-red-900 hover:text-gray-200 hover:bg-red-900 outline-none px-2"
                         onClick={() => confirmFunction()}
                       >
-                        Confirmar
+                        {t("confirm")}
                       </button>
                       <button
                         className="confirmation-button px-2 sm:px-16"
                         ref={completeButtonRef}
                         onClick={() => setShow}
                       >
-                        Cancelar
+                        {t("cancel")}
                       </button>
                     </div>
                   </motion.div>

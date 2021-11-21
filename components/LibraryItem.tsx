@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { useRouter } from "next/router";
+import { useTranslation } from "next-i18next";
 
 export default function LibraryItem({
   title,
@@ -9,6 +10,7 @@ export default function LibraryItem({
   pathName,
 }) {
   const router = useRouter();
+  const { t } = useTranslation();
 
   function handleClick(id: string) {
     router.push({
@@ -36,7 +38,9 @@ export default function LibraryItem({
         <p className="font-bold text-4xl break-all whitespace-normal">
           {title}
         </p>
-        <p className="text-2xl font-thin">{numberOfCards} cartas</p>
+        <p className="text-2xl font-thin">
+          {numberOfCards} {t("cards")}
+        </p>
       </div>
     </motion.div>
   );

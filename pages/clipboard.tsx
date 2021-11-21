@@ -6,6 +6,9 @@ import * as localForage from "localforage";
 import DictionaryEntry from "../components/DictionaryEntry";
 import { api, verifyToken } from "../utils/api";
 import parse from "html-react-parser";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { GetServerSideProps } from "next";
+import { parseCookies } from "nookies";
 
 export default function Clipboard() {
   const [query, setQuery] = useState("");
@@ -328,3 +331,20 @@ export default function Clipboard() {
     </div>
   );
 }
+
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const { ["kyoka-token"]: token } = parseCookies(ctx);
+
+  if (!token) {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    };
+  }
+
+  return {
+    props: { ...(await serverSideTranslations(ctx.locale, ["common"])) },
+  };
+};

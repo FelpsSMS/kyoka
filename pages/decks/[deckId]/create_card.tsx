@@ -6,6 +6,7 @@ import Container from "../../../components/Container";
 import Footer from "../../../components/Footer";
 import Navbar from "../../../components/Navbar";
 import { NewCardForm } from "../../../components/NewCardForm";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 
 export default function CreateCard() {
   const router = useRouter();
@@ -34,5 +35,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     };
   }
 
-  return { props: {} };
+  return {
+    props: { ...(await serverSideTranslations(ctx.locale, ["common"])) },
+  };
 };

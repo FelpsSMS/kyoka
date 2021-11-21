@@ -5,6 +5,7 @@ import DeckRepo from "../components/DeckRepo";
 import Footer from "../components/Footer";
 
 import Navbar from "../components/Navbar";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 
 export default function deck_repo() {
   return (
@@ -30,7 +31,6 @@ export default function deck_repo() {
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { ["kyoka-token"]: token } = parseCookies(ctx);
-  //const apiClient = getAPIClient(ctx);
 
   if (!token) {
     return {
@@ -41,7 +41,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     };
   }
 
-  //await apiClient.get("/users");
-
-  return { props: {} };
+  return {
+    props: { ...(await serverSideTranslations(ctx.locale, ["common"])) },
+  };
 };

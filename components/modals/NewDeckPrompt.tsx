@@ -6,6 +6,7 @@ import * as Yup from "yup";
 import { api, verifyToken } from "../../utils/api";
 import Select from "../Select";
 import { TextField } from "../TextField";
+import { useTranslation } from "next-i18next";
 
 interface newDeckPromptProps {
   show: boolean;
@@ -24,6 +25,7 @@ export default function NewDeckPrompt({
 }: newDeckPromptProps) {
   const completeButtonRef = useRef(null);
   const deckNameFieldRef = useRef(null);
+  const { t } = useTranslation();
 
   const [selectedLayout, setSelectedLayout] = useState(0);
   const [layoutsState, setLayoutsState] = useState([]);
@@ -33,19 +35,19 @@ export default function NewDeckPrompt({
   const maxSubjectSize = 10;
 
   const validate = Yup.object({
-    deckName: Yup.string()
-      .required("Por favor, adicione um nome")
-      .max(
+    deckName: Yup.string().required(t("req_add_name")).max(
+      maxNameSize,
+      t("deck_name_len_validation_msg", {
         maxNameSize,
-        `O nome não pode ultrapassar ${maxNameSize} caracteres`
-      ),
+      })
+    ),
 
-    deckSubject: Yup.string()
-      .required("Por favor, adicione um assunto")
-      .max(
+    deckSubject: Yup.string().required(t("req_add_subject")).max(
+      maxSubjectSize,
+      t("subject_len_validation_msg", {
         maxSubjectSize,
-        `O assunto não pode ultrapassar ${maxSubjectSize} caracteres`
-      ),
+      })
+    ),
   });
 
   useEffect(() => {
@@ -155,7 +157,7 @@ export default function NewDeckPrompt({
                     transition={{ duration: 0.4 }}
                   >
                     <Dialog.Title className="text-xl font-bold sm:text-2xl">
-                      Insira as informações do deck
+                      {t("insert_deck_info")}
                     </Dialog.Title>
                     <Formik
                       initialValues={{
@@ -169,7 +171,7 @@ export default function NewDeckPrompt({
                         <Form className="w-full space-y-8">
                           <div className="flex flex-col items-center justify-center">
                             <label className="font-normal text-xl">
-                              Layout
+                              {t("layout")}
                             </label>
                             <Select
                               selectedItem={selectedLayout}
@@ -177,12 +179,12 @@ export default function NewDeckPrompt({
                               items={layoutsState}
                               className="flex w-full justify-center my-6 sm:px-6"
                               className2="px-8 sm:px-20 font-bold bg-white py-2 text-xl w-full focus:outline-none
-                                                    focus:shadow-outline-blue focus:border-blue-300 relative border shadow-sm
-                                                    border-gray-300 rounded text-gray-800"
+                                          focus:shadow-outline-blue focus:border-blue-300 relative border shadow-sm
+                                          border-gray-300 rounded text-gray-800"
                             />
                           </div>
                           <TextField
-                            label="Nome"
+                            label={t("name")}
                             type="text"
                             innerref={deckNameFieldRef}
                             name="deckName"
@@ -190,7 +192,7 @@ export default function NewDeckPrompt({
                           />
 
                           <TextField
-                            label="Assunto"
+                            label={t("subject")}
                             type="text"
                             name="deckSubject"
                             className="bg-gray-100 border-2 border-gray-200 rounded-lg w-full outline-none focus:border-black p-2"
@@ -205,7 +207,7 @@ export default function NewDeckPrompt({
                                 formik.submitForm();
                               }}
                             >
-                              Confirmar
+                              {t("confirm")}
                             </button>
                             <button
                               className="confirmation-button px-2 sm:px-16"
@@ -213,7 +215,7 @@ export default function NewDeckPrompt({
                               onClick={setShow}
                               type="button"
                             >
-                              Cancelar
+                              {t("cancel")}
                             </button>
                           </div>
                         </Form>

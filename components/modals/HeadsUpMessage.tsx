@@ -1,5 +1,6 @@
 import { Dialog } from "@headlessui/react";
 import { AnimatePresence, motion } from "framer-motion";
+import { useTranslation } from "next-i18next";
 
 import React, { useRef } from "react";
 
@@ -11,6 +12,7 @@ export default function HeadsUpMessage({
   colorFocusOrHover,
 }) {
   const completeButtonRef = useRef(null);
+  const { t } = useTranslation();
 
   return (
     <AnimatePresence>
@@ -54,7 +56,7 @@ export default function HeadsUpMessage({
                         className={`${color} text-white p-2 sm:px-16 rounded-sm text-xl font-bold focus:text-gray-200 
                         focus:bg-${colorFocusOrHover} hover:text-gray-200 hover:${colorFocusOrHover} outline-none px-2`}
                       >
-                        Confirmar
+                        {t("confirm")}
                       </button>
                     </div>
                   </motion.div>

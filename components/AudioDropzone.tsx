@@ -1,13 +1,16 @@
 import { useField } from "formik";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { UploadIcon } from "@heroicons/react/outline";
+import { useTranslation } from "next-i18next";
 
 export default function AudioDropzone(props) {
   const [field, meta, helpers] = useField(props);
   const [audioContentURL, setAudioContentURL] = useState(props.webSource ?? "");
   const [rejectFile, setRejectFile] = useState(false);
   const [rejectFileSize, setRejectFileSize] = useState(false);
+
+  const { t } = useTranslation();
 
   const audioRef = useRef(null);
 
@@ -84,12 +87,10 @@ export default function AudioDropzone(props) {
         </audio>
       )}
       {rejectFile && (
-        <p className="text-red-700 ">
-          O arquivo precisa ser uma faixa de áudio
-        </p>
+        <p className="text-red-700 ">{t("file_needs_to_be_audio")}</p>
       )}
       {rejectFileSize && (
-        <p className="text-red-700 ">O arquivo precisa ser menor do que 5MB</p>
+        <p className="text-red-700 "> {t("file_needs_to_be_smaller")}</p>
       )}
     </div>
   );

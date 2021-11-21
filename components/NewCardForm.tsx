@@ -4,6 +4,7 @@ import { TextArea } from "./TextArea";
 import React, { useEffect, useMemo, useState } from "react";
 import ImageDropzone from "./ImageDropzone";
 import AudioDropzone from "./AudioDropzone";
+import { useTranslation } from "next-i18next";
 
 import { api, verifyToken } from "../utils/api";
 import router from "next/router";
@@ -16,6 +17,8 @@ export const NewCardForm = ({ deckId }) => {
   const [needValidation, setNeedValidation] = useState([]);
 
   const [initValues, setInitValues] = useState(false);
+
+  const { t } = useTranslation();
 
   const numberOfImages = useMemo(() => {
     return Array.from(Array(4).keys());
@@ -151,7 +154,7 @@ export const NewCardForm = ({ deckId }) => {
               whitespace-nowrap"
             >
               <h1 className="font-black text-3xl sm:text-5xl">
-                Registrar carta
+                {t("register_card")}
               </h1>
 
               <div className="flex flex-col w-full space-y-4">
@@ -236,7 +239,7 @@ export const NewCardForm = ({ deckId }) => {
               </div>
 
               <button className="confirmation-button" type="submit">
-                Criar
+                {t("create")}
               </button>
             </Form>
           )}

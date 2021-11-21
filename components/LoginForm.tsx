@@ -6,6 +6,7 @@ import { api } from "../utils/api";
 import router from "next/router";
 import { setCookie } from "nookies";
 import { motion } from "framer-motion";
+import { useTranslation } from "next-i18next";
 
 export const LoginForm = () => {
   const [newUserForm, setNewUserForm] = useState(false);
@@ -16,39 +17,47 @@ export const LoginForm = () => {
   const [emailVerificationSent, setEmailVerificationSent] = useState(false);
   const [informedEmail, setInformedEmail] = useState("");
 
+  const { t } = useTranslation();
+
   const validateLogin = Yup.object({
     email: Yup.string()
-      .required("Por favor, insira seu e-mail de login")
-      .email("Por favor, insira um e-mail válido"),
-    password: Yup.string().required("Por favor, insira sua senha"),
+      .required(t("email_login_validation_required_msg"))
+      .email(t("email_login_validation_msg")),
+    password: Yup.string().required(
+      t("password_login_validation_required_msg")
+    ),
   });
 
   const regex: RegExp = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])");
 
   const regex2: RegExp = new RegExp("^(?!.*\\s)");
 
+  const passwordMinSize = 6;
+
   const validateRegister = Yup.object({
     email: Yup.string()
-      .required("Por favor, insira um e-mail")
-      .email("Por favor, insira um e-mail válido"),
+      .required(t("email_register_validation_required_msg"))
+      .email(t("email_login_validation_msg")),
     password: Yup.string()
-      .required("Por favor, insira uma senha")
-      .min(6, "Sua senha deve conter um mínimo de 6 caracteres")
-      .matches(
-        regex,
-        "Sua senha deve conter pelo menos 1 número, 1 letra maiúscula e 1 letra minúscula"
+      .required(t("password_register_validation_required_msg"))
+      .min(
+        passwordMinSize,
+        t("password_min_len_msg", {
+          passwordMinSize,
+        })
       )
-      .matches(regex2, "Sua senha não pode conter espaços vazios"),
+      .matches(regex, t("password_requirements_msg"))
+      .matches(regex2, t("password_no_spaces_msg")),
     passwordConfirmation: Yup.string()
 
-      .required("As senhas devem corresponder")
-      .oneOf([Yup.ref("password"), null], "As senhas devem corresponder"),
+      .required(t("passwords_must_match_msg"))
+      .oneOf([Yup.ref("password"), null], t("passwords_must_match_msg")),
   });
 
   const validateForgot = Yup.object({
     email: Yup.string()
-      .required("Por favor, insira seu e-mail de login")
-      .email("Por favor, insira um e-mail válido"),
+      .required(t("email_login_validation_required_msg"))
+      .email(t("email_login_validation_msg")),
   });
 
   async function handleLogin({ email, password }) {
@@ -137,7 +146,9 @@ export const LoginForm = () => {
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.3 }}
               >
-                <label className="text-red-900">Credenciais inválidas</label>
+                <label className="text-red-900">
+                  {t("invalid_credentials_msg")}
+                </label>
               </motion.div>
             )}
 
@@ -149,14 +160,13 @@ export const LoginForm = () => {
                 transition={{ duration: 0.3 }}
               >
                 <label className="text-red-900 whitespace-normal">
-                  Por favor, verifique sua conta. Caso você não tenha recebido
-                  um e-mail de verificação, clique no link abaixo
+                  {t("req_verify_account_msg")}
                 </label>
                 <a
                   className="text-blue-500 hover:cursor-pointer hover:text-blue-700"
                   onClick={() => sendVerificationEmail(informedEmail)}
                 >
-                  Clique aqui
+                  {t("click_here")}
                 </a>
               </motion.div>
             )}
@@ -166,7 +176,7 @@ export const LoginForm = () => {
               <TextField label="Senha" name="password" type="password" />
             </div>
             <button className="confirmation-button" type="submit">
-              Login
+              {t("login")}
             </button>
             <div className="flex space-x-4">
               <label
@@ -176,7 +186,7 @@ export const LoginForm = () => {
                   setForgotPasswordForm(false);
                 }}
               >
-                Criar conta
+                {t("create_account")}
               </label>
 
               <label
@@ -186,7 +196,7 @@ export const LoginForm = () => {
                   setNewUserForm(false);
                 }}
               >
-                Esqueceu sua senha?
+                {t("forgot_password")}
               </label>
             </div>
           </Form>
@@ -223,15 +233,13 @@ export const LoginForm = () => {
                     transition={{ duration: 0.3 }}
                   >
                     <label className="text-green-900 whitespace-normal">
-                      Um e-mail de verificação foi enviado para o e-mail
-                      informado. Caso você não tenha recebido um e-mail de
-                      verificação, clique no link abaixo
+                      {t("verification_email_sent")}
                     </label>
                     <a
                       className="text-blue-500 hover:cursor-pointer hover:text-blue-700"
                       onClick={() => sendVerificationEmail(informedEmail)}
                     >
-                      Clique aqui
+                      {t("click_here")}
                     </a>
                   </motion.div>
                 )}
@@ -246,7 +254,7 @@ export const LoginForm = () => {
                   />
                 </div>
                 <button className="confirmation-button" type="submit">
-                  Enviar
+                  {t("send")}
                 </button>
               </Form>
             )}
@@ -282,18 +290,18 @@ export const LoginForm = () => {
                     transition={{ duration: 0.3 }}
                   >
                     <label className="text-green-900">
-                      Uma confirmação foi enviada para o e-mail informado
+                      {t("confirmation_sent")}
                     </label>
                   </motion.div>
                 )}
                 <h1 className="font-black text-3xl sm:text-5xl">
-                  Insira seu e-mail
+                  {t("insert_email")}
                 </h1>
                 <div className="flex flex-col w-full space-y-4">
                   <TextField label="E-mail" name="email" type="text" />
                 </div>
                 <button className="confirmation-button" type="submit">
-                  Enviar
+                  {t("send")}
                 </button>
               </Form>
             )}

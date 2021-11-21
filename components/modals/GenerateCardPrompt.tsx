@@ -3,6 +3,7 @@ import { Form, Formik } from "formik";
 import { AnimatePresence, motion } from "framer-motion";
 import React, { useRef } from "react";
 import { TextField } from "../TextField";
+import { useTranslation } from "next-i18next";
 
 import { api, verifyToken } from "../../utils/api";
 
@@ -14,6 +15,7 @@ export default function GenerateCardPrompt({
   setShowMessage,
 }) {
   const sentenceField = useRef(null);
+  const { t } = useTranslation();
 
   async function sendToServer(values) {
     const userId = verifyToken();
@@ -101,8 +103,7 @@ export default function GenerateCardPrompt({
                     transition={{ duration: 0.4 }}
                   >
                     <Dialog.Title className="text-xl font-bold sm:text-2xl">
-                      Deseja adicionar uma frase? Para tentar gerar uma frase
-                      automaticamente, deixe o campo em branco
+                      {t("wish_to_add_sentence_msg")}
                     </Dialog.Title>
                     <Formik
                       initialValues={{
@@ -129,14 +130,14 @@ export default function GenerateCardPrompt({
                                 formik.submitForm();
                               }}
                             >
-                              Confirmar
+                              {t("confirm")}
                             </button>
 
                             <button
                               className="confirmation-button px-2 sm:px-16"
                               onClick={() => setShow()}
                             >
-                              Cancelar
+                              {t("cancel")}
                             </button>
                           </div>
                         </Form>

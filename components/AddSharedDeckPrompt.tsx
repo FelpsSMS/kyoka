@@ -3,8 +3,9 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/router";
 import React, { useRef } from "react";
 import { api, verifyToken } from "../utils/api";
+import { useTranslation } from "next-i18next";
 
-function AddSharedDeckPrompt({
+export default function AddSharedDeckPrompt({
   show,
   setShow,
   id,
@@ -13,6 +14,7 @@ function AddSharedDeckPrompt({
 }) {
   const completeButtonRef = useRef(null);
   const router = useRouter();
+  const { t } = useTranslation();
 
   async function confirmFunction() {
     const userId = verifyToken();
@@ -97,14 +99,14 @@ function AddSharedDeckPrompt({
                         focus:bg-blue-900 hover:text-gray-200 hover:bg-blue-900 outline-none px-2"
                         onClick={() => confirmFunction()}
                       >
-                        Confirmar
+                        {t("confirm")}
                       </button>
                       <button
                         className="confirmation-button px-2 sm:px-16"
                         ref={completeButtonRef}
                         onClick={() => setShow}
                       >
-                        Cancelar
+                        {t("cancel")}
                       </button>
                     </div>
                   </motion.div>
@@ -117,5 +119,3 @@ function AddSharedDeckPrompt({
     </AnimatePresence>
   );
 }
-
-export default AddSharedDeckPrompt;
