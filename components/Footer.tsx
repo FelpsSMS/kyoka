@@ -88,7 +88,7 @@ export default function Footer() {
         <p
           className="text-white font-black my-3 hover:text-gray-100 hover:cursor-pointer"
           onClick={() => {
-            router.push("credits");
+            router.push("/credits");
           }}
         >
           {t("credits")}

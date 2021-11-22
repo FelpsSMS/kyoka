@@ -174,7 +174,7 @@ export const LoginForm = () => {
                 </a>
               </motion.div>
             )}
-            <h1 className="font-black text-3xl sm:text-5xl">Login</h1>
+            <h1 className="font-black text-3xl sm:text-5xl">{t("login")}</h1>
             <div className="flex flex-col w-full space-y-4">
               <TextField label={t("email")} name="email" type="text" />
               <TextField
