@@ -21,6 +21,7 @@ export default function Clipboard() {
   const [dictionaryEntries, setDictionaryEntries] = useState([]);
 
   const [activeDictionary, setActiveDictionary] = useState("");
+  const [activeDictionaryLanguage, setActiveDictionaryLanguage] = useState("");
 
   const [configDone, setConfigDone] = useState(false);
 
@@ -188,8 +189,10 @@ export default function Clipboard() {
           api.get(`dictionaries/${dict}`).then((res) => {
             const splitName = res.data.name.split(".");
             const dictName = splitName[0] + "_json"; //formatted name
+            const language = res.data.language;
 
             setActiveDictionary(dictName);
+            setActiveDictionaryLanguage(language);
           });
         }
       })
@@ -326,6 +329,7 @@ export default function Clipboard() {
                       key={i}
                       term={item.term}
                       text={item.text}
+                      language={activeDictionaryLanguage}
                     />
                   );
                 })}

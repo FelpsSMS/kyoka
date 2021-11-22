@@ -13,6 +13,7 @@ export default function GenerateCardPrompt({
   term,
   text,
   setShowMessage,
+  language,
 }) {
   const sentenceField = useRef(null);
   const { t } = useTranslation();
@@ -24,6 +25,7 @@ export default function GenerateCardPrompt({
       .post("automatic-card-creation/generate-card", {
         focus: term,
         sentence: values.sentence,
+        language,
       })
       .then(async (res) => {
         if (res) {
@@ -34,9 +36,6 @@ export default function GenerateCardPrompt({
             .then((res) => {
               return res.data.defaultDeckForGeneratedCards;
             });
-
-          console.log(res.data.images);
-          console.log(defaultDeckForGeneratedCards);
 
           api
             .post("cards/create-without-files", {

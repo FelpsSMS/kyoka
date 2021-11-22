@@ -42,7 +42,7 @@ export default function DisplayLoading({ show, setShow, loadingBarProgress }) {
                   >
                     <div className="p-4 items-center justify-center space-y-4">
                       <label className="font-bold text-2xl">
-                        {t("loading")}
+                        {t("loading_msg")}
                       </label>
                       <div
                         className={`bg-black h-4 rounded`}

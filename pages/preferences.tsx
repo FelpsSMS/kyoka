@@ -186,75 +186,82 @@ export default function Preferences() {
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
-    const userId = verifyToken();
+    if (jsonResponse.length > 1) {
+      const userId = verifyToken();
 
-    let altReading = false;
+      let altReading = false;
+      const dictLanguage = jsonResponse[0]["language"];
+      jsonResponse.shift();
 
-    //in case the language has multiple scripts, like in Japanese, Korean, etc
-    if (Object.keys(jsonResponse[0]).includes("altReading")) altReading = true;
+      console.log(jsonResponse);
+      //in case the language has multiple scripts, like in Japanese, Korean, etc
+      if (Object.keys(jsonResponse[0]).includes("altReading"))
+        altReading = true;
 
-    if (jsonResponse[0]["term"] && jsonResponse[0]["definition"]) {
-      const strippedFileName = fileName.split(".")[0];
+      if (jsonResponse[0]["term"] && jsonResponse[0]["definition"]) {
+        const strippedFileName = fileName.split(".")[0];
 
-      if (!dictsState.includes(strippedFileName)) {
-        setShowLoadingPrompt(true);
+        if (!dictsState.includes(strippedFileName)) {
+          setShowLoadingPrompt(true);
 
-        localForage.config({
-          driver: localForage.INDEXEDDB, // Force WebSQL; same as using setDriver()
-          name: "kyokaDicts",
-          version: 1.0,
-          // size: 4980736, // Size of database, in bytes. WebSQL-only for now.
-          storeName: fileName, // Should be alphanumeric, with underscores.
-          description: "Dictionary for Kyoka",
-        });
-
-        let numberOfChunks = 1;
-
-        const jsonSize = jsonResponse.length;
-
-        const responseLength = jsonSize.toString().length;
-
-        if (responseLength > 3) {
-          numberOfChunks = (responseLength - 1) * 200;
-        }
-
-        const chunkedArray = chunk(jsonResponse, numberOfChunks);
-
-        let counter = 0;
-
-        //need to look into how to improve loading performance
-        Promise.all(
-          chunkedArray.map(async (chunk) => {
-            await Promise.all(
-              chunk.map(async (item) => {
-                let dictEntry;
-
-                if (altReading) {
-                  dictEntry = {
-                    definition: item["definition"],
-                    altReading: item["altReading"],
-                  };
-                } else {
-                  dictEntry = {
-                    definition: item["definition"],
-                  };
-                }
-
-                await localForage.setItem(item["term"], dictEntry);
-              })
-            ).then(() => {
-              counter += numberOfChunks;
-              setLoadingBarProgress(Math.round((counter / jsonSize) * 100));
-            });
-          })
-        ).then(() => {
-          api.post("dictionaries", {
-            user: userId,
-            name: fileName,
+          localForage.config({
+            driver: localForage.INDEXEDDB, // Force WebSQL; same as using setDriver()
+            name: "kyokaDicts",
+            version: 1.0,
+            // size: 4980736, // Size of database, in bytes. WebSQL-only for now.
+            storeName: fileName, // Should be alphanumeric, with underscores.
+            description: "Dictionary for Kyoka",
           });
-        });
-      } else {
-        setNameAlreadyExistsMessage(true);
+
+          let numberOfChunks = 1;
+
+          const jsonSize = jsonResponse.length;
+
+          const responseLength = jsonSize.toString().length;
+
+          if (responseLength > 3) {
+            numberOfChunks = (responseLength - 1) * 200;
+          }
+
+          const chunkedArray = chunk(jsonResponse, numberOfChunks);
+
+          let counter = 0;
+
+          //need to look into how to improve loading performance
+          Promise.all(
+            chunkedArray.map(async (chunk) => {
+              await Promise.all(
+                chunk.map(async (item) => {
+                  let dictEntry;
+
+                  if (altReading) {
+                    dictEntry = {
+                      definition: item["definition"],
+                      altReading: item["altReading"],
+                    };
+                  } else {
+                    dictEntry = {
+                      definition: item["definition"],
+                    };
+                  }
+
+                  await localForage.setItem(item["term"], dictEntry);
+                })
+              ).then(() => {
+                counter += numberOfChunks;
+                setLoadingBarProgress(Math.round((counter / jsonSize) * 100));
+              });
+            })
+          ).then(() => {
+            api.post("dictionaries", {
+              user: userId,
+              name: fileName,
+              language: dictLanguage,
+            });
+          });
+        } else {
+          setNameAlreadyExistsMessage(true);
+        }
       }
     }
   }, [jsonResponse, fileName, dictsState]);

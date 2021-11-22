@@ -6,7 +6,7 @@ import HeadsUpMessage from "./modals/HeadsUpMessage";
 import PlayAudioButton from "./PlayAudioButton";
 import { useTranslation } from "next-i18next";
 
-export default function DictionaryEntry({ term, text }) {
+export default function DictionaryEntry({ term, text, language }) {
   const splitText = text.split("<br>");
 
   const [audio, setAudio] = useState("");
@@ -38,6 +38,7 @@ export default function DictionaryEntry({ term, text }) {
           term={term}
           text={splitText}
           setShowMessage={setShowMessage}
+          language={language}
         />
       )}
       {showMessage && (
