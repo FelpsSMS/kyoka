@@ -193,7 +193,6 @@ export default function Preferences() {
       const dictLanguage = jsonResponse[0]["language"];
       jsonResponse.shift();
 
-      console.log(jsonResponse);
       //in case the language has multiple scripts, like in Japanese, Korean, etc
       if (Object.keys(jsonResponse[0]).includes("altReading"))
         altReading = true;

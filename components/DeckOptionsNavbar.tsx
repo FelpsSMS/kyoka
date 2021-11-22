@@ -26,8 +26,6 @@ export default function DeckOptionsNavbar({ deckId, readOnly }) {
           userId: userId,
         })
         .then((res) => {
-          console.log(res.data);
-
           setEnabled(res.data.active);
 
           setToggleLoaded(true);

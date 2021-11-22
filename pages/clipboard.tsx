@@ -101,7 +101,7 @@ export default function Clipboard() {
 
     const strippedString = text.replace(/(<([^>]+)>)/gi, ""); //regex for removing html tags
 
-    console.log(strippedString.match("\\P{L}"));
+    //console.log(strippedString.match("\\P{L}"));
 
     const splitString = strippedString.split(" ");
 

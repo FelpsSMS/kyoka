@@ -34,8 +34,6 @@ export default function Footer() {
 
     const currentLocale = cookies["NEXT_LOCALE"] ?? locale;
 
-    console.log(currentLocale);
-
     switch (currentLocale) {
       case "pt":
         setSelectedLanguage(0);

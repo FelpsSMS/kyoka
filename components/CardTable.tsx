@@ -87,7 +87,6 @@ export default function CardTable({ deckId, search, sorting, readOnly }) {
         <motion.ul layout>
           {hasCards ? (
             cards.map((card, i) => {
-              console.log(card);
               return (
                 <CardTableItem
                   key={i}

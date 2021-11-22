@@ -69,7 +69,6 @@ export const LoginForm = () => {
         password,
       })
       .then((response) => {
-        console.log(response.data);
         if (response.data.success) {
           //Set jwt token as a cookie
 

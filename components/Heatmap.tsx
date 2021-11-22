@@ -22,14 +22,6 @@ export default function Heatmap() {
 
   useEffect(() => {
     const userId = verifyToken();
-    api
-      .post("users/user-info", {
-        id: userId,
-      })
-      .then((res) => {
-        console.log(res.data);
-        //get start date set by the user
-      });
 
     api
       .post("sessions/user-sessions", {
