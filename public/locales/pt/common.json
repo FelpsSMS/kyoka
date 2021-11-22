@@ -89,5 +89,8 @@
   "clipboard_page_title": "Clipboard",
   "shared_decks_page_title": "Deck compartilhado",
   "decks_page_title": "Deck",
-  "create_card_page_title": "Criar carta"
+  "create_card_page_title": "Criar carta",
+  "email": "E-mail",
+  "password": "Senha",
+  "confirm_password": "Confirmar senha"
 }

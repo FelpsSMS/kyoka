@@ -3,7 +3,7 @@ import { TextField } from "./TextField";
 import * as Yup from "yup";
 import React, { useState } from "react";
 import { api } from "../utils/api";
-import router from "next/router";
+import router, { useRouter } from "next/router";
 import { setCookie } from "nookies";
 import { motion } from "framer-motion";
 import { useTranslation } from "next-i18next";
@@ -18,6 +18,8 @@ export const LoginForm = () => {
   const [informedEmail, setInformedEmail] = useState("");
 
   const { t } = useTranslation();
+  const router = useRouter();
+  const { locale } = router;
 
   const validateLogin = Yup.object({
     email: Yup.string()
@@ -98,6 +100,7 @@ export const LoginForm = () => {
         api
           .post("/users/email-verification", {
             email,
+            locale,
           })
           .then(() => {
             setEmailVerificationSent(true);
@@ -109,6 +112,7 @@ export const LoginForm = () => {
     await api
       .post("/users/forgot", {
         email,
+        locale,
       })
       .then((response) => {
         setPasswordResetSuccessful(response.data.success);
@@ -118,6 +122,7 @@ export const LoginForm = () => {
   async function sendVerificationEmail(email) {
     await api.post(`users/email-verification`, {
       email,
+      locale,
     });
   }
 
@@ -171,8 +176,12 @@ export const LoginForm = () => {
             )}
             <h1 className="font-black text-3xl sm:text-5xl">Login</h1>
             <div className="flex flex-col w-full space-y-4">
-              <TextField label="E-mail" name="email" type="text" />
-              <TextField label="Senha" name="password" type="password" />
+              <TextField label={t("email")} name="email" type="text" />
+              <TextField
+                label={t("password")}
+                name="password"
+                type="password"
+              />
             </div>
             <button className="confirmation-button" type="submit">
               {t("login")}
@@ -242,12 +251,18 @@ export const LoginForm = () => {
                     </a>
                   </motion.div>
                 )}
-                <h1 className="font-black text-3xl sm:text-5xl">Criar conta</h1>
+                <h1 className="font-black text-3xl sm:text-5xl">
+                  {t("create_account")}
+                </h1>
                 <div className="flex flex-col w-full space-y-4">
-                  <TextField label="E-mail" name="email" type="text" />
-                  <TextField label="Senha" name="password" type="password" />
+                  <TextField label={t("email")} name="email" type="text" />
                   <TextField
-                    label="Confirmar senha"
+                    label={t("password")}
+                    name="password"
+                    type="password"
+                  />
+                  <TextField
+                    label={t("confirm_password")}
                     name="passwordConfirmation"
                     type="password"
                   />
@@ -297,7 +312,7 @@ export const LoginForm = () => {
                   {t("insert_email")}
                 </h1>
                 <div className="flex flex-col w-full space-y-4">
-                  <TextField label="E-mail" name="email" type="text" />
+                  <TextField label={t("email")} name="email" type="text" />
                 </div>
                 <button className="confirmation-button" type="submit">
                   {t("send")}
