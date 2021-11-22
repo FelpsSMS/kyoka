@@ -41,10 +41,10 @@ export default function Login() {
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { ["kyoka-token"]: token } = parseCookies(ctx);
 
-  if (!token) {
+  if (token) {
     return {
       redirect: {
-        destination: "/",
+        destination: `/${ctx.locale}/home`,
         permanent: false,
       },
     };

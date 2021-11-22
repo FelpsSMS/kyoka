@@ -25,14 +25,14 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
     return {
       redirect: {
-        destination: "/",
+        destination: `/${ctx.locale}`,
         permanent: false,
       },
     };
   } else {
     return {
       redirect: {
-        destination: "/",
+        destination: `/${ctx.locale}`,
         permanent: false,
       },
     };

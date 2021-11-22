@@ -6,6 +6,7 @@ import { useTranslation } from "next-i18next";
 
 export default function Footer() {
   const router = useRouter();
+  const { locale } = router;
 
   const languages = ["Português", "English", "日本語"];
   const [selectedLanguage, setSelectedLanguage] = useState(0);
@@ -16,7 +17,7 @@ export default function Footer() {
     (newLocale) => {
       const { pathname, asPath, query } = router;
 
-      if (router.locale != newLocale) {
+      if (locale != newLocale) {
         setCookie(undefined, "NEXT_LOCALE", newLocale, {
           maxAge: 60 * 60 * 24 * 30, //30 days
           path: "/",
@@ -25,13 +26,15 @@ export default function Footer() {
         router.push({ pathname, query }, asPath, { locale: newLocale });
       }
     },
-    [router]
+    [locale, router]
   );
 
   useEffect(() => {
     const cookies = parseCookies();
 
-    const currentLocale = cookies["NEXT_LOCALE"];
+    const currentLocale = cookies["NEXT_LOCALE"] ?? locale;
+
+    console.log(currentLocale);
 
     switch (currentLocale) {
       case "pt":
@@ -48,7 +51,7 @@ export default function Footer() {
     }
 
     setIsCookieLoaded(true);
-  }, []);
+  }, [locale]);
 
   useEffect(() => {
     if (isCookieLoaded) {
