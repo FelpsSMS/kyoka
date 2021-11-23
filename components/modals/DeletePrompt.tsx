@@ -43,7 +43,24 @@ export default function DeletePrompt({ show, setShow, id, routeName, title }) {
                 id: id,
               })
               .then(() => {
-                setTimeout(() => router.back(), 500); //small delay before going back just in case
+                api
+                  .post("users/user-info", {
+                    id: userId,
+                  })
+                  .then((res) => {
+                    if (res.data.defaultDeckForGeneratedCards == deckId) {
+                      api
+                        .post("users/update-user-info", {
+                          defaultDeckForGeneratedCards: "", //delete default deck for generated cards if it's the same one
+                          userId: userId,
+                        })
+                        .then(() => {
+                          setTimeout(() => router.back(), 500); //small delay before going back just in case
+                        });
+                    } else {
+                      setTimeout(() => router.back(), 500);
+                    }
+                  });
               })
               .catch((err) => {
                 console.log(err);
