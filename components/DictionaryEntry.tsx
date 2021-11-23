@@ -17,6 +17,10 @@ export default function DictionaryEntry({ term, text, language }) {
 
   const { t } = useTranslation();
 
+  function handleSuccessHeadsUp() {
+    setTimeout(() => setShowMessage(true), 500); //temporary fix for a headless ui bug that locks the scrollbar
+  }
+
   useEffect(() => {
     api
       .post("automatic-card-creation/get-audio", {
@@ -31,25 +35,23 @@ export default function DictionaryEntry({ term, text, language }) {
 
   return (
     <div className="bg-gray-200 rounded flex flex-col items-center justify-center mx-4 relative">
-      {showSentencePrompt && (
-        <GenerateCardPrompt
-          show={showSentencePrompt}
-          setShow={setShowSentencePrompt}
-          term={term}
-          text={splitText}
-          setShowMessage={setShowMessage}
-          language={language}
-        />
-      )}
-      {showMessage && (
-        <HeadsUpMessage
-          show={showMessage}
-          setShow={() => setShowMessage(false)}
-          title={t("add_card_success_msg")}
-          color="bg-blue-800"
-          colorFocusOrHover="bg-blue-900"
-        />
-      )}
+      <GenerateCardPrompt
+        show={showSentencePrompt}
+        setShow={() => setShowSentencePrompt(false)}
+        term={term}
+        text={splitText}
+        showMessageInside={(showMessageInside) => {
+          if (showMessageInside) handleSuccessHeadsUp();
+        }}
+        language={language}
+      />
+      <HeadsUpMessage
+        show={showMessage}
+        setShow={() => setShowMessage(false)}
+        title={t("add_card_success_msg")}
+        color="bg-blue-800"
+        colorFocusOrHover="bg-blue-900"
+      />
       <div className="border border-b-black">
         <label className="text-3xl font-bold">{term}</label>
 

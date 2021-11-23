@@ -7,13 +7,14 @@ import { api, verifyToken } from "../../utils/api";
 import Select from "../Select";
 import { TextField } from "../TextField";
 import { useTranslation } from "next-i18next";
+import { useRouter } from "next/router";
 
 interface newDeckPromptProps {
   show: boolean;
   setShow: any;
   deckId?: string;
-  libraryChanged: boolean;
-  setLibraryChanged: any;
+  libraryChanged?: boolean;
+  setLibraryChanged?: any;
 }
 
 export default function NewDeckPrompt({
@@ -26,6 +27,8 @@ export default function NewDeckPrompt({
   const completeButtonRef = useRef(null);
   const deckNameFieldRef = useRef(null);
   const { t } = useTranslation();
+
+  const router = useRouter();
 
   const [selectedLayout, setSelectedLayout] = useState(0);
   const [layoutsState, setLayoutsState] = useState([]);
@@ -85,7 +88,10 @@ export default function NewDeckPrompt({
           name: deckName,
           subject: deckSubject,
         })
-        .then()
+        .then(() => {
+          setShow();
+          router.back();
+        })
         .catch((err) => {
           console.log(err);
         });

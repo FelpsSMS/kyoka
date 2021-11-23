@@ -11,14 +11,12 @@ import { api } from "../utils/api";
 import router from "next/router";
 import { useValidator } from "../utils/customHooks";
 import DeletePrompt from "./modals/DeletePrompt";
-import getLabelLocale from "../utils/getLabelLocale";
 
 export const CardInfoUpdateForm = ({ cardDetails: card, readOnly }) => {
   const [fields, setFields] = useState([]);
   const [initialVal, setInitialVal] = useState({});
   const { t } = useTranslation();
   const { locale } = router;
-  const [labelLocale, setLabelLocale] = useState(1);
 
   const [needValidation, setNeedValidation] = useState([]);
 
@@ -89,14 +87,10 @@ export const CardInfoUpdateForm = ({ cardDetails: card, readOnly }) => {
           setNeedValidation(waitingForValidation);
         })
         .then(() => {
-          const labelNumber = getLabelLocale(locale);
-
-          setLabelLocale(labelNumber);
-
           setInitValues(true);
         });
     });
-  }, [card.deckId, card.layoutInfo, numberOfImages, locale]);
+  }, [card.deckId, card.layoutInfo, numberOfImages]);
 
   function renameFile(originalFile, newName) {
     return new File([originalFile], newName, {
@@ -169,7 +163,7 @@ export const CardInfoUpdateForm = ({ cardDetails: card, readOnly }) => {
                   {fields.map((item, i) => {
                     const currentFieldName = item.fieldName;
 
-                    const label = item.fieldLabel;
+                    const label = item.fieldLabel[0];
                     const currentValue = card.layoutInfo[currentFieldName];
 
                     switch (item.fieldType) {
@@ -177,7 +171,7 @@ export const CardInfoUpdateForm = ({ cardDetails: card, readOnly }) => {
                         return (
                           <TextField
                             key={i}
-                            label={label[labelLocale]}
+                            label={label[locale]}
                             name={currentFieldName}
                             type="text"
                             readOnly={readOnly}
@@ -188,7 +182,7 @@ export const CardInfoUpdateForm = ({ cardDetails: card, readOnly }) => {
                         return (
                           <TextArea
                             key={i}
-                            label={label[labelLocale]}
+                            label={label[locale]}
                             name={currentFieldName}
                             type="text"
                             readOnly={readOnly}
@@ -199,7 +193,7 @@ export const CardInfoUpdateForm = ({ cardDetails: card, readOnly }) => {
                         return (
                           <div key={i}>
                             <AudioDropzone
-                              label={label[labelLocale]}
+                              label={label[locale]}
                               name={currentFieldName + "Holder"}
                               fileExchange={(audio) => {
                                 formik.setFieldValue(currentFieldName, audio);
@@ -216,7 +210,7 @@ export const CardInfoUpdateForm = ({ cardDetails: card, readOnly }) => {
                         return (
                           <div className="flex flex-col space-y-2" key={i}>
                             <label className="text-xl font-normal">
-                              {label[labelLocale]}
+                              {label[locale]}
                             </label>
                             <div className="flex flex-wrap flex-col space-y-4 xs:space-x-4 xs:space-y-0 xs:flex-row">
                               <div className="flex space-x-4 xs:space-x-4">

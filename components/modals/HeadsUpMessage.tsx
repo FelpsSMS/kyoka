@@ -38,7 +38,7 @@ export default function HeadsUpMessage({
           static
           initialFocus={completeButtonRef}
           open={show}
-          onClose={setShow}
+          onClose={reload ? () => {} : setShow}
           className=""
         >
           {({ open }) => (

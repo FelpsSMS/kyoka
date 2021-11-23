@@ -10,12 +10,10 @@ import { dayInMilliseconds } from "../utils/constants";
 import { nanoid } from "nanoid";
 import ImagePopup from "./modals/ImagePopup";
 import { useTranslation } from "next-i18next";
-import getLabelLocale from "../utils/getLabelLocale";
 import { useRouter } from "next/router";
 
 export default function SRSPanel() {
   const { t } = useTranslation();
-  const [labelLocale, setLabelLocale] = useState(1);
   const [show, setShow] = useState(false);
   const [src, setSRC] = useState("");
   const router = useRouter();
@@ -423,17 +421,13 @@ export default function SRSPanel() {
         setReviewedCardsNumber(totalReviewedCards);
         setRelearnedCardsNumber(cardsBeingRelearned.length);
 
-        const labelNumber = getLabelLocale(locale);
-
-        setLabelLocale(labelNumber);
-
         setIsPageLoaded(true);
 
         setIsDataLoaded(true);
       });
 
     return () => {};
-  }, [reloadCards, locale]);
+  }, [reloadCards]);
 
   const getTotalCardsNumber = useCallback(() => {
     return newCardsNumber + reviewedCardsNumber + relearnedCardsNumber;
@@ -469,6 +463,8 @@ export default function SRSPanel() {
         isCardFlipped && isDataLoaded ? (
           <div className="flex flex-col items-center justify-center space-y-2">
             {cardsToBeShowed[0].card.fieldData.map((field) => {
+              const itemLabel = field.fieldLabel[0];
+
               switch (field.fieldType) {
                 case 0:
                 case 1:
@@ -507,7 +503,7 @@ export default function SRSPanel() {
                           field.fieldName
                         ] && (
                           <ToggleBox
-                            title={field.fieldLabel[labelLocale]}
+                            title={itemLabel[locale]}
                             text={
                               cardsToBeShowed[0].card.layoutInfo[0][
                                 field.fieldName

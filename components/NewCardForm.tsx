@@ -7,7 +7,7 @@ import AudioDropzone from "./AudioDropzone";
 import { useTranslation } from "next-i18next";
 
 import { api, verifyToken } from "../utils/api";
-import router from "next/router";
+import router, { useRouter } from "next/router";
 import { useValidator } from "../utils/customHooks";
 
 export const NewCardForm = ({ deckId }) => {
@@ -19,6 +19,10 @@ export const NewCardForm = ({ deckId }) => {
   const [initValues, setInitValues] = useState(false);
 
   const { t } = useTranslation();
+
+  const router = useRouter();
+
+  const { locale } = router;
 
   const numberOfImages = useMemo(() => {
     return Array.from(Array(4).keys());
@@ -160,14 +164,15 @@ export const NewCardForm = ({ deckId }) => {
               <div className="flex flex-col w-full space-y-4">
                 {fields.map((item, i) => {
                   const currentFieldName = item.fieldName;
-                  const labelNumber = 0;
+
+                  const itemLabel = item.fieldLabel[0];
 
                   switch (item.fieldType) {
                     case 0:
                       return (
                         <TextField
                           key={i}
-                          label={item.fieldLabel[labelNumber]}
+                          label={itemLabel[locale]}
                           name={currentFieldName}
                           type="text"
                         />
@@ -177,7 +182,7 @@ export const NewCardForm = ({ deckId }) => {
                       return (
                         <TextArea
                           key={i}
-                          label={item.fieldLabel[labelNumber]}
+                          label={itemLabel[locale]}
                           name={currentFieldName}
                           type="text"
                         />
@@ -187,7 +192,7 @@ export const NewCardForm = ({ deckId }) => {
                       return (
                         <div key={i}>
                           <AudioDropzone
-                            label={item.fieldLabel[labelNumber]}
+                            label={itemLabel[locale]}
                             name={currentFieldName + "Holder"}
                             fileExchange={(audio) => {
                               formik.setFieldValue(currentFieldName, audio);
@@ -202,7 +207,7 @@ export const NewCardForm = ({ deckId }) => {
                       return (
                         <div className="flex flex-col space-y-2" key={i}>
                           <label className="text-xl font-normal">
-                            {item.fieldLabel[labelNumber]}
+                            {itemLabel[locale]}
                           </label>
                           <div className="flex flex-wrap flex-col space-y-4 xs:space-x-4 xs:space-y-0 xs:flex-row">
                             <div className="flex space-x-4 xs:space-x-4">

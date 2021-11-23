@@ -55,12 +55,12 @@ export default function DeckOptionsNavbar({ deckId, readOnly }) {
         readOnly ? "justify-center sm:justify-end" : "justify-between"
       }`}
     >
-      {/*@ts-ignore: Unreachable code error*/}
       <NewDeckPrompt
         show={showDeckNameChangePrompt}
         setShow={() => setShowDeckNameChangePrompt(false)}
         deckId={deckId}
       />
+
       <DeletePrompt
         show={showDeletePrompt}
         setShow={() => setShowDeletePrompt(false)}

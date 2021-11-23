@@ -7,16 +7,11 @@ import { useTranslation } from "next-i18next";
 
 import { api, verifyToken } from "../../utils/api";
 
-export default function GenerateCardPrompt({
-  show,
-  setShow,
-  term,
-  text,
-  setShowMessage,
-  language,
-}) {
+export default function GenerateCardPrompt(props) {
   const sentenceField = useRef(null);
   const { t } = useTranslation();
+
+  const { show, setShow, term, text, language } = props;
 
   async function sendToServer(values) {
     const userId = verifyToken();
@@ -58,8 +53,8 @@ export default function GenerateCardPrompt({
                 })
                 .then(() => {
                   //show a success message
-                  setShowMessage(true);
-                  setShow(false);
+                  props.showMessageInside(true);
+                  setShow();
                 });
             })
             .catch((err) => {
@@ -70,85 +65,87 @@ export default function GenerateCardPrompt({
   }
 
   return (
-    <AnimatePresence>
-      {show && ( //needed for a bug with nextjs
-        <Dialog
-          static
-          initialFocus={sentenceField}
-          open={show}
-          onClose={() => {}}
-          className=""
-        >
-          {({ open }) => (
-            <>
-              {/* Trick to center a fixed div */}
-              {open && (
-                <Dialog.Overlay
-                  className="fixed h-screen w-screen bg-black z-50 inset-0 mx-auto 
+    <>
+      <AnimatePresence>
+        {show && ( //needed for a bug with nextjs
+          <Dialog
+            static
+            initialFocus={sentenceField}
+            open={show}
+            onClose={() => {}}
+            className=""
+          >
+            {({ open }) => (
+              <>
+                {/* Trick to center a fixed div */}
+                {open && (
+                  <Dialog.Overlay
+                    className="fixed h-screen w-screen bg-black z-50 inset-0 mx-auto 
                   flex items-center justify-center"
-                  as={motion.div}
-                  initial={{ backgroundColor: "rgba(0, 0, 0, 0)" }} //Opacity is inherited, backgroundColor isn't
-                  animate={{
-                    height: "auto",
-                    backgroundColor: "rgba(0, 0, 0, 0.8)",
-                  }}
-                  transition={{ duration: 0.4 }}
-                >
-                  <motion.div
-                    className="bg-white fixed flex flex-col items-center justify-center space-y-8 opacity-100 
-                    p-4 sm:p-8 rounded-lg shadow-lg mx-2"
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: "auto", opacity: 1 }}
+                    as={motion.div}
+                    initial={{ backgroundColor: "rgba(0, 0, 0, 0)" }} //Opacity is inherited, backgroundColor isn't
+                    animate={{
+                      height: "auto",
+                      backgroundColor: "rgba(0, 0, 0, 0.8)",
+                    }}
                     transition={{ duration: 0.4 }}
                   >
-                    <Dialog.Title className="text-xl font-bold sm:text-2xl">
-                      {t("wish_to_add_sentence_msg")}
-                    </Dialog.Title>
-                    <Formik
-                      initialValues={{
-                        sentence: "",
-                      }}
-                      onSubmit={(values) => sendToServer(values)}
+                    <motion.div
+                      className="bg-white fixed flex flex-col items-center justify-center space-y-8 opacity-100 
+                    p-4 sm:p-8 rounded-lg shadow-lg mx-2"
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      transition={{ duration: 0.4 }}
                     >
-                      {(formik) => (
-                        <Form className="w-full space-y-8">
-                          <TextField
-                            label=""
-                            type="text"
-                            innerref={sentenceField}
-                            name="sentence"
-                            className="bg-gray-100 border-2 border-gray-200 rounded-lg w-full outline-none focus:border-black p-2"
-                          />
+                      <Dialog.Title className="text-xl font-bold sm:text-2xl">
+                        {t("wish_to_add_sentence_msg")}
+                      </Dialog.Title>
+                      <Formik
+                        initialValues={{
+                          sentence: "",
+                        }}
+                        onSubmit={(values) => sendToServer(values)}
+                      >
+                        {(formik) => (
+                          <Form className="w-full space-y-8">
+                            <TextField
+                              label=""
+                              type="text"
+                              innerref={sentenceField}
+                              name="sentence"
+                              className="bg-gray-100 border-2 border-gray-200 rounded-lg w-full outline-none focus:border-black p-2"
+                            />
 
-                          <div className="flex space-x-2 sm:space-x-8">
-                            <button
-                              className="bg-blue-800 text-white p-2 sm:px-16 rounded-sm text-xl font-bold focus:text-gray-200 
+                            <div className="flex space-x-2 sm:space-x-8">
+                              <button
+                                className="bg-blue-800 text-white p-2 sm:px-16 rounded-sm text-xl font-bold focus:text-gray-200 
                             focus:bg-blue-900 hover:text-gray-200 hover:bg-blue-900 outline-none px-2"
-                              type="submit"
-                              onClick={() => {
-                                formik.submitForm();
-                              }}
-                            >
-                              {t("confirm")}
-                            </button>
+                                type="submit"
+                                onClick={() => {
+                                  formik.submitForm();
+                                }}
+                              >
+                                {t("confirm")}
+                              </button>
 
-                            <button
-                              className="confirmation-button px-2 sm:px-16"
-                              onClick={() => setShow()}
-                            >
-                              {t("cancel")}
-                            </button>
-                          </div>
-                        </Form>
-                      )}
-                    </Formik>
-                  </motion.div>
-                </Dialog.Overlay>
-              )}
-            </>
-          )}
-        </Dialog>
-      )}
-    </AnimatePresence>
+                              <button
+                                className="confirmation-button px-2 sm:px-16"
+                                onClick={() => setShow()}
+                              >
+                                {t("cancel")}
+                              </button>
+                            </div>
+                          </Form>
+                        )}
+                      </Formik>
+                    </motion.div>
+                  </Dialog.Overlay>
+                )}
+              </>
+            )}
+          </Dialog>
+        )}
+      </AnimatePresence>
+    </>
   );
 }
