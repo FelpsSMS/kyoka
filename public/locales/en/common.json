@@ -92,5 +92,6 @@
   "create_card_page_title": "Create card",
   "email": "Email",
   "password": "Password",
-  "confirm_password": "Confirm password"
+  "confirm_password": "Confirm password",
+  "add_dictionary": "Add dictionary"
 }

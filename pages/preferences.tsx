@@ -327,12 +327,12 @@ export default function Preferences() {
                     </h1>
                     <div className="flex flex-col w-full space-y-4">
                       <TextField
-                        label="Senha"
+                        label={t("password")}
                         name="password"
                         type="password"
                       />
                       <TextField
-                        label="Confirmar senha"
+                        label={t("confirm_password")}
                         name="passwordConfirmation"
                         type="password"
                       />
@@ -428,7 +428,7 @@ export default function Preferences() {
                   {(formik: any) => (
                     <Form className="flex flex-col items-center justify-center my-8 relative z-0">
                       <JsonDropzone
-                        label="Adicionar dicionário"
+                        label={t("add_dictionary")}
                         name="dict"
                         fileExchange={(dict) => {
                           formik.setFieldValue("dictHolder", dict);

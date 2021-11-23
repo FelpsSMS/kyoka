@@ -92,5 +92,6 @@
   "create_card_page_title": "カードを作る",
   "email": "メールアドレス",
   "password": "パスワード",
-  "confirm_password": "パスワード確認"
+  "confirm_password": "パスワード確認",
+  "add_dictionary": "辞書を追加"
 }

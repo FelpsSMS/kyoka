@@ -92,5 +92,6 @@
   "create_card_page_title": "Criar carta",
   "email": "E-mail",
   "password": "Senha",
-  "confirm_password": "Confirmar senha"
+  "confirm_password": "Confirmar senha",
+  "add_dictionary": "Adicionar dicionário"
 }
