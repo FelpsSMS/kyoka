@@ -2,10 +2,25 @@ import { Dialog } from "@headlessui/react";
 import { AnimatePresence, motion } from "framer-motion";
 import React, { useRef } from "react";
 import { useTranslation } from "next-i18next";
+import { useRouter } from "next/router";
 
-export default function DisplayLoading({ show, setShow, loadingBarProgress }) {
+export default function DisplayLoading({
+  show,
+  setShow,
+  loadingBarProgress,
+  reload,
+}) {
   const completeButtonRef = useRef(null);
   const { t } = useTranslation();
+
+  const router = useRouter();
+  const { locale } = router;
+
+  function handleReload() {
+    setShow(false);
+    const { pathname, asPath, query } = router;
+    router.push({ pathname, query }, asPath, { locale });
+  }
 
   return (
     <AnimatePresence>
@@ -54,7 +69,7 @@ export default function DisplayLoading({ show, setShow, loadingBarProgress }) {
                         <button
                           className="bg-blue-800 text-white p-2 sm:px-16 rounded-sm text-xl font-bold focus:text-gray-200 
                         focus:bg-blue-900 hover:text-gray-200 hover:bg-blue-900 outline-none px-2"
-                          onClick={() => setShow()}
+                          onClick={() => (reload ? handleReload() : setShow())}
                         >
                           {t("confirm")}
                         </button>

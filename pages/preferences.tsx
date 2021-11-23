@@ -290,6 +290,7 @@ export default function Preferences() {
               title={t("settings_changed_successfully")}
               color="bg-blue-800"
               colorFocusOrHover="bg-blue-900"
+              reload={true}
             />
           )}
           {nameAlreadyExistsMessage && (
@@ -306,6 +307,7 @@ export default function Preferences() {
               show={showLoadingPrompt}
               setShow={() => setShowLoadingPrompt(false)}
               loadingBarProgress={loadingBarProgress}
+              reload={true}
             />
           )}
           {isDataLoaded ? (

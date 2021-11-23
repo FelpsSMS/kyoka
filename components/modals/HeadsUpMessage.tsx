@@ -1,8 +1,18 @@
 import { Dialog } from "@headlessui/react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTranslation } from "next-i18next";
+import { useRouter } from "next/router";
 
 import React, { useRef } from "react";
+
+interface HeadsUpMessage {
+  show: boolean;
+  setShow: any;
+  title: string;
+  color: string;
+  colorFocusOrHover: string;
+  reload?: boolean;
+}
 
 export default function HeadsUpMessage({
   show,
@@ -10,9 +20,18 @@ export default function HeadsUpMessage({
   title,
   color,
   colorFocusOrHover,
-}) {
+  reload,
+}: HeadsUpMessage) {
   const completeButtonRef = useRef(null);
   const { t } = useTranslation();
+
+  const router = useRouter();
+  const { locale } = router;
+
+  function handleReload() {
+    const { pathname, asPath, query } = router;
+    router.push({ pathname, query }, asPath, { locale });
+  }
 
   return (
     <AnimatePresence>
@@ -55,6 +74,9 @@ export default function HeadsUpMessage({
                         ref={completeButtonRef}
                         className={`${color} text-white p-2 sm:px-16 rounded-sm text-xl font-bold focus:text-gray-200 
                         focus:bg-${colorFocusOrHover} hover:text-gray-200 hover:${colorFocusOrHover} outline-none px-2`}
+                        onClick={() => {
+                          reload ? handleReload() : "";
+                        }}
                       >
                         {t("confirm")}
                       </button>
