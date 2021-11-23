@@ -43,24 +43,7 @@ export default function DeletePrompt({ show, setShow, id, routeName, title }) {
                 id: id,
               })
               .then(() => {
-                api
-                  .post("users/user-info", {
-                    id: userId,
-                  })
-                  .then((res) => {
-                    if (res.data.defaultDeckForGeneratedCards == deckId) {
-                      api
-                        .post("users/update-user-info", {
-                          defaultDeckForGeneratedCards: "", //delete default deck for generated cards if it's the same one
-                          userId: userId,
-                        })
-                        .then(() => {
-                          setTimeout(() => router.back(), 500); //small delay before going back just in case
-                        });
-                    } else {
-                      setTimeout(() => router.back(), 500);
-                    }
-                  });
+                setTimeout(() => router.back(), 500); //small delay before going back just in case
               })
               .catch((err) => {
                 console.log(err);
@@ -120,13 +103,33 @@ export default function DeletePrompt({ show, setShow, id, routeName, title }) {
                 );
               })
               .then(() => {
-                setTimeout(() => router.back(), 500); //small delay before going back just in case
+                api
+                  .post("users/user-info", {
+                    id: userId,
+                  })
+                  .then((res) => {
+                    if (res.data.defaultDeckForGeneratedCards == id) {
+                      api
+                        .post("users/update-user-default-deck", {
+                          defaultDeckForGeneratedCards: "", //delete default deck for generated cards if it's the same one
+                          userId: userId,
+                        })
+                        .then(() => {
+                          setTimeout(() => router.push("library"), 500); //small delay before going back just in case
+                        });
+                    } else {
+                      setTimeout(() => router.push("library"), 500);
+                    }
+                  });
+              })
+              .then(() => {
+                setTimeout(() => router.push("library"), 500); //small delay before going back just in case
               })
               .catch((err) => {
                 console.log(err);
               });
           } else {
-            setTimeout(() => router.back(), 500); //small delay before going back just in case
+            setTimeout(() => router.push("library"), 500); //small delay before going back just in case
           }
         });
     }
