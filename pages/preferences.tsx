@@ -2,7 +2,7 @@ import { Form, Formik } from "formik";
 import * as localForage from "localforage";
 import { GetServerSideProps } from "next";
 import { parseCookies } from "nookies";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import Footer from "../components/Footer";
 import JsonDropzone from "../components/JsonDropzone";
 import LoadingWheel from "../components/LoadingWheel";
@@ -42,9 +42,9 @@ export default function Preferences() {
 
   const [targetDecksState, setTargetDecksState] = useState([]);
 
-  const [selectedDict, setSelectedDict] = useState(0);
+  const [selectedDict, setSelectedDict] = useState(-1);
 
-  const [selectedTargetDeck, setSelectedTargetDeck] = useState(0);
+  const [selectedTargetDeck, setSelectedTargetDeck] = useState(-1);
 
   const [showMessage, setShowMessage] = useState(false);
 
@@ -79,40 +79,24 @@ export default function Preferences() {
       .oneOf([Yup.ref("password"), null], t("passwords_must_match_msg")),
   });
 
-  useEffect(() => {
-    const userId = verifyToken();
+  const getActiveDictIndex = useCallback((dicts, active) => {
+    if (active.length > 0) {
+      return dicts.indexOf(active);
+    } else {
+      return 0;
+    }
+  }, []);
 
-    api
-      .post("dictionaries/by-user", {
-        user: userId,
-      })
-      .then(async (res) => {
-        const dicts = await Promise.all(
-          res.data.map((item) => {
-            return item.name;
-          })
-        );
-
-        const formattedDicts = dicts.map((item: string) => {
-          const aux = item.split(".");
-
-          return aux[0];
-        });
-
-        setDictsState(formattedDicts);
-      });
-
-    api
-      .post("decks/by-creator", {
-        userId: userId,
-      })
-      .then((res) => {
-        const formattedDecks = res.data.map((item) => {
-          return { id: item._id, name: item.name };
-        });
-
-        setTargetDecksState(formattedDecks);
-      });
+  const getActiveTargetDeckIndex = useCallback((decks, active) => {
+    if (active.length > 0) {
+      return decks
+        .map((item) => {
+          return item.name;
+        })
+        .indexOf(active);
+    } else {
+      return 0;
+    }
   }, []);
 
   useEffect(() => {
@@ -127,39 +111,89 @@ export default function Preferences() {
         setEnabled(res.data.removeLeeches);
         setNumberOfNewCards(res.data.numberOfNewCards);
 
+        let activeDictName = "";
+
         if (res.data.activeDictionary) {
-          await api
-            .get(`dictionaries/${res.data.activeDictionary}`)
-            .then((res) => {
-              console.log(res.data);
-              const aux = res.data.name.split(".");
+          const activeDictResult = await api.get(
+            `dictionaries/${res.data.activeDictionary}`
+          );
 
-              const currentActiveDict = aux[0];
+          const activeDictResultData = activeDictResult.data;
 
-              dictsState.map((item, i) => {
-                if (item == currentActiveDict) setSelectedDict(i);
-              });
-            });
+          const aux = activeDictResultData.name.split(".");
+
+          activeDictName = aux[0];
         }
+
+        const dictsToSet = await api
+          .post("dictionaries/by-user", {
+            user: userId,
+          })
+          .then(async (res) => {
+            const dicts = await Promise.all(
+              res.data.map((item) => {
+                return item.name;
+              })
+            );
+
+            const formattedDicts = dicts.map((item: string) => {
+              const aux = item.split(".");
+
+              return aux[0];
+            });
+
+            return formattedDicts;
+          })
+          .then((dicts) => {
+            return dicts;
+          });
+
+        let activeDefaultDeckName = "";
 
         if (res.data.defaultDeckForGeneratedCards) {
-          await api
-            .get(`decks/${res.data.defaultDeckForGeneratedCards}`)
-            .then((res) => {
-              console.log(res.data);
+          const defaultDeckResult = await api.get(
+            `decks/${res.data.defaultDeckForGeneratedCards}`
+          );
 
-              const currentActiveDefaultDeck = res.data.name;
+          const defaultDeckResultData = defaultDeckResult.data;
 
-              targetDecksState.map((item, i) => {
-                if (item.name == currentActiveDefaultDeck)
-                  setSelectedTargetDeck(i);
-              });
-            });
+          activeDefaultDeckName = defaultDeckResultData.name;
         }
 
-        setIsDataLoaded(true);
+        const decksToSet = await api
+          .post("decks/by-creator", {
+            userId: userId,
+          })
+          .then((res) => {
+            const formattedDecks = res.data.map((item) => {
+              return { id: item._id, name: item.name };
+            });
+
+            return formattedDecks;
+          })
+          .then((decks) => {
+            return decks;
+          });
+
+        setDictsState(dictsToSet);
+        setTargetDecksState(decksToSet);
+
+        const dictsIndex = getActiveDictIndex(dictsToSet, activeDictName);
+        const decksIndex = getActiveTargetDeckIndex(
+          decksToSet,
+          activeDefaultDeckName
+        );
+
+        setSelectedDict(dictsIndex);
+        setSelectedTargetDeck(decksIndex);
       });
-  }, [dictsState, targetDecksState]);
+  }, [getActiveDictIndex, getActiveTargetDeckIndex]);
+
+  useEffect(() => {
+    if (selectedDict != -1 && selectedTargetDeck != -1) {
+      setIsDataLoaded(true);
+    }
+  }, [selectedTargetDeck, selectedDict]);
 
   function sendToServer() {
     const userId = verifyToken();

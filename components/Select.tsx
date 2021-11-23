@@ -20,11 +20,11 @@ export default function Select({
   className2,
   setSorting,
 }: SelectInterface) {
-  useEffect(() => {
+  /* useEffect(() => {
     if (items.length > 0) setSelectedItem(Object.keys(items[0])[0]);
     //weird workaround to make it so headless UI's listbox detects the selection for the first element
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, []); */
 
   return (
     <Listbox
