@@ -93,5 +93,6 @@
   "email": "メールアドレス",
   "password": "パスワード",
   "confirm_password": "パスワード確認",
-  "add_dictionary": "辞書を追加"
+  "add_dictionary": "辞書を追加",
+  "field_required": "この欄は必須です"
 }

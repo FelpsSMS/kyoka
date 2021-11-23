@@ -93,5 +93,6 @@
   "email": "Email",
   "password": "Password",
   "confirm_password": "Confirm password",
-  "add_dictionary": "Add dictionary"
+  "add_dictionary": "Add dictionary",
+  "field_required": "This field is required"
 }
