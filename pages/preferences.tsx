@@ -247,7 +247,12 @@ export default function Preferences() {
                   await localForage.setItem(item["term"], dictEntry);
                 })
               ).then(() => {
-                counter += numberOfChunks;
+                if (counter + numberOfChunks < jsonSize) {
+                  counter += numberOfChunks;
+                } else {
+                  counter = jsonSize;
+                }
+
                 setLoadingBarProgress(Math.round((counter / jsonSize) * 100));
               });
             })
