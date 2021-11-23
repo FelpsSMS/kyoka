@@ -28,7 +28,7 @@ export default function DeckNavbar({
 
   const sortingOptions = ["A-Z", t("review")];
 
-  const [selectSorting, setSelectSorting] = useState();
+  const [selectSorting, setSelectSorting] = useState(0);
 
   return (
     <nav className="bg-gray-500 flex justify-center flex-col md:flex-row">

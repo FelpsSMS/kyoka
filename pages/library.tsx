@@ -10,7 +10,7 @@ import Head from "next/head";
 import { useTranslation } from "next-i18next";
 
 export default function LibraryPage() {
-  const [sorting, setSorting] = useState();
+  const [sorting, setSorting] = useState(0);
   const [libraryChanged, setLibraryChanged] = useState("A-Z");
   const [search, setSearch] = useState("");
   const { t } = useTranslation();

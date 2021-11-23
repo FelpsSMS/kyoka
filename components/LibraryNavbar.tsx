@@ -22,7 +22,7 @@ export default function LibraryNavbar({
 
   const sortingOptions = ["A-Z", t("quantity")];
 
-  const [selectSorting, setSelectSorting] = useState();
+  const [selectSorting, setSelectSorting] = useState(0);
 
   return (
     <nav className="bg-gray-500 flex justify-center flex-col md:flex-row">
