@@ -127,31 +127,35 @@ export default function Preferences() {
         setEnabled(res.data.removeLeeches);
         setNumberOfNewCards(res.data.numberOfNewCards);
 
-        await api
-          .get(`dictionaries/${res.data.activeDictionary}`)
-          .then((res) => {
-            console.log(res.data);
-            const aux = res.data.name.split(".");
+        if (res.data.activeDictionary) {
+          await api
+            .get(`dictionaries/${res.data.activeDictionary}`)
+            .then((res) => {
+              console.log(res.data);
+              const aux = res.data.name.split(".");
 
-            const currentActiveDict = aux[0];
+              const currentActiveDict = aux[0];
 
-            dictsState.map((item, i) => {
-              if (item == currentActiveDict) setSelectedDict(i);
+              dictsState.map((item, i) => {
+                if (item == currentActiveDict) setSelectedDict(i);
+              });
             });
-          });
+        }
 
-        await api
-          .get(`decks/${res.data.defaultDeckForGeneratedCards}`)
-          .then((res) => {
-            console.log(res.data);
+        if (res.data.defaultDeckForGeneratedCards) {
+          await api
+            .get(`decks/${res.data.defaultDeckForGeneratedCards}`)
+            .then((res) => {
+              console.log(res.data);
 
-            const currentActiveDefaultDeck = res.data.name;
+              const currentActiveDefaultDeck = res.data.name;
 
-            targetDecksState.map((item, i) => {
-              if (item.name == currentActiveDefaultDeck)
-                setSelectedTargetDeck(i);
+              targetDecksState.map((item, i) => {
+                if (item.name == currentActiveDefaultDeck)
+                  setSelectedTargetDeck(i);
+              });
             });
-          });
+        }
 
         setIsDataLoaded(true);
       });
