@@ -33,24 +33,39 @@ export default function Clipboard() {
 
   const [clipboardText, setClipboardText] = useState("");
 
-  const [wordStateChanged, setWordStateChanged] = useState(false);
+  const handleClick = useCallback((e, ref) => {
+    const userId = verifyToken();
+    const wordToSet = e.target.innerText.toUpperCase();
 
-  const handleClick = useCallback(
-    (e) => {
-      const userId = verifyToken();
-      const wordToSet = e.target.innerText;
+    const splitClassName = ref.className.split(" ");
 
-      api
-        .post("word-states/set-word", {
-          user: userId,
-          word: wordToSet,
-        })
-        .then(() => {
-          setWordStateChanged(!wordStateChanged);
-        });
-    },
-    [wordStateChanged]
-  );
+    const currentColor = splitClassName[0];
+
+    let newColor = "";
+
+    switch (currentColor) {
+      case "bg-gray-300":
+        newColor = "bg-yellow-500";
+        break;
+
+      case "bg-yellow-500":
+        newColor = "bg-green-500";
+        break;
+
+      case "bg-green-500":
+        newColor = "bg-gray-300";
+        break;
+    }
+
+    api
+      .post("word-states/set-word", {
+        user: userId,
+        word: wordToSet,
+      })
+      .then(() => {
+        ref.className = `${newColor} font-bold rounded hover:cursor-pointer p-1`;
+      });
+  }, []);
 
   const getNewText = useCallback(async (data, userId, text) => {
     const decks = await Promise.all(
@@ -137,7 +152,9 @@ export default function Clipboard() {
         trail = match + splitMatch[1];
       }
 
-      const inCards = cardData.filter((card) => item == card.focus);
+      const inCards = cardData.filter(
+        (card) => item.toUpperCase() == card.focus.toUpperCase()
+      );
 
       if (inCards.length > 0) {
         color = inCards[0].mature
@@ -147,7 +164,9 @@ export default function Clipboard() {
           : "bg-gray-300";
       }
 
-      const inWordStates = userWordStates.filter((word) => item == word.word);
+      const inWordStates = userWordStates.filter(
+        (word) => item.toUpperCase() == word.word.toUpperCase()
+      );
 
       if (inWordStates.length > 0) {
         color =
@@ -219,13 +238,15 @@ export default function Clipboard() {
         if (divRef.current.children.length > 1) {
           for (let i = 0; i < divRef.current.children.length; i++) {
             //map doesn't work
-            divRef.current.children[i].onclick = (e) => handleClick(e);
+            divRef.current.children[i].onclick = (e) =>
+              handleClick(e, divRef.current.children[i]);
           }
         } else if (divRef.current.children.length > 0) {
-          divRef.current.children[0].onclick = (e) => handleClick(e);
+          divRef.current.children[0].onclick = (e) =>
+            handleClick(e, divRef.current.children[0]);
         }
       });
-  }, [clipboardText, wordStateChanged, handleClick, getNewText]);
+  }, [clipboardText, handleClick, getNewText]);
 
   useEffect(() => {
     if (activeDictionary) {
