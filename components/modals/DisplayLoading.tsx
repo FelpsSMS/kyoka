@@ -17,9 +17,7 @@ export default function DisplayLoading({
   const { locale } = router;
 
   function handleReload() {
-    setShow(false);
-    const { pathname, asPath, query } = router;
-    router.push({ pathname, query }, asPath, { locale });
+    router.reload();
   }
 
   return (

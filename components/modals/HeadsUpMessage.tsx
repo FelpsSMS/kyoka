@@ -26,11 +26,9 @@ export default function HeadsUpMessage({
   const { t } = useTranslation();
 
   const router = useRouter();
-  const { locale } = router;
 
   function handleReload() {
-    const { pathname, asPath, query } = router;
-    router.push({ pathname, query }, asPath, { locale });
+    router.reload();
   }
 
   return (
