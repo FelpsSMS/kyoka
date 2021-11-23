@@ -40,7 +40,9 @@ export default function Heatmap() {
           });
 
           setLastSessionDuration(
-            dateNewestToOldest[0].endTime - dateNewestToOldest[0].startTime
+            Math.abs(
+              dateNewestToOldest[0].endTime - dateNewestToOldest[0].startTime
+            )
           );
 
           setLastSessionReviews(dateNewestToOldest[0].numberOfCardsReviewed);
