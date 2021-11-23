@@ -107,7 +107,7 @@ export default function Clipboard() {
           });
 
         return {
-          focus: item.focus,
+          focus: item.layoutInfo[0].focus,
           mature: cardStats.mature,
           state: cardStats.state,
         };
@@ -152,9 +152,9 @@ export default function Clipboard() {
         trail = match + splitMatch[1];
       }
 
-      const inCards = cardData.filter(
-        (card) => item.toUpperCase() == card.focus.toUpperCase()
-      );
+      const inCards = cardData.filter((card) => {
+        item.toUpperCase() == card.focus.toUpperCase();
+      });
 
       if (inCards.length > 0) {
         color = inCards[0].mature
@@ -224,28 +224,30 @@ export default function Clipboard() {
     //get active decks for the specific user
     const userId = verifyToken();
 
-    api
-      .post("deck-stats/user", {
-        userId: userId,
-      })
-      .then(async (res) => {
-        const data = res.data;
+    if (clipboardText.length > 0) {
+      api
+        .post("deck-stats/user", {
+          userId: userId,
+        })
+        .then(async (res) => {
+          const data = res.data;
 
-        const newText = await getNewText(data, userId, clipboardText);
+          const newText = await getNewText(data, userId, clipboardText);
 
-        setHtmlContent(newText);
+          setHtmlContent(newText);
 
-        if (divRef.current.children.length > 1) {
-          for (let i = 0; i < divRef.current.children.length; i++) {
-            //map doesn't work
-            divRef.current.children[i].onclick = (e) =>
-              handleClick(e, divRef.current.children[i]);
+          if (divRef.current.children.length > 1) {
+            for (let i = 0; i < divRef.current.children.length; i++) {
+              //map doesn't work
+              divRef.current.children[i].onclick = (e) =>
+                handleClick(e, divRef.current.children[i]);
+            }
+          } else if (divRef.current.children.length > 0) {
+            divRef.current.children[0].onclick = (e) =>
+              handleClick(e, divRef.current.children[0]);
           }
-        } else if (divRef.current.children.length > 0) {
-          divRef.current.children[0].onclick = (e) =>
-            handleClick(e, divRef.current.children[0]);
-        }
-      });
+        });
+    }
   }, [clipboardText, handleClick, getNewText]);
 
   useEffect(() => {

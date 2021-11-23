@@ -122,14 +122,40 @@ export default function Preferences() {
       .post("users/user-info", {
         id: userId,
       })
-      .then((res) => {
+      .then(async (res) => {
         setLapseThreshold(res.data.lapseThreshold);
         setEnabled(res.data.removeLeeches);
         setNumberOfNewCards(res.data.numberOfNewCards);
 
+        await api
+          .get(`dictionaries/${res.data.activeDictionary}`)
+          .then((res) => {
+            console.log(res.data);
+            const aux = res.data.name.split(".");
+
+            const currentActiveDict = aux[0];
+
+            dictsState.map((item, i) => {
+              if (item == currentActiveDict) setSelectedDict(i);
+            });
+          });
+
+        await api
+          .get(`decks/${res.data.defaultDeckForGeneratedCards}`)
+          .then((res) => {
+            console.log(res.data);
+
+            const currentActiveDefaultDeck = res.data.name;
+
+            targetDecksState.map((item, i) => {
+              if (item.name == currentActiveDefaultDeck)
+                setSelectedTargetDeck(i);
+            });
+          });
+
         setIsDataLoaded(true);
       });
-  }, []);
+  }, [dictsState, targetDecksState]);
 
   function sendToServer() {
     const userId = verifyToken();
