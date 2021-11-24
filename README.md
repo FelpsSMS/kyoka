@@ -33,3 +33,7 @@ Kyoka is heavily inspired by [Anki](https://apps.ankiweb.net/), but aims to offe
 - [Tatoeba](https://tatoeba.org/) - Example sentences and word audio
 - [Free Dictionary API](https://dictionaryapi.dev/) - English definitions
 - [Libre Translate](https://translate.argosopentech.com/) - Machine translation
+
+# License
+
+[MIT](https://choosealicense.com/licenses/mit/)
