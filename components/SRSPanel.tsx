@@ -401,7 +401,7 @@ export default function SRSPanel() {
         //add new cards to the SRS up to a limit set by the user
         const cardsToBeAdded = sortedQueuedCards.slice(
           0,
-          userInfo.numberOfCards
+          userInfo.numberOfNewCards
         );
 
         setCardsToBeShowed(
