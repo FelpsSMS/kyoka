@@ -37,7 +37,7 @@ export default function HamburgerMenu() {
                             router.push(item.link);
                           }}
                         >
-                          {item.title}
+                          {item.title[router.locale]}
                         </button>
                       )}
                     </Menu.Item>
