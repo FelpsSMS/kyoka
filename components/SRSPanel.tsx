@@ -196,6 +196,11 @@ export default function SRSPanel() {
     //set session data
     let failedOnMatureCard = 0;
     let isMature = 0;
+    let isNew = 0;
+
+    if (cardStats.state === 0) {
+      isNew = 1;
+    }
 
     if (cardStats.mature) {
       failedOnMatureCard = 1;
@@ -209,6 +214,7 @@ export default function SRSPanel() {
         sessionInfo.numberOfFailsOnMatureCards + failedOnMatureCard,
       numberOfMatureCardsReviewed:
         sessionInfo.numberOfMatureCardsReviewed + isMature,
+      numberOfNewCardsReviewed: sessionInfo.numberOfNewCardsReviewed + isNew,
     });
 
     await checkSRS(cardStats, pass).then(() => {
@@ -219,6 +225,17 @@ export default function SRSPanel() {
   useEffect(() => {
     //get active decks for the specific user
     const userId = verifyToken();
+
+    const millisecondsInDay = 60 * 60 * 24 * 1000;
+
+    function getDiffInDays(a, b) {
+      // a and b are javascript Date objects
+      // Discard the time and time-zone information.
+      const utc1 = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate());
+      const utc2 = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate());
+
+      return Math.abs(Math.floor((utc2 - utc1) / millisecondsInDay));
+    }
 
     api
       .post("deck-stats/user", {
@@ -393,6 +410,30 @@ export default function SRSPanel() {
           (item: any) => item.cardStats.state === 3
         );
 
+        //relevant sessions for the day
+        const sessionsData = await api
+          .post("sessions/user-sessions", {
+            userId,
+          })
+          .then((res) => {
+            const sessions = res.data;
+
+            return sessions.map((session) => {
+              const currentDay = new Date();
+
+              const diffInDays = getDiffInDays(
+                currentDay,
+                new Date(session.endTime)
+              );
+
+              if (diffInDays === 0) return session;
+            });
+          });
+
+        const newCardsDone = sessionsData.reduce((acc, session) => {
+          return acc + session.numberOfNewCardsReviewed;
+        }, 0);
+
         //sort cards with state 0 from oldest to newest
         const sortedQueuedCards = queuedCards.sort((a: any, b: any) => {
           return a.cardStats.dueDate - b.cardStats.dueDate;
@@ -401,7 +442,7 @@ export default function SRSPanel() {
         //add new cards to the SRS up to a limit set by the user
         const cardsToBeAdded = sortedQueuedCards.slice(
           0,
-          userInfo.numberOfNewCards
+          userInfo.numberOfNewCards - newCardsDone
         );
 
         setCardsToBeShowed(

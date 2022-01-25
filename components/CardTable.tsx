@@ -44,7 +44,9 @@ export default function CardTable({ deckId, search, sorting, readOnly }) {
 
         if (search) {
           cardsInfo = cardsInfo.filter((item: any) => {
-            if (item.focus.toUpperCase().includes(search.toUpperCase())) {
+            if (
+              item.layoutInfo.focus.toUpperCase().includes(search.toUpperCase())
+            ) {
               return item;
             }
           });
@@ -56,8 +58,8 @@ export default function CardTable({ deckId, search, sorting, readOnly }) {
 
         if (sorting == 0) {
           cardsInfo.sort((a: any, b: any) => {
-            const titleA = a.focus.toUpperCase(); // ignore upper and lowercase
-            const titleB = b.focus.toUpperCase(); // ignore upper and lowercase
+            const titleA = a.layoutInfo.focus.toUpperCase(); // ignore upper and lowercase
+            const titleB = b.layoutInfo.focus.toUpperCase(); // ignore upper and lowercase
 
             if (titleA < titleB) {
               return -1;
