@@ -430,9 +430,15 @@ export default function SRSPanel() {
             });
           });
 
+        console.log(sessionsData);
+
         const newCardsDone = sessionsData.reduce((acc, session) => {
-          return acc + session.numberOfNewCardsReviewed;
+          if (session) return acc + session.numberOfNewCardsReviewed;
+
+          return acc;
         }, 0);
+
+        console.log(newCardsDone);
 
         //sort cards with state 0 from oldest to newest
         const sortedQueuedCards = queuedCards.sort((a: any, b: any) => {
