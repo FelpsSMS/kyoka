@@ -380,10 +380,22 @@ export default function SRSPanel() {
         );
 
         let cardDataForTheDay = cardData.filter((item: any) => {
-          const dueDay = new Date(item.cardStats.dueDate).getDate();
-          const currentDay = new Date().getDate();
+          const dueDate = new Date(item.cardStats.dueDate);
+          const currentDate = new Date();
 
-          return dueDay <= currentDay;
+          const utc1 = Date.UTC(
+            dueDate.getFullYear(),
+            dueDate.getMonth(),
+            dueDate.getDate()
+          );
+
+          const utc2 = Date.UTC(
+            currentDate.getFullYear(),
+            currentDate.getMonth(),
+            currentDate.getDate()
+          );
+
+          return utc1 <= utc2;
         });
 
         //if the user wishes to, remove leeches
@@ -430,15 +442,11 @@ export default function SRSPanel() {
             });
           });
 
-        console.log(sessionsData);
-
         const newCardsDone = sessionsData.reduce((acc, session) => {
           if (session) return acc + session.numberOfNewCardsReviewed;
 
           return acc;
         }, 0);
-
-        console.log(newCardsDone);
 
         //sort cards with state 0 from oldest to newest
         const sortedQueuedCards = queuedCards.sort((a: any, b: any) => {
